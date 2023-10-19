@@ -9,7 +9,7 @@ export default function Dealer({ params }: { params: { slug: string } }) {
 
   useEffect(() => {
     async function checkRoomExists() {
-      const res = await fetch(`http://127.0.0.1:8000/api/room-exists/${params.slug}`);
+      const res = await fetch(`${process.env.NEXT_PUBLIC_HTTP_URL}/api/room-exists/${params.slug}`);
       const data = await res.json();
 
       if (!data.exists) {
