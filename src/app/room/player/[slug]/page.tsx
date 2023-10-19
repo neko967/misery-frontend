@@ -17,9 +17,7 @@ export default function Player({ params }: {
       if (!data.exists) {
         router.push('/waiting_room');
       } else {
-        const websocket = new WebSocket(`ws://127.0.0.1:8000/ws/${params.slug}`);
-        /*元はこうだったけどよく分からんので一旦直書き
-        const websocket = new WebSocket(`${process.env.NEXT_PUBLIC_WEBSOCKET_URL}/${params.slug}`);*/
+        const websocket = new WebSocket(`${process.env.NEXT_PUBLIC_WEBSOCKET_URL}/${params.slug}`);
         setWs(websocket);
 
         websocket.onmessage = (event) => {
