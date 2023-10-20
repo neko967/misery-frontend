@@ -12,8 +12,8 @@ type pointerPosition = {
 export default function Player({ params }: { params: { slug: string },}) {
   const elements = 20;
   const keyImage = "/keyImage.png";
-  const keyPositions: number[][] = [[],[15,5],[6,5],[13,24]];  //[縦,横],鍵の番号と合わせるために0番目に空の配列を追加
-  const doorPositions: number[][] = [[],[12,7],[5,17],[14,23]]; //[縦,横],ドアの番号と合わせるために0番目に空の配列を追加
+  const keyPositions: number[][] = [[],[15,5],[6,5],[13,24]];  //[[空の配列],[key1縦,key1横],[key2縦,key2横],[key3縦,key3横]]
+  const doorPositions: number[][] = [[],[12,7],[5,17],[14,23]]; //[[空の配列],[door1縦,door1横],[door2縦,door2横],[door3縦,door3横]]
   const [windowSize, setWindowSize] = useState({ width: window.innerWidth, height: window.innerHeight });
   const cellSize = Math.min(windowSize.width, windowSize.height) / elements;
   const [ws, setWs] = useState<WebSocket | null>(null);
