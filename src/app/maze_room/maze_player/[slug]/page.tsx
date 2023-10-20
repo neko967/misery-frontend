@@ -12,12 +12,8 @@ type pointerPosition = {
 export default function Player({ params }: { params: { slug: string },}) {
   const elements = 20;
   const keyImage = "/keyImage.png";
-  const key1Position: number[] = [15,5];  //[縦,横]
-  const key2Position: number[] = [6,5];
-  const key3Position: number[] = [13,24];
-  const door1Position: number[] = [12,7];
-  const door2Position: number[] = [5,17];
-  const door3Position: number[] = [14,23];
+  const keyPositions: number[][] = [[],[15,5],[6,5],[13,24]];  //[縦,横],鍵の番号と合わせるために0番目に空の配列を追加
+  const doorPositions: number[][] = [[],[12,7],[5,17],[14,23]]; //[縦,横],ドアの番号と合わせるために0番目に空の配列を追加
   const [windowSize, setWindowSize] = useState({ width: window.innerWidth, height: window.innerHeight });
   const cellSize = Math.min(windowSize.width, windowSize.height) / elements;
   const [ws, setWs] = useState<WebSocket | null>(null);
@@ -76,13 +72,13 @@ export default function Player({ params }: { params: { slug: string },}) {
             return () => clearTimeout(timer);
           } else if (event.data == "getkey1") {
             setKeys(prev => ({ ...prev, key1: true }));
-            maze[door1Position[0]][door1Position[1]] = ' ';
+            maze[doorPositions[1][0]][doorPositions[1][1]] = ' ';
           } else if (event.data == "getkey2") {
             setKeys(prev => ({ ...prev, key2: true }));
-            maze[door2Position[0]][door2Position[1]] = ' ';
+            maze[doorPositions[2][0]][doorPositions[2][1]] = ' ';
           } else if (event.data == "getkey3") {
             setKeys(prev => ({ ...prev, key3: true }));
-            maze[door3Position[0]][door3Position[1]] = ' ';
+            maze[doorPositions[3][0]][doorPositions[3][1]] = ' ';
           }
         };
 
@@ -118,17 +114,17 @@ export default function Player({ params }: { params: { slug: string },}) {
     const y = Math.floor((e.clientY - rect.top) / cellSize);
 
     if (ws && ws.readyState === WebSocket.OPEN) {
-      if (maze[y][x] === '#' || (y == door1Position[0] && x == door1Position[1] && !keys.key1)
-                             || (y == door2Position[0] && x == door2Position[1] && !keys.key2)
-                             || (y == door3Position[0] && x == door3Position[1] && !keys.key3)) {
+      if (maze[y][x] === '#' || (y == doorPositions[1][0] && x == doorPositions[1][1] && !keys.key1)
+                             || (y == doorPositions[2][0] && x == doorPositions[2][1] && !keys.key2)
+                             || (y == doorPositions[3][0] && x == doorPositions[3][1] && !keys.key3)) {
         ws.send('gameover');
       } else if (maze[y][x] === 'G') {
         setIsGameClear(true);
-      } else if (y === key1Position[0] && x === key1Position[1] && maze[y][x] === 'K') {
+      } else if (y === keyPositions[1][0] && x === keyPositions[1][1] && maze[y][x] === 'K') {
         ws.send('getkey1');
-      } else if (y === key2Position[0] && x === key2Position[1] && maze[y][x] === 'K') {
+      } else if (y === keyPositions[2][0] && x === keyPositions[2][1] && maze[y][x] === 'K') {
         ws.send('getkey2');
-      } else if (y === key3Position[0] && x === key3Position[1] && maze[y][x] === 'K') {
+      } else if (y === keyPositions[3][0] && x === keyPositions[3][1] && maze[y][x] === 'K') {
         ws.send('getkey3');
       } else {
         setPlayerPosition({ x, y });
@@ -204,21 +200,21 @@ export default function Player({ params }: { params: { slug: string },}) {
                       cell === 'S' ? 'green' :
                       cell === 'G' ? 'red' :
                       cell === 'K' ? (
-                        rowIndex === key1Position[0] && cellIndex === key1Position[1] && keys.key1 ? 'white' :
-                        rowIndex === key2Position[0] && cellIndex === key2Position[1] && keys.key2 ? 'white' :
-                        rowIndex === key3Position[0] && cellIndex === key3Position[1] && keys.key3 ? 'white' : 'gold'
+                        rowIndex === keyPositions[1][0] && cellIndex === keyPositions[1][1]&& keys.key1 ? 'white' :
+                        rowIndex === keyPositions[2][0] && cellIndex === keyPositions[2][1] && keys.key2 ? 'white' :
+                        rowIndex === keyPositions[3][0] && cellIndex === keyPositions[3][1] && keys.key3 ? 'white' : 'gold'
                       ) :
                       cell === '*' ? (
-                        rowIndex === door1Position[0] && cellIndex === door1Position[1] && keys.key1 ? 'white' :
-                        rowIndex === door2Position[0] && cellIndex === door2Position[1] && keys.key2 ? 'white' :
-                        rowIndex === door3Position[0] && cellIndex === door3Position[1] && keys.key3 ? 'white' : 'silver'
+                        rowIndex === doorPositions[1][0] && cellIndex === doorPositions[1][1] && keys.key1 ? 'white' :
+                        rowIndex === doorPositions[2][0] && cellIndex === doorPositions[2][1] && keys.key2 ? 'white' :
+                        rowIndex === doorPositions[3][0] && cellIndex === doorPositions[3][1] && keys.key3 ? 'white' : 'silver'
                       ) :
                       'white',
                     cursor: `url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="5" height="5" viewBox="0 0 2 2"><circle cx="1" cy="1" r="1" fill="black" /></svg>') 1 1, auto`,
                 backgroundSize: 'cover',
-                backgroundImage: cell === 'K' ? rowIndex === key1Position[0] && cellIndex === key1Position[1] && !keys.key1 ? `url(${keyImage})` :
-                                                rowIndex === key2Position[0] && cellIndex === key2Position[1] && !keys.key2 ? `url(${keyImage})` :
-                                                rowIndex === key3Position[0] && cellIndex === key3Position[1] && !keys.key3 ? `url(${keyImage})` : undefined
+                backgroundImage: cell === 'K' ? rowIndex === keyPositions[1][0] && cellIndex === keyPositions[1][1] && !keys.key1 ? `url(${keyImage})` :
+                                                rowIndex === keyPositions[2][0] && cellIndex === keyPositions[2][1] && !keys.key2 ? `url(${keyImage})` :
+                                                rowIndex === keyPositions[3][0] && cellIndex === keyPositions[3][1] && !keys.key3 ? `url(${keyImage})` : undefined
                                               : undefined
                 }}
               ></div>
