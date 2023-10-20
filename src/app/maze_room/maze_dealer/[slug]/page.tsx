@@ -59,9 +59,7 @@ export default function Dealer({ params }: { params: { slug: string } }) {
       if (!data.exists) {
         router.push('/maze_waiting_room');
       } else {
-        const currentHost = window.location.host; // 例: localhost:3000
-        const wsHost = currentHost.replace('3000', '8000');
-        const websocketUrl = `ws://${wsHost}/ws/${params.slug}`;
+        const websocketUrl = `${process.env.MYSELF_WEBSOCKET_URL}/${params.slug}`;
         const websocket = new WebSocket(websocketUrl);
         setWs(websocket);
 
