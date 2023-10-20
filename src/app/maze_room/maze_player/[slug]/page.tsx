@@ -179,7 +179,7 @@ export default function Player({ params }: { params: { slug: string },}) {
         <div
         style={{
             display: 'grid',
-            gridTemplateColumns: `repeat(25, ${cellSize}px)`,
+            gridTemplateColumns: `repeat(${maze[0].length}, ${cellSize}px)`,
             cursor: 'none',
             gridGap: '0px',
             width: '100%',
@@ -210,8 +210,8 @@ export default function Player({ params }: { params: { slug: string },}) {
                       ) :
                       cell === '*' ? (
                         rowIndex === door1Position[0] && cellIndex === door1Position[1] && keys.key1 ? 'white' :
-                        rowIndex === door2Position[0] && cellIndex === door2Position[0] && keys.key2 ? 'white' :
-                        rowIndex === door3Position[0] && cellIndex === door3Position[0] && keys.key3 ? 'white' : 'silver'
+                        rowIndex === door2Position[0] && cellIndex === door2Position[1] && keys.key2 ? 'white' :
+                        rowIndex === door3Position[0] && cellIndex === door3Position[1] && keys.key3 ? 'white' : 'silver'
                       ) :
                       'white',
                     cursor: `url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="5" height="5" viewBox="0 0 2 2"><circle cx="1" cy="1" r="1" fill="black" /></svg>') 1 1, auto`,
