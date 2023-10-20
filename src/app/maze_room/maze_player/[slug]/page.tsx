@@ -4,7 +4,7 @@ import { useRouter } from 'next/navigation';
 import Image from "next/image";
 import localImage from "../../../../../public/horror_image.png";
 
-type Position = {
+type pointerPosition = {
   x: number;
   y: number;
 };
@@ -12,11 +12,17 @@ type Position = {
 export default function Player({ params }: { params: { slug: string },}) {
   const elements = 20;
   const keyImage = "/keyImage.png";
+  const key1Position: number[] = [15,5];  //[縦,横]
+  const key2Position: number[] = [6,5];
+  const key3Position: number[] = [13,24];
+  const door1Position: number[] = [12,7];
+  const door2Position: number[] = [5,17];
+  const door3Position: number[] = [14,23];
   const [windowSize, setWindowSize] = useState({ width: window.innerWidth, height: window.innerHeight });
   const cellSize = Math.min(windowSize.width, windowSize.height) / elements;
   const [ws, setWs] = useState<WebSocket | null>(null);
   const router = useRouter();
-  const [playerPosition, setPlayerPosition] = useState<Position>({ x: 0, y: 0 });
+  const [playerPosition, setPlayerPosition] = useState<pointerPosition>({ x: 0, y: 0 });
   const [isGameOver, setIsGameOver] = useState(false);
   const [resetButton, setResetButton] = useState(false);
   const [isGameClear, setIsGameClear] = useState(false);
@@ -70,13 +76,13 @@ export default function Player({ params }: { params: { slug: string },}) {
             return () => clearTimeout(timer);
           } else if (event.data == "getkey1") {
             setKeys(prev => ({ ...prev, key1: true }));
-            maze[12][7] = ' ';
+            maze[door1Position[0]][door1Position[1]] = ' ';
           } else if (event.data == "getkey2") {
             setKeys(prev => ({ ...prev, key2: true }));
-            maze[5][17] = ' ';
+            maze[door2Position[0]][door2Position[1]] = ' ';
           } else if (event.data == "getkey3") {
             setKeys(prev => ({ ...prev, key3: true }));
-            maze[14][23] = ' ';
+            maze[door3Position[0]][door3Position[1]] = ' ';
           }
         };
 
@@ -112,15 +118,17 @@ export default function Player({ params }: { params: { slug: string },}) {
     const y = Math.floor((e.clientY - rect.top) / cellSize);
 
     if (ws && ws.readyState === WebSocket.OPEN) {
-      if (maze[y][x] === '#' || (maze[y][x] === '*' && !keys) ) {
+      if (maze[y][x] === '#' || (y == door1Position[0] && x == door1Position[1] && !keys.key1)
+                             || (y == door2Position[0] && x == door2Position[1] && !keys.key2)
+                             || (y == door3Position[0] && x == door3Position[1] && !keys.key3)) {
         ws.send('gameover');
       } else if (maze[y][x] === 'G') {
         setIsGameClear(true);
-      } else if (y === 15 && x === 5 && maze[y][x] === 'K') {
+      } else if (y === key1Position[0] && x === key1Position[1] && maze[y][x] === 'K') {
         ws.send('getkey1');
-      } else if (y === 6 && x === 5 && maze[y][x] === 'K') {
+      } else if (y === key2Position[0] && x === key2Position[1] && maze[y][x] === 'K') {
         ws.send('getkey2');
-      } else if (y === 13 && x === 24 && maze[y][x] === 'K') {
+      } else if (y === key3Position[0] && x === key3Position[1] && maze[y][x] === 'K') {
         ws.send('getkey3');
       } else {
         setPlayerPosition({ x, y });
@@ -129,7 +137,7 @@ export default function Player({ params }: { params: { slug: string },}) {
   };
 
   const maze = [
-    ['S', ' ', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', ' ', ' ', ' ', ' ', ' ', ' ', '#', '#', '#', '#'],
+    ['S', 'S', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', ' ', ' ', ' ', ' ', ' ', ' ', '#', '#', '#', '#'],
     ['#', ' ', '#', ' ', ' ', ' ', '#', ' ', ' ', ' ', ' ', ' ', '#', ' ', ' ', ' ', '#', '#', '#', '#', ' ', ' ', ' ', '#', '#'],
     ['#', ' ', '#', ' ', '#', ' ', '#', ' ', '#', '#', '#', ' ', '#', ' ', '#', '#', '#', '#', '#', '#', '#', '#', ' ', '#', '#'],
     ['#', ' ', ' ', ' ', '#', ' ', '#', ' ', '#', '#', '#', ' ', ' ', ' ', '#', '#', '#', '#', '#', '#', '#', '#', ' ', '#', '#'],
@@ -146,16 +154,13 @@ export default function Player({ params }: { params: { slug: string },}) {
     ['#', ' ', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '*', '#'],
     ['#', ' ', ' ', ' ', ' ', 'K', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', 'G', '#'],
     ['#', ' ', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#'],
-    ['#', ' ', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '*', '#'],
-    ['#', ' ', ' ', ' ', ' ', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', 'G', '#'],
+    ['#', ' ', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#'],
+    ['#', ' ', ' ', ' ', ' ', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#'],
     ['#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#'],
   ];
 
   return (
     <main>
-      <p>player_a_meiro</p>
-      <p>X: {playerPosition.x}, Y: {playerPosition.y}</p>
-
       {!isGameStarted ? (
         // ゲームが開始されていない場合、スタートボタンを表示
         <button onClick={() => setIsGameStarted(true)}>スタート</button>
@@ -199,21 +204,21 @@ export default function Player({ params }: { params: { slug: string },}) {
                       cell === 'S' ? 'green' :
                       cell === 'G' ? 'red' :
                       cell === 'K' ? (
-                        rowIndex === 15 && cellIndex === 5 && keys.key1 ? 'white' :
-                        rowIndex === 6 && cellIndex === 5 && keys.key2 ? 'white' :
-                        rowIndex === 13 && cellIndex === 24 && keys.key3 ? 'white' : 'gold'
+                        rowIndex === key1Position[0] && cellIndex === key1Position[1] && keys.key1 ? 'white' :
+                        rowIndex === key2Position[0] && cellIndex === key2Position[1] && keys.key2 ? 'white' :
+                        rowIndex === key3Position[0] && cellIndex === key3Position[1] && keys.key3 ? 'white' : 'gold'
                       ) :
                       cell === '*' ? (
-                        rowIndex === 12 && cellIndex === 7 && keys.key1 ? 'white' :
-                        rowIndex === 5 && cellIndex === 17 && keys.key2 ? 'white' :
-                        rowIndex === 14 && cellIndex === 23 && keys.key3 ? 'white' : 'silver'
+                        rowIndex === door1Position[0] && cellIndex === door1Position[1] && keys.key1 ? 'white' :
+                        rowIndex === door2Position[0] && cellIndex === door2Position[0] && keys.key2 ? 'white' :
+                        rowIndex === door3Position[0] && cellIndex === door3Position[0] && keys.key3 ? 'white' : 'silver'
                       ) :
                       'white',
                     cursor: `url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="5" height="5" viewBox="0 0 2 2"><circle cx="1" cy="1" r="1" fill="black" /></svg>') 1 1, auto`,
                 backgroundSize: 'cover',
-                backgroundImage: cell === 'K' ? rowIndex === 15 && cellIndex === 5 && !keys.key1 ? `url(${keyImage})` :
-                                                rowIndex === 6 && cellIndex === 5 && !keys.key2 ? `url(${keyImage})` :
-                                                rowIndex === 13 && cellIndex === 24 && !keys.key3 ? `url(${keyImage})` : undefined
+                backgroundImage: cell === 'K' ? rowIndex === key1Position[0] && cellIndex === key1Position[1] && !keys.key1 ? `url(${keyImage})` :
+                                                rowIndex === key2Position[0] && cellIndex === key2Position[1] && !keys.key2 ? `url(${keyImage})` :
+                                                rowIndex === key3Position[0] && cellIndex === key3Position[1] && !keys.key3 ? `url(${keyImage})` : undefined
                                               : undefined
                 }}
               ></div>
