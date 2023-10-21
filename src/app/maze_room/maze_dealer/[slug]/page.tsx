@@ -53,15 +53,13 @@ export default function Dealer({ params }: { params: { slug: string } }) {
 
   useEffect(() => {
     async function checkRoomExists() {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_HTTP_URL}/api/room-exists/${params.slug}`);
+      const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_HTTP_URL}/api/room-exists/${params.slug}`);
       const data = await res.json();
 
       if (!data.exists) {
         router.push('/maze_waiting_room');
       } else {
-        const currentHost = window.location.host; // 例: localhost:3000
-        const wsHost = currentHost.replace('3000', '8000');
-        const websocketUrl = `ws://${wsHost}/ws/${params.slug}`;
+        const websocketUrl = `${process.env.NEXT_PUBLIC_BACKEND_WEBSOCKET_URL}/${params.slug}`;
         const websocket = new WebSocket(websocketUrl);
         setWs(websocket);
 
