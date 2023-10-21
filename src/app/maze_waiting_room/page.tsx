@@ -15,7 +15,7 @@ export default function Home() {
   async function createRoom() {
     const name = prompt("Enter room name");
     const password = prompt("Enter room password");
-    const response = await fetch(`${process.env.NEXT_PUBLIC_HTTP_URL}/api/create-room/`, {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_HTTP_URL}/api/create-room/`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ name, password }),
@@ -32,7 +32,7 @@ export default function Home() {
 
   async function joinRoom(id: number) {
     const password = prompt("パスワードを入力してください");
-    const response = await fetch(`${process.env.NEXT_PUBLIC_HTTP_URL}/api/join-room/${id}`, {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_HTTP_URL}/api/join-room/${id}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ password }),
@@ -49,7 +49,7 @@ export default function Home() {
 
   useEffect(() => {
     async function fetchRooms() {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_HTTP_URL}/api/list-rooms/`);
+      const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_HTTP_URL}/api/list-rooms/`);
       if (!response.ok) {
         console.error('Failed to fetch rooms:', response.statusText);
         return;
