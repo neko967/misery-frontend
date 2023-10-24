@@ -24,7 +24,7 @@ export default function Home() {
     setRooms([...rooms, newRoom]);
 
     if (newRoom.name) {
-      router.push(`/maze_room/maze_dealer/${newRoom.name}`);
+      router.push(`/maze/clean/${newRoom.name}`);
     } else {
       console.error('Failed to get the room id from the response');
     }
@@ -41,7 +41,7 @@ export default function Home() {
       const data = await response.json();
       const roomName = data.name;
       alert("Successfully joined the room");
-      router.push(`/maze_room/maze_player/${roomName}`);
+      router.push(`/maze/dirty/${roomName}`);
     } else {
       alert("Failed to join the room");
     }
