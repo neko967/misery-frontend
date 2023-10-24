@@ -11,12 +11,12 @@ type pointerPosition = {
 };
 
 export default function Dealer({ params }: { params: { slug: string } }) {
+  const elements = 20;
   const doorImage = "/door.png";
   const brickImage = "/brick.png";
-  const elements = 20;
   const keyImage = "/keyImage.png";
-  const keyPositions: number[][] = [[],[8,14],[9,7],[18,5]];  //[[空の配列],[key1縦,key1横],[key2縦,key2横],[key3縦,key3横]]
-  const doorPositions: number[][] = [[],[4,23],[5,12],[2,1]]; //[[空の配列],[door1縦,door1横],[door2縦,door2横],[door3縦,door3横]]
+  const keyPositions: number[][] = [[],[18,5],[6,3],[3,24]];  //[[空の配列],[key1縦,key1横],[key2縦,key2横],[key3縦,key3横]]
+  const doorPositions: number[][] = [[],[8,1],[10,13],[2,23]]; //[[空の配列],[door1縦,door1横],[door2縦,door2横],[door3縦,door3横]]
   const [windowSize, setWindowSize] = useState({ width: window.innerWidth, height: window.innerHeight });
   const cellSize = Math.min(windowSize.width, windowSize.height) / elements;
   const [ws, setWs] = useState<WebSocket | null>(null);
@@ -43,7 +43,6 @@ export default function Dealer({ params }: { params: { slug: string } }) {
   }, []);
 
   useEffect(() => {
-    // Move cursor to the starting position
     const startPosition = document.querySelector('[data-start]');
     if (startPosition) {
       startPosition.dispatchEvent(new MouseEvent('mousemove', {
@@ -60,7 +59,7 @@ export default function Dealer({ params }: { params: { slug: string } }) {
       const data = await res.json();
 
       if (!data.exists) {
-        router.push('/maze_waiting_room');
+        router.push('/waiting_room');
       } else {
         const websocketUrl = `${process.env.NEXT_PUBLIC_BACKEND_WEBSOCKET_URL}/${params.slug}`;
         const websocket = new WebSocket(websocketUrl);
@@ -138,24 +137,24 @@ export default function Dealer({ params }: { params: { slug: string } }) {
 
   const maze = [
     ['#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#'],
-    ['#', 'G', '#', '#', '#', '#', '#', '#', '#', '#', '#', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '#', '#', '#'],
-    ['#', '*', '#', '#', '#', '#', '#', '#', '#', '#', '#', ' ', '#', '#', '#', '#', '#', ' ', '#', '#', '#', ' ', '#', '#', '#'],
-    ['#', ' ', '#', '#', '#', '#', '#', '#', '#', ' ', ' ', ' ', '#', '#', ' ', ' ', ' ', ' ', '#', '#', '#', ' ', ' ', ' ', '#'],
-    ['#', ' ', ' ', ' ', ' ', ' ', '#', '#', '#', ' ', '#', '#', '#', '#', ' ', '#', '#', '#', '#', '#', '#', '#', '#', '*', '#'],
-    ['#', '#', '#', '#', '#', ' ', '#', '#', '#', ' ', '#', '#', '*', ' ', ' ', '#', '#', '#', '#', '#', '#', ' ', ' ', ' ', '#'],
-    ['#', ' ', ' ', ' ', ' ', ' ', '#', ' ', ' ', ' ', '#', '#', ' ', '#', '#', '#', '#', '#', '#', '#', '#', ' ', '#', '#', '#'],
-    ['#', ' ', '#', '#', '#', '#', '#', ' ', '#', '#', '#', '#', ' ', '#', '#', '#', '#', ' ', ' ', ' ', ' ', ' ', '#', '#', '#'],
-    ['#', ' ', '#', '#', '#', '#', '#', ' ', '#', ' ', ' ', ' ', ' ', '#', 'K', '#', '#', ' ', '#', '#', '#', '#', '#', '#', '#'],
-    ['#', ' ', '#', ' ', ' ', ' ', '#', '#', '#', ' ', '#', '#', '#', '#', ' ', '#', '#', ' ', ' ', ' ', ' ', ' ', '#', '#', '#'],
-    ['#', ' ', '#', ' ', '#', ' ', '#', '#', '#', ' ', ' ', ' ', ' ', '#', ' ', '#', '#', '#', '#', '#', '#', ' ', '#', '#', '#'],
-    ['#', ' ', '#', ' ', '#', ' ', '#', '#', '#', '#', '#', '#', ' ', '#', ' ', '#', '#', ' ', ' ', ' ', ' ', ' ', '#', '#', '#'],
-    ['#', ' ', '#', ' ', '#', ' ', ' ', ' ', '#', '#', ' ', ' ', ' ', '#', ' ', ' ', '#', ' ', '#', '#', '#', '#', '#', '#', '#'],
-    ['#', ' ', ' ', ' ', '#', '#', '#', ' ', '#', '#', ' ', '#', '#', '#', '#', ' ', '#', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '#'],
-    ['#', ' ', '#', '#', '#', '#', '#', ' ', '#', ' ', ' ', '#', '#', '#', '#', ' ', '#', '#', '#', '#', '#', '#', '#', ' ', '#'],
-    ['#', ' ', '#', '#', '#', '#', '#', ' ', '#', ' ', '#', '#', '#', ' ', ' ', ' ', ' ', ' ', '#', '#', '#', '#', '#', ' ', '#'],
+    ['#', '#', '#', ' ', ' ', ' ', '#', '#', '#', '#', '#', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '#', 'G', '#'],
+    ['#', '#', '#', ' ', '#', ' ', '#', '#', '#', '#', '#', ' ', '#', '#', '#', '#', '#', '#', '#', '#', '#', ' ', '#', '*', '#'],
+    ['#', ' ', ' ', ' ', '#', ' ', '#', '#', '#', ' ', ' ', ' ', '#', '#', ' ', ' ', ' ', ' ', '#', ' ', ' ', ' ', '#', ' ', '#'],
+    ['#', ' ', '#', '#', '#', ' ', ' ', '#', '#', ' ', '#', '#', '#', '#', ' ', '#', '#', ' ', '#', ' ', '#', '#', '#', ' ', '#'],
+    ['#', ' ', '#', '#', '#', '#', ' ', '#', '#', ' ', '#', '#', ' ', ' ', ' ', '#', '#', ' ', ' ', ' ', '#', ' ', ' ', ' ', '#'],
+    ['#', ' ', '#', 'K', ' ', ' ', ' ', ' ', ' ', ' ', '#', '#', ' ', '#', '#', '#', '#', '#', '#', '#', '#', ' ', '#', '#', '#'],
+    ['#', ' ', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', ' ', '#', '#', '#', '#', ' ', ' ', ' ', ' ', ' ', '#', '#', '#'],
+    ['#', '*', '#', '#', '#', '#', '#', '#', '#', ' ', ' ', ' ', ' ', '#', '#', '#', '#', ' ', '#', '#', '#', '#', '#', '#', '#'],
+    ['#', ' ', '#', ' ', ' ', ' ', '#', '#', '#', ' ', '#', '#', '#', '#', '#', '#', '#', ' ', ' ', ' ', ' ', ' ', '#', '#', '#'],
+    ['#', ' ', '#', ' ', '#', ' ', '#', '#', '#', ' ', ' ', ' ', ' ', '*', ' ', ' ', '#', '#', '#', '#', '#', ' ', '#', '#', '#'],
+    ['#', ' ', '#', ' ', '#', ' ', '#', '#', '#', '#', '#', '#', '#', '#', '#', ' ', '#', ' ', ' ', ' ', ' ', ' ', '#', '#', '#'],
+    ['#', ' ', '#', ' ', '#', ' ', ' ', ' ', '#', '#', ' ', ' ', ' ', ' ', '#', ' ', '#', ' ', '#', '#', '#', '#', '#', '#', '#'],
+    ['#', ' ', ' ', ' ', '#', '#', '#', ' ', '#', '#', ' ', '#', '#', ' ', '#', ' ', '#', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '#'],
+    ['#', ' ', '#', '#', '#', '#', '#', ' ', '#', ' ', ' ', '#', '#', ' ', '#', ' ', '#', '#', '#', '#', '#', '#', '#', ' ', '#'],
+    ['#', ' ', '#', '#', '#', '#', '#', ' ', '#', ' ', '#', '#', '#', ' ', '#', ' ', ' ', ' ', '#', '#', '#', '#', '#', ' ', '#'],
     ['#', ' ', '#', '#', '#', '#', '#', ' ', ' ', ' ', '#', '#', '#', ' ', '#', '#', '#', ' ', '#', '#', '#', '#', '#', ' ', '#'],
     ['#', ' ', '#', '#', '#', '#', '#', '#', '#', '#', '#', 'S', 'S', 'S', 'S', 'S', '#', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '#'],
-    ['#', ' ', ' ', ' ', ' ', 'K', '#', '#', '#', '#', '#', 'S', 'S', 'S', 'S', 'S', '#', '#', '#', '#', '#', '#', '#', '#', '#'],
+    ['#', ' ', ' ', ' ', ' ', '#', '#', '#', '#', '#', '#', 'S', 'S', 'S', 'S', 'S', '#', '#', '#', '#', '#', '#', '#', '#', '#'],
     ['#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#'],
   ];
 
@@ -181,10 +180,12 @@ export default function Dealer({ params }: { params: { slug: string } }) {
           }
         </div>
       ) : isGameClear ? (
-        <><div style={{ fontSize: '24px', color: 'green' }}>ゲームクリア</div>
-            <Link href="/prologue/host" className="absolute top-1/4 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-red-600 p-5 rounded-lg shadow-lg">
-        <button>エンディングへ</button>
-      </Link></>
+        <>
+          <div style={{ fontSize: '24px', color: 'green' }}>ゲームクリア</div>
+          <Link href="/prologue/host" className="absolute top-1/4 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-red-600 p-5 rounded-lg shadow-lg">
+            <button>エンディングへ</button>
+          </Link>
+        </>
       ) : (
         <div
           style={{
@@ -213,28 +214,22 @@ export default function Dealer({ params }: { params: { slug: string } }) {
                         cell === '#' ? 'black' :
                         cell === 'S' ? 'green' :
                         cell === 'G' ? 'red' :
+                        'white',
+                    cursor: `url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="5" height="5" viewBox="0 0 2 2"><circle cx="1" cy="1" r="1" fill="black" /></svg>') 1 1, auto`,
+                    backgroundSize: 'cover',
+                    backgroundImage: 
+                        cell === '#' ? `url(${brickImage})` :
                         cell === 'K' ? (
-                          rowIndex === keyPositions[1][0] && cellIndex === keyPositions[1][1]&& keys.key1 ? 'white' :
-                          rowIndex === keyPositions[2][0] && cellIndex === keyPositions[2][1] && keys.key2 ? 'white' :
-                          rowIndex === keyPositions[3][0] && cellIndex === keyPositions[3][1] && keys.key3 ? 'white' : 'gold'
+                          rowIndex === keyPositions[1][0] && cellIndex === keyPositions[1][1] && !keys.key1 ? `url(${keyImage})` :
+                          rowIndex === keyPositions[2][0] && cellIndex === keyPositions[2][1] && !keys.key2 ? `url(${keyImage})` :
+                          rowIndex === keyPositions[3][0] && cellIndex === keyPositions[3][1] && !keys.key3 ? `url(${keyImage})` : undefined
                         ) :
                         cell === '*' ? (
-                          rowIndex === doorPositions[1][0] && cellIndex === doorPositions[1][1] && keys.key1 ? 'white' :
-                          rowIndex === doorPositions[2][0] && cellIndex === doorPositions[2][1] && keys.key2 ? 'white' :
-                          rowIndex === doorPositions[3][0] && cellIndex === doorPositions[3][1] && keys.key3 ? 'white' : 'silver'
-                        ) :
-                        'white',
-                      cursor: `url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="5" height="5" viewBox="0 0 2 2"><circle cx="1" cy="1" r="1" fill="black" /></svg>') 1 1, auto`,
-                      backgroundSize: 'cover',
-                      backgroundImage: cell === 'K' ? rowIndex === keyPositions[1][0] && cellIndex === keyPositions[1][1] && !keys.key1 ? `url(${keyImage})` :
-                                                      rowIndex === keyPositions[2][0] && cellIndex === keyPositions[2][1] && !keys.key2 ? `url(${keyImage})` :
-                                                      rowIndex === keyPositions[3][0] && cellIndex === keyPositions[3][1] && !keys.key3 ? `url(${keyImage})` : undefined
-                                                      : cell === '#' ? `url(${brickImage})`
-                                                      : cell === '*' ? `url(${doorImage})`
-                                                    : undefined
-                                                   
-                                                   
-                                                   
+                          rowIndex === doorPositions[1][0] && cellIndex === doorPositions[1][1] && !keys.key1 ? `url(${doorImage})` :
+                          rowIndex === doorPositions[2][0] && cellIndex === doorPositions[2][1] && !keys.key2 ? `url(${doorImage})` :
+                          rowIndex === doorPositions[3][0] && cellIndex === doorPositions[3][1] && !keys.key3 ? `url(${doorImage})` : undefined
+                        ) : 
+                        undefined,                          
                 }}
               ></div>
             ))
