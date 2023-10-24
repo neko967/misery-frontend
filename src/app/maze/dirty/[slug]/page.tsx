@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from "next/image";
 import localImage from "../../../../../public/horror_image.png";
+import Link from 'next/link';
 
 type pointerPosition = {
   x: number;
@@ -93,7 +94,7 @@ export default function Dealer({ params }: { params: { slug: string } }) {
   }, [params.slug]);
 
   const playGameOverSound = () => {
-    const sound = new Audio("/horror_sound.wav");
+    //const sound = new Audio("/horror_sound.wav");
     sound.play();
   };
 
@@ -178,7 +179,10 @@ export default function Dealer({ params }: { params: { slug: string } }) {
           }
         </div>
       ) : isGameClear ? (
-        <div style={{ fontSize: '24px', color: 'green' }}>ゲームクリア</div>
+        <><div style={{ fontSize: '24px', color: 'green' }}>ゲームクリア</div>
+            <Link href="/prologue/host" className="absolute top-1/4 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-red-600 p-5 rounded-lg shadow-lg">
+        <button>エンディングへ</button>
+      </Link></>
       ) : (
         <div
           style={{
