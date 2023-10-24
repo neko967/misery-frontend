@@ -11,6 +11,8 @@ type pointerPosition = {
 };
 
 export default function Dealer({ params }: { params: { slug: string } }) {
+  const doorImage = "/door.png";
+  const brickImage = "/brick.png";
   const elements = 20;
   const keyImage = "/keyImage.png";
   const keyPositions: number[][] = [[],[8,14],[9,7],[18,5]];  //[[空の配列],[key1縦,key1横],[key2縦,key2横],[key3縦,key3横]]
@@ -67,7 +69,7 @@ export default function Dealer({ params }: { params: { slug: string } }) {
         websocket.onmessage = (event) => {
           if (event.data == "gameover") {
             setIsGameOver(true);
-            playGameOverSound();
+            //playGameOverSound();
             const timer = setTimeout(() => {
               setResetButton(true);
             }, 3000);
@@ -227,7 +229,12 @@ export default function Dealer({ params }: { params: { slug: string } }) {
                       backgroundImage: cell === 'K' ? rowIndex === keyPositions[1][0] && cellIndex === keyPositions[1][1] && !keys.key1 ? `url(${keyImage})` :
                                                       rowIndex === keyPositions[2][0] && cellIndex === keyPositions[2][1] && !keys.key2 ? `url(${keyImage})` :
                                                       rowIndex === keyPositions[3][0] && cellIndex === keyPositions[3][1] && !keys.key3 ? `url(${keyImage})` : undefined
+                                                      : cell === '#' ? `url(${brickImage})`
+                                                      : cell === '*' ? `url(${doorImage})`
                                                     : undefined
+                                                   
+                                                   
+                                                   
                 }}
               ></div>
             ))
