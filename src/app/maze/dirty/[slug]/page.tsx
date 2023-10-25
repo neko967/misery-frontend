@@ -31,6 +31,10 @@ export default function Dealer({ params }: { params: { slug: string } }) {
     key2: false,
     key3: false
   });
+  const wallPositions: number[][] = [[16,13]]; // 出現・消失する壁
+  // const [wallPositions, setWallPositions] = useState<number[][]>([[16, 13]]);
+  // 壁の表示/非表示を管理するstateを追加
+  const [showWall, setShowWall] = useState(false);
 
   useEffect(() => {
     const handleResize = () => {
@@ -103,6 +107,7 @@ export default function Dealer({ params }: { params: { slug: string } }) {
     setIsGameOver(false);
     setResetButton(false);
     setIsGameStarted(false);
+    setShowWall(false);
     setKeys({
       key1: false,
       key2: false,
@@ -110,6 +115,15 @@ export default function Dealer({ params }: { params: { slug: string } }) {
     });
     // 他に初期化するべきステートや変数があればこちらに追加
   };
+
+    // 壁を2秒間隔で出現・消失
+    useEffect(() => {
+      const interval = setInterval(() => {
+        setShowWall(prev => !prev); 
+      }, 2000);
+    
+      return () => clearInterval(interval);
+    }, []);
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     const rect = e.currentTarget.getBoundingClientRect();
@@ -119,7 +133,8 @@ export default function Dealer({ params }: { params: { slug: string } }) {
     if (ws && ws.readyState === WebSocket.OPEN) {
       if (maze[y][x] === '#' || (y == doorPositions[1][0] && x == doorPositions[1][1] && !keys.key1)
                              || (y == doorPositions[2][0] && x == doorPositions[2][1] && !keys.key2)
-                             || (y == doorPositions[3][0] && x == doorPositions[3][1] && !keys.key3)) {
+                             || (y == doorPositions[3][0] && x == doorPositions[3][1] && !keys.key3)
+                             || (maze[y][x] === 'W' && showWall)) {
         ws.send('gameover');
       } else if (maze[y][x] === 'G') {
         setIsGameClear(true);
@@ -157,6 +172,10 @@ export default function Dealer({ params }: { params: { slug: string } }) {
     ['#', ' ', ' ', ' ', ' ', '#', '#', '#', '#', '#', '#', 'S', 'S', 'S', 'S', 'S', '#', '#', '#', '#', '#', '#', '#', '#', '#'],
     ['#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#'],
   ];
+
+  wallPositions.forEach(([x, y]) => {
+    maze[x][y] = 'W';
+  });
 
   return (
     <main>
@@ -214,6 +233,7 @@ export default function Dealer({ params }: { params: { slug: string } }) {
                         cell === '#' ? 'black' :
                         cell === 'S' ? 'green' :
                         cell === 'G' ? 'red' :
+                        cell === 'W' ? (showWall ? 'pink' : 'white') :
                         'white',
                     cursor: `url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="5" height="5" viewBox="0 0 2 2"><circle cx="1" cy="1" r="1" fill="black" /></svg>') 1 1, auto`,
                     backgroundSize: 'cover',
