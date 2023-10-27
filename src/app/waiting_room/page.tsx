@@ -65,7 +65,6 @@ export default function Home() {
     fetchRooms();
   }, []);
 
-
   return (
     <div>
       <button onClick={createRoom}>部屋を作成する？</button>

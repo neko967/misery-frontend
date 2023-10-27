@@ -26,11 +26,7 @@ export default function Dealer({ params }: { params: { slug: string } }) {
   const [resetButton, setResetButton] = useState(false);
   const [isGameClear, setIsGameClear] = useState(false);
   const [isGameStarted, setIsGameStarted] = useState(false);
-  const [keys, setKeys] = useState({
-    key1: false,
-    key2: false,
-    key3: false
-  });
+  const [keys, setKeys] = useState({ key1: false, key2: false, key3: false });
   const wallPositions: number[][] = [[16,13]]; // 出現・消失する壁
   // const [wallPositions, setWallPositions] = useState<number[][]>([[16, 13]]);
   // 壁の表示/非表示を管理するstateを追加
@@ -177,6 +173,10 @@ export default function Dealer({ params }: { params: { slug: string } }) {
     maze[x][y] = 'W';
   });
 
+  async function goEndingDirty() {
+    router.push(`/ending/dirty/${params.slug}`);
+  }
+
   return (
     <main>
       {!isGameStarted ? (
@@ -201,9 +201,10 @@ export default function Dealer({ params }: { params: { slug: string } }) {
       ) : isGameClear ? (
         <>
           <div style={{ fontSize: '24px', color: 'green' }}>ゲームクリア</div>
-          <Link href="/prologue/host" className="absolute top-1/4 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-red-600 p-5 rounded-lg shadow-lg">
-            <button>エンディングへ</button>
-          </Link>
+          <button onClick={goEndingDirty}
+                  className="absolute top-1/4 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-red-600 p-5 rounded-lg shadow-lg">
+            エンディングへ
+          </button>
         </>
       ) : (
         <div
