@@ -43,12 +43,27 @@ export default function Home({ params }: { params: { slug: string } }) {
       ws.send('goPrologue');
     }
   }
+  async function goMysteryClean() {
+    router.push(`/mystery/clean/${params.slug}`);
+  }
+
+  async function goMysteryDirty() {
+    router.push(`/mystery/dirty/${params.slug}`);
+  }
 
   return (
     <div
       className="h-screen w-full bg-cover"
       style={{ backgroundImage: "url('/background.png')" }}
     >
+      <button onClick={goMysteryClean}
+              className="absolute top-3/4 left-1/3 transform -translate-x-1/2 -translate-y-1/2 bg-red-600 p-5 rounded-lg shadow-lg">
+        謎解き 綺麗な部屋に行く（作業用）
+      </button>
+      <button onClick={goMysteryDirty}
+              className="absolute top-3/4 left-2/3 transform -translate-x-1/2 -translate-y-1/2 bg-red-600 p-5 rounded-lg shadow-lg">
+        謎解き さびれた部屋に行く（作業用）
+      </button>
       {readyToPrologue &&
         <button onClick={goPrologue}
                 className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-red-600 p-5 rounded-lg shadow-lg">
