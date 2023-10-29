@@ -68,7 +68,7 @@ export default function Home() {
   return (
     <div
       className="h-screen w-full bg-cover"
-      style={{ backgroundImage: "url('/background.png')" }}
+      style={{ backgroundImage: "url('/dirty_house.png')" }}
     >
 
       <div>{message}</div>
