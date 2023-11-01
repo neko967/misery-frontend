@@ -42,6 +42,11 @@ body {
   border-color: transparent transparent transparent #ffffff;
 }
 
+.triangle-down {
+  border-width: 60px 0 20px 30px;
+  border-color: transparent transparent transparent #ffffff;
+}
+
 /* ボタンの位置調整（必要に応じて調整） */
 .triangle-button-position {
   position: absolute;
@@ -49,3 +54,52 @@ body {
   transform: translateY(-50%);
   z-index: 10;
 }
+.triangle-button.triangle-down {
+  width: 0;
+  height: 0;
+  border-left: 30px solid transparent;
+  border-right: 30px solid transparent;
+  border-top: 60px solid #ffffff; /* or your desired color */
+}
+
+.custom-cursor {
+  cursor: url('/path/to/custom-cursor.png'), auto;
+}
+.modal {
+  position: fixed;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+.modal-content {
+  margin: auto;
+  padding: 20px;
+  background-color: white;
+  width: 80%;
+}
+
+.close {
+  color: #aaaaaa;
+  float: right;
+  font-size: 28px;
+  font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+  color: #000;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+
+
+
+
+
+
+
+
+
