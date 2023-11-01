@@ -16,7 +16,7 @@ type Item = {
     choices: {
       confirmText: string;
       cancelText: string;
-    };
+    }| null;
   }[];
 };
 
@@ -29,8 +29,8 @@ const Message = ({text}: {text: string}) => {
 
 // 選択肢コンポーネント  
 const Choices = ({onConfirm, onCancel, options}: any) => {
-  const confirmText = options?.confirmText || '取得する';
-  const cancelText = options?.cancelText || '取得しない';
+  const confirmText = options?.confirmText;
+  const cancelText = options?.cancelText || "戻る";
 
   return (
     <div className="flex flex-col space-y-4">
@@ -122,15 +122,54 @@ export default function Home() {
         }
       ]
     },
+    {
+      id: 5,
+      name: '壁',
+      positionClasses: "absolute top-1/2 left-1/2 translate-x-[calc(-50%-400px)] translate-y-[calc(-50%+80px)]",
+      width: "w-28",
+      height: "h-12",
+      additionalStyles: { background: 'rgba(255, 255, 255, 0.1)', borderRadius: '8px' },
+      messages: [
+        {
+          text: "壁だ",
+          choices: null
+        },
+        {
+          text: "壁を破壊しますか？",
+          choices: {
+            confirmText: "破壊する",
+            cancelText: "破壊しない"
+          }
+        }
+      ]
+    },
+    {
+      id: 6,
+      name: '宝石',
+      positionClasses: "absolute top-1/2 left-1/2 translate-x-[calc(-50%-400px)] translate-y-[calc(-50%-100px)]",
+      width: "w-28",
+      height: "h-12",
+      additionalStyles: { background: 'rgba(255, 255, 255, 0.1)', borderRadius: '8px' },
+      messages: [
+        {
+          text: "宝石を取得しますか？",
+          choices: {
+            confirmText: "取得する",
+            cancelText: "取得しない"
+          }
+        }
+      ]
+    }
   ];
 
   const [acquiredItems, setAcquiredItems] = useState<Item[]>([]); // 取得済みのアイテムを管理する状態
   const [currentItem, setCurrentItem] = useState<Item | null>(null); // 現在選択されているアイテムを管理する状態 毎回nullにリセット
   const [messageIndex, setMessageIndex] = useState<number>(0); // 現在のメッセージのインデックスを管理する状態
   const [isItemListVisible, setIsItemListVisible] = useState(false); // アイテムリストの表示・非表示を管理する状態
+  const [selectedItem, setSelectedItem] = useState<Item | null>(null); // 選択中のアイテムを管理する状態
 
   let message: string | undefined;
-  let choicesOptions = {};
+  let choicesOptions: { confirmText: string; cancelText: string } | null = null;
 
   // 現在選択されているアイテムがある場合、そのアイテムの特定のメッセージと選択肢を取得
   if (currentItem) {
@@ -140,27 +179,48 @@ export default function Home() {
 
   // アイテムがクリックされた時の処理
   const handleClick = (item: Item) => {
-    if (!acquiredItems.some(acquiredItem => acquiredItem.id === item.id)) {
+    if (item.id === 5 && selectedItem && selectedItem.name === 'ナイフ') {
       setCurrentItem(item);
-      setMessageIndex(0); // Reset message index when new item is clicked
+      setMessageIndex(1);
+    } else if (item.id === 5) {
+      setCurrentItem(item);
+      setMessageIndex(0); 
+    } else if (!acquiredItems.some(acquiredItem => acquiredItem.id === item.id)) {
+      setCurrentItem(item);
+      setMessageIndex(0); 
     }
   };
 
   // 選択肢の処理
-  const handleConfirm = () => {
-    if (currentItem && messageIndex < currentItem.messages.length - 1) {
-      setMessageIndex(prevIndex => prevIndex + 1);
-    } else {
-      if (currentItem) {
-        setAcquiredItems([...acquiredItems, currentItem]);
-      }
-      setCurrentItem(null);
+
+const handleConfirm = () => {
+  if (currentItem?.id === 5) {
+    let gem = items.find(item => item.id === 6);
+    if (gem) {
+      gem.additionalStyles = {}; // Show the gem
     }
-  };
+    setCurrentItem(null);
+  } else if (currentItem && messageIndex < currentItem.messages.length - 1) {
+    setMessageIndex(prevIndex => prevIndex + 1);
+  } else {
+    if (currentItem) {
+      setAcquiredItems([...acquiredItems, currentItem]);
+    }
+    setCurrentItem(null);
+  }
+};
 
   // 選択肢拒否時の処理
   const handleCancel = () => {
     setCurrentItem(null);
+  };
+
+  const handleItemSelect = (item: Item) => {
+    if (selectedItem && selectedItem.id === item.id) {
+      setSelectedItem(null); // 既に選択されているアイテムを再度クリックした場合、選択を解除
+    } else {
+      setSelectedItem(item); // それ以外の場合、アイテムを選択
+    }
   };
 
   return (
@@ -194,9 +254,12 @@ export default function Home() {
         {isItemListVisible && (
         <div className="bg-gray bg-opacity-60 p-2 rounded-b-lg shadow-xl border-t border-gray-500">
           {acquiredItems.map(item => (
-            <div key={item.id} className="border-b border-gray-600 p-1 hover:bg-gray-700 text-shadow-md">
-              {item.name}
-            </div>
+            <div 
+            className={`p-2 rounded-b-lg shadow-xl border-t ${selectedItem && selectedItem.id === item.id ? 'bg-red-600' : 'bg-gray-800 bg-opacity-60'}`} 
+            onClick={() => handleItemSelect(item)}
+            >
+            {item.name}
+          </div>
           ))}
         </div>
         )}
