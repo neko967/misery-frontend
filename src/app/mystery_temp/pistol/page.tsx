@@ -19,6 +19,8 @@ type Item = {
     };
   }[];
 };
+//音
+
 
 //三角ボタンコンポーネント
 const TriangleButton = ({ direction, onClick }) => {
@@ -58,7 +60,11 @@ const Message = ({text}: {text: string}) => {
     <div className="text-white text-xl">{text}</div>
   )
 }
-
+//音
+const playGameOverSound = () => {
+    const sound = new Audio("/se_gun_fire10.wav");
+    sound.play();
+};
 // 選択肢コンポーネント  
 const Choices = ({onConfirm, onCancel, options}: any) => { //関数内での内容を返す = return
   const confirmText = options?.confirmText || '取得する';
@@ -77,6 +83,8 @@ export default function Home() {
         setBackgroundImage('/wall.png');
         setDarkMode(false);  // 真っ暗なモードを無効にする
       };
+      
+      
   const items: Item[] = [ //Itemタイプの配列を用いてオブジェクトの作成??
     {
       id: 1,
@@ -260,6 +268,11 @@ const divStyle = {
     }
   };
 
+  //カーソルの定義
+  const customCursorStyle = {
+    cursor: `url('/custom-cursor.png'), auto`, // カスタムカーソルのパス
+  };
+
   const handleCancel = () => {
     setCurrentItem(null);
   };
@@ -270,7 +283,9 @@ const divStyle = {
       style={{ backgroundImage: `url('${backgroundImage}')` }}
       onClick={handleBackgroundClick}
     >
+
    
+            
     
     {isModalVisible && (
   <div className="modal cursor-pointer">
@@ -298,7 +313,25 @@ const divStyle = {
        </div>
       )}
 
+      {/* dark.png の背景の時、画面下部中央に下向きの三角ボタンを表示 */}
+      {backgroundImage === '/dark.png' && (
+       <div className="absolute bottom-10 left-1/2 transform -translate-x-1/2">
+        <TriangleButton direction="down" onClick={() => {switchToWall()}}
+         />
+       </div>
+      )}
+
+{/*音の配置dark,png */}音
+{backgroundImage === '/dark.png' && ( 
+<div style={{ 
+        backgroundImage: 'url(/dark.png)', 
+        height: '100vh', 
+        width: '100vw' ,
         
+      }}
+      onClick={playGameOverSound}
+    ></div>
+)}
       {/* 条件に基づいて左の三角形ボタンを表示 */}
       {backgroundImage === '/wall.png' && (
         <div>
