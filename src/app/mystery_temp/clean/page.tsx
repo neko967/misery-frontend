@@ -251,18 +251,6 @@ const handleConfirm = () => {
             </span>
           </span>
         </div>
-        {isItemListVisible && (
-        <div className="bg-gray bg-opacity-60 p-2 rounded-b-lg shadow-xl border-t border-gray-500">
-          {acquiredItems.map(item => (
-            <div 
-            className={`p-2 rounded-b-lg shadow-xl border-t ${selectedItem && selectedItem.id === item.id ? 'bg-red-600' : 'bg-gray-800 bg-opacity-60'}`} 
-            onClick={() => handleItemSelect(item)}
-            >
-            {item.name}
-          </div>
-          ))}
-        </div>
-        )}
       </div>
 
       {/* ドア */}
