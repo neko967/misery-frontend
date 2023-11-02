@@ -16,39 +16,40 @@ type Item = {
     choices: {
       confirmText: string;
       cancelText: string;
-    };
+    }| null;
   }[];
 };
 
 // メッセージコンポーネント
 const Message = ({text}: {text: string}) => {
   return (
-    <div className="text-white text-xl">{text}</div>
+    <div className="flex items-center justify-center h-full text-white text-xl">{text}</div>
   )
 }
 
 // 選択肢コンポーネント  
 const Choices = ({onConfirm, onCancel, options}: any) => {
-  const confirmText = options?.confirmText || '取得する';
-  const cancelText = options?.cancelText || '取得しない';
+  const confirmText = options?.confirmText;
+  const cancelText = options?.cancelText || "戻る";
 
   return (
-    <div>
-      <button onClick={onConfirm}>{confirmText}</button>
-      <button onClick={onCancel}>{cancelText}</button>
+    <div className="flex flex-col space-y-4">
+      <button className="px-4 text-white rounded" onClick={onConfirm}>{confirmText}</button>
+      <button className="px-4 text-white rounded" onClick={onCancel}>{cancelText}</button>
     </div>
   )
 }
 
 export default function Home() {
+  // 配列にて、アイテム、メッセージ、選択肢等をオブジェクトの形で管理。
   const items: Item[] = [
     {
       id: 1,
       name: '本',
-      positionClasses: "absolute left-50 top-10",
-      
-      width: "w-32",
-      height: "h-32",
+      positionClasses: "absolute top-1/2 left-1/2 translate-x-[calc(-50%+360px)] translate-y-[calc(-50%+350px)]",
+      width: "w-64",
+      height: "h-20",
+      // コメントアウトで、クリック部分の色を消す
       additionalStyles: { background: 'rgba(255, 255, 255, 0.1)', borderRadius: '8px' },
       messages: [
         {
@@ -70,7 +71,11 @@ export default function Home() {
     {
       id: 2,
       name: '鍵',
-      positionClasses: "absolute left-20 top-40",
+      positionClasses: "absolute top-1/2 left-1/2 translate-x-[calc(-50%+480px)] translate-y-[calc(-50%+120px)]",
+      width: "w-80",
+      height: "h-16",
+      // コメントアウトで、クリック部分の色を消す
+      additionalStyles: { background: 'rgba(255, 255, 255, 0.1)', borderRadius: '8px' },
       messages: [
         {
           text: "鍵を取得しますか？",
@@ -84,7 +89,11 @@ export default function Home() {
     {
       id: 3,
       name: '地図',
-      positionClasses: "absolute left-10 top-30",
+      positionClasses: "absolute top-1/2 left-1/2 translate-x-[calc(-50%+50px)] translate-y-[calc(-50%-120px)]",
+      width: "w-20",
+      height: "h-12",
+      // コメントアウトで、クリック部分の色を消す
+      additionalStyles: { background: 'rgba(255, 255, 255, 0.1)', borderRadius: '8px' },
       messages: [
         {
           text: "地図を取得しますか？",
@@ -98,7 +107,11 @@ export default function Home() {
     {
       id: 4,
       name: 'ナイフ',
-      positionClasses: "absolute left-20",
+      positionClasses: "absolute top-1/2 left-1/2 translate-x-[calc(-50%+40px)] translate-y-[calc(-50%+80px)]",
+      width: "w-44",
+      height: "h-12",
+      // コメントアウトで、クリック部分の色を消す
+      additionalStyles: { background: 'rgba(255, 255, 255, 0.1)', borderRadius: '8px' },
       messages: [
         {
           text: "ナイフを取得しますか？",
@@ -109,46 +122,110 @@ export default function Home() {
         }
       ]
     },
+    {
+      id: 5,
+      name: '壁',
+      positionClasses: "absolute top-1/2 left-1/2 translate-x-[calc(-50%-400px)] translate-y-[calc(-50%+80px)]",
+      width: "w-28",
+      height: "h-12",
+      additionalStyles: { background: 'rgba(255, 255, 255, 0.1)', borderRadius: '8px' },
+      messages: [
+        {
+          text: "壁だ",
+          choices: null
+        },
+        {
+          text: "壁を破壊しますか？",
+          choices: {
+            confirmText: "破壊する",
+            cancelText: "破壊しない"
+          }
+        }
+      ]
+    },
+    {
+      id: 6,
+      name: '宝石',
+      positionClasses: "absolute top-1/2 left-1/2 translate-x-[calc(-50%-400px)] translate-y-[calc(-50%-100px)]",
+      width: "w-28",
+      height: "h-12",
+      additionalStyles: { background: 'rgba(255, 255, 255, 0.1)', borderRadius: '8px' },
+      messages: [
+        {
+          text: "宝石を取得しますか？",
+          choices: {
+            confirmText: "取得する",
+            cancelText: "取得しない"
+          }
+        }
+      ]
+    }
   ];
 
-  const [acquiredItems, setAcquiredItems] = useState<Item[]>([]);
-  const [currentItem, setCurrentItem] = useState<Item | null>(null);
-  const [messageIndex, setMessageIndex] = useState<number>(0);
-  // アイテムリストの表示・非表示を管理する状態
-  const [isItemListVisible, setIsItemListVisible] = useState(false);
+  const [acquiredItems, setAcquiredItems] = useState<Item[]>([]); // 取得済みのアイテムを管理する状態
+  const [currentItem, setCurrentItem] = useState<Item | null>(null); // 現在選択されているアイテムを管理する状態 毎回nullにリセット
+  const [messageIndex, setMessageIndex] = useState<number>(0); // 現在のメッセージのインデックスを管理する状態
+  const [isItemListVisible, setIsItemListVisible] = useState(false); // アイテムリストの表示・非表示を管理する状態
+  const [selectedItem, setSelectedItem] = useState<Item | null>(null); // 選択中のアイテムを管理する状態
 
   let message: string | undefined;
-  let choicesOptions = {};
+  let choicesOptions: { confirmText: string; cancelText: string } | null = null;
 
+  // 現在選択されているアイテムがある場合、そのアイテムの特定のメッセージと選択肢を取得
   if (currentItem) {
     message = currentItem.messages[messageIndex]?.text;
     choicesOptions = currentItem.messages[messageIndex]?.choices;
   }
 
+  // アイテムがクリックされた時の処理
   const handleClick = (item: Item) => {
-    if (!acquiredItems.some(acquiredItem => acquiredItem.id === item.id)) {
+    if (item.id === 5 && selectedItem && selectedItem.name === 'ナイフ') {
       setCurrentItem(item);
-      setMessageIndex(0); // Reset message index when new item is clicked
+      setMessageIndex(1);
+    } else if (item.id === 5) {
+      setCurrentItem(item);
+      setMessageIndex(0); 
+    } else if (!acquiredItems.some(acquiredItem => acquiredItem.id === item.id)) {
+      setCurrentItem(item);
+      setMessageIndex(0); 
     }
   };
 
-  const handleConfirm = () => {
-    if (currentItem && messageIndex < currentItem.messages.length - 1) {
-      setMessageIndex(prevIndex => prevIndex + 1);
-    } else {
-      if (currentItem) {
-        setAcquiredItems([...acquiredItems, currentItem]);
-      }
-      setCurrentItem(null);
-    }
-  };
+  // 選択肢の処理
 
+const handleConfirm = () => {
+  if (currentItem?.id === 5) {
+    let gem = items.find(item => item.id === 6);
+    if (gem) {
+      gem.additionalStyles = {}; // Show the gem
+    }
+    setCurrentItem(null);
+  } else if (currentItem && messageIndex < currentItem.messages.length - 1) {
+    setMessageIndex(prevIndex => prevIndex + 1);
+  } else {
+    if (currentItem) {
+      setAcquiredItems([...acquiredItems, currentItem]);
+    }
+    setCurrentItem(null);
+  }
+};
+
+  // 選択肢拒否時の処理
   const handleCancel = () => {
     setCurrentItem(null);
   };
 
+  const handleItemSelect = (item: Item) => {
+    if (selectedItem && selectedItem.id === item.id) {
+      setSelectedItem(null); // 既に選択されているアイテムを再度クリックした場合、選択を解除
+    } else {
+      setSelectedItem(item); // それ以外の場合、アイテムを選択
+    }
+  };
+
   return (
     <div
+      // 背景画像
       className="h-screen w-full bg-contain bg-center bg-no-repeat"
       style={{ backgroundImage: "url('/dirty_house.png')" }}
     >
@@ -165,13 +242,27 @@ export default function Home() {
       ))}
 
       {/* 取得済みアイテム */}
-      <div className="absolute right-0 translate-y-1/2 text-white">
-        <div onClick={() => setIsItemListVisible(!isItemListVisible)}>
-          アイテム一覧:
-          {isItemListVisible && acquiredItems.map(item => (
-            <div key={item.id}>{item.name}</div>
+      <div className="absolute top-2/5 right-0 text-white">
+        <div className="bg-gray-800 bg-opacity-60 p-2 rounded-t-lg cursor-pointer hover:bg-opacity-70" onClick={() => setIsItemListVisible(!isItemListVisible)}>
+          <span>
+            アイテム一覧
+            <span className="ml-2">
+              {isItemListVisible ? '▲' : '▼'}
+            </span>
+          </span>
+        </div>
+        {isItemListVisible && (
+        <div className="bg-gray bg-opacity-60 p-2 rounded-b-lg shadow-xl border-t border-gray-500">
+          {acquiredItems.map(item => (
+            <div 
+            className={`p-2 rounded-b-lg shadow-xl border-t ${selectedItem && selectedItem.id === item.id ? 'bg-red-600' : 'bg-gray-800 bg-opacity-60'}`} 
+            onClick={() => handleItemSelect(item)}
+            >
+            {item.name}
+          </div>
           ))}
         </div>
+        )}
       </div>
 
       {/* ドア */}
@@ -179,20 +270,27 @@ export default function Home() {
         <div className="text-white">ドア</div>
       </Link>
 
+      {/* currentItemに値がある場合、以降のメッセージと選択を描画する */}
       {currentItem && (
         <>
-          <div className="flex justify-center items-end h-screen">
-            <div className="mb-8 w-4/5 bg-gray-800 opacity-90 px-6 py-4 rounded-lg shadow-lg">
+          <div className="fixed justify-center items-end bottom-4 left-0 right-0 flex">
+            <div className="mb-20 w-3/5 p-20 relative">
+              <div className="absolute top-0 left-0 w-full h-full border-4 border-gray-600 bg-gray-800 bg-opacity-50">
               {message && <Message text={message} />}
             </div>
           </div>
-         
-          <div className="fixed top-0 left-0 right-0 bottom-0 flex items-center justify-center text-white">
-            <Choices
-              onConfirm={handleConfirm}
-              onCancel={handleCancel}  
-              options={choicesOptions} 
-            />
+          </div>
+
+          <div className="fixed top-0 left-0 right-0 bottom-0 flex items-center justify-center">
+            <div className="relative w-1/5 p-14">
+              <div className="absolute top-0 left-0 w-full h-full border-4 border-gray-600 bg-gray-800 bg-opacity-50 flex flex-col items-center justify-center">
+                <Choices
+                  onConfirm={handleConfirm}
+                  onCancel={handleCancel}  
+                  options={choicesOptions} 
+                />
+              </div>
+            </div>
           </div>
         </>
       )}
