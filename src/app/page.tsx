@@ -53,21 +53,19 @@ export default function Home() {
       className="h-screen w-full bg-cover"
       style={{ backgroundImage: "url('/background.png')" }}
     >
-      {/* <Link href="/waiting_room"
-            className="absolute top-1/4 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-red-600 p-5 rounded-lg shadow-lg">
-        <button>ゲームを始める</button>
-      </Link> */}
-      <div className="absolute top-8 flex animate-flicker-5">
+      <div className="fixed top-8 flex animate-flicker-5">
         <div className="font-horror2 ml-10 text-9xl">M</div><div className="font-horror1 text-9xl">ISE</div><div className="font-horror2 text-9xl">R</div><div className="font-horror4 text-9xl">Y</div>
       </div>
-      {/* <button onClick={createRoom}
-              className="btn glass">
-        部屋を作る
-      </button>
-      <button onClick={joinRoom}
-              className="btn glass">
-        部屋に入る
-      </button> */}
+      <div className="absolute right-10 bottom-10 gap-4 flex flex-col ">
+        <button onClick={createRoom}
+                className="font-horror2 ml-10 text-3xl">
+        NEW GAME
+        </button>
+        <button onClick={joinRoom}
+                className="font-horror2 ml-10 text-3xl">
+        JOIN ROOM
+        </button>
+      </div>
     </div>
   );
 }
