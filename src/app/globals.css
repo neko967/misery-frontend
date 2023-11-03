@@ -25,6 +25,32 @@ body {
     )
     rgb(var(--background-start-rgb));
 }
+
+@font-face {
+  font-family: 'Horror1';
+  src: url('/fonts/horror1.otf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'Horror2';
+  src: url('/fonts/horror2.otf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'Horror3';
+  src: url('/fonts/horror3.otf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'Horror4';
+  src: url('/fonts/horror4.otf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+}
+
 .triangle-button {
   width: 0;
   height: 0;
@@ -93,13 +119,3 @@ body {
   text-decoration: none;
   cursor: pointer;
 }
-
-
-
-
-
-
-
-
-
-
