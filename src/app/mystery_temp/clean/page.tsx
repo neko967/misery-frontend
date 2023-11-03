@@ -7,6 +7,7 @@ import Link from 'next/link';
 type Item = {
   id: number;
   name: string;
+  imagePath?: string;
   positionClasses: string;
   width?: string; // 例: "w-32"
   height?: string; // 例: "h-32"
@@ -88,7 +89,8 @@ export default function Home() {
     },
     {
       id: 3,
-      name: '地図',
+      name: '青い箱',
+      imagePath: '/box_blue.png',
       positionClasses: "absolute top-1/2 left-1/2 translate-x-[calc(-50%+50px)] translate-y-[calc(-50%-120px)]",
       width: "w-20",
       height: "h-12",
@@ -96,7 +98,7 @@ export default function Home() {
       additionalStyles: { background: 'rgba(255, 255, 255, 0.1)', borderRadius: '8px' },
       messages: [
         {
-          text: "地図を取得しますか？",
+          text: "青い箱を取得しますか？",
           choices: {
             confirmText: "取得する",
             cancelText: "取得しない"
@@ -242,28 +244,33 @@ const handleConfirm = () => {
       ))}
 
       {/* 取得済みアイテム */}
-      <div className="absolute top-2/5 right-0 text-white">
-        <div className="bg-gray-800 bg-opacity-60 p-2 rounded-t-lg cursor-pointer hover:bg-opacity-70" onClick={() => setIsItemListVisible(!isItemListVisible)}>
-          <span>
-            アイテム一覧
-            <span className="ml-2">
-              {isItemListVisible ? '▲' : '▼'}
-            </span>
+    <div className="absolute top-2/5 right-0 text-white">
+      <div className="bg-gray-800 bg-opacity-60 p-2 rounded-t-lg cursor-pointer hover:bg-opacity-70" onClick={() => setIsItemListVisible(!isItemListVisible)}>
+        <span>
+          アイテム一覧
+          <span className="ml-2">
+            {isItemListVisible ? '▲' : '▼'}
           </span>
-        </div>
-        {isItemListVisible && (
-        <div className="bg-gray bg-opacity-60 p-2 rounded-b-lg shadow-xl border-t border-gray-500">
-          {acquiredItems.map(item => (
-            <div 
-            className={`p-2 rounded-b-lg shadow-xl border-t ${selectedItem && selectedItem.id === item.id ? 'bg-red-600' : 'bg-gray-800 bg-opacity-60'}`} 
-            onClick={() => handleItemSelect(item)}
-            >
-            {item.name}
-          </div>
-          ))}
-        </div>
-        )}
+        </span>
       </div>
+      {isItemListVisible && (
+      <div className="bg-gray bg-opacity-60 p-2 rounded-b-lg shadow-xl border-t border-gray-500">
+        {acquiredItems.map(item => (
+          <div
+          className={`p-2 rounded-b-lg shadow-xl border-t ${selectedItem && selectedItem.id === item.id ? 'bg-red-600' : 'bg-gray-800 bg-opacity-60'}`} 
+          onClick={() => handleItemSelect(item)}
+          >
+          {item.name}
+          </div>
+        ))}
+      </div>
+      )}
+
+
+      </div>
+      {selectedItem && selectedItem.imagePath && (
+          <img src={selectedItem.imagePath} alt={selectedItem.name} className="absolute top-1/2 left-1/2 translate-x-[-50%] translate-y-[-50%] w-1/4 h-2/4"/>
+      )}
 
       {/* ドア */}
       <Link href={acquiredItems.length === items.length ? "dirty" : "#"}>
