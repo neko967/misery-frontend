@@ -1,7 +1,36 @@
 'use client';
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import GlitchEffect from '../../components/GlitchEffect';
+import TextEffect from '../../components/TextEffect';
+import styles from '../../components/WaitingRoomButton.module.css';
+import DirtyButtonStyles from '../../components/WaitingRoomDirtyButton.module.css';
 
+
+function WaitingRoomButton() {
+  return (
+      <main className={styles.container}>
+          <div className={styles.section}>
+              <div className={styles.text}>
+                  <div className={styles.character}>綺麗な</div>
+                  <div className={styles.character}>部屋に入る？</div>
+              </div>
+          </div>
+      </main>
+  );
+}
+function WaitingRoomDirtyButton() {
+  return (
+      <main className={DirtyButtonStyles.container}>
+          <div className={DirtyButtonStyles.section}>
+              <div className={DirtyButtonStyles.text}>
+                  <div className={DirtyButtonStyles.character}>寂れた</div>
+                  <div className={DirtyButtonStyles.character}>部屋に入る？</div>
+              </div>
+          </div>
+      </main>
+  );
+}
 type RoomState = 'clean' | 'dirty';
 
 export default function Home({ params }: { params: { slug: string } }) {
@@ -21,6 +50,7 @@ export default function Home({ params }: { params: { slug: string } }) {
         const websocketUrl = `${process.env.NEXT_PUBLIC_BACKEND_WEBSOCKET_URL}/${params.slug}`;
         const websocket = new WebSocket(websocketUrl);
         setWs(websocket);
+        
 
         websocket.onmessage = (event) => {
           if (event.data == "goMystery") {
@@ -72,34 +102,31 @@ export default function Home({ params }: { params: { slug: string } }) {
       className="h-screen w-full bg-cover"
       style={{ backgroundImage: "url('/background.png')" }}
     >
-      <button onClick={clickMysteryClean}
-              className="indicator absolute top-1/4 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-red-600 p-5 rounded-lg shadow-lg">
-        <div>綺麗な部屋に入る</div>
-        {hostWhichRoom == 'clean' &&
-          <span className="indicator-item indicator-start badge badge-secondary"></span>
-        }
-        {guestWhichRoom == 'clean' &&
-          <span className="indicator-item badge badge-primary"></span>
-        }
+      <GlitchEffect />
+  
+      <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white bg-opacity-50 p-10 rounded-lg shadow-lg">
+        <TextEffect>ここに特殊効果のテキスト</TextEffect>
+      </div>
+    
+      <button className="clean-my-button" onClick={clickMysteryClean} type="button">
+        <WaitingRoomButton />
+        {hostWhichRoom === 'clean' && <span className="indicator-item indicator-start badge badge-secondary"></span>}
+        {guestWhichRoom === 'clean' && <span className="indicator-item badge badge-primary"></span>}
       </button>
-      <button onClick={clickMysteryDirty}
-              className="indicator absolute top-2/4 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-red-600 p-5 rounded-lg shadow-lg">
-        <div>さびれた部屋に入る</div>
-        {hostWhichRoom == 'dirty' &&
-          <span className="indicator-item indicator-start badge badge-secondary"></span>
-        }
-        {guestWhichRoom == 'dirty' &&
-          <span className="indicator-item badge badge-primary"></span>
-        }
+    
+      <button className="dirty-my-button" onClick={clickMysteryDirty} type="button">
+        <WaitingRoomDirtyButton />
+        {hostWhichRoom === 'dirty' && <span className="indicator-item indicator-start badge badge-secondary"></span>}
+        {guestWhichRoom === 'dirty' && <span className="indicator-item badge badge-primary"></span>}
       </button>
-      {hostWhichRoom && guestWhichRoom && (hostWhichRoom != guestWhichRoom) &&
-        <button onClick={goMystery}
-                className="absolute top-3/4 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-red-600 p-5 rounded-lg shadow-lg">
+    
+      {hostWhichRoom && guestWhichRoom && (hostWhichRoom !== guestWhichRoom) && (
+        <button onClick={goMystery} className="game-start" type="button">
           ゲームスタート
         </button>
-      }
+      )}
     </div>
   );
-}
+      }  
 
 

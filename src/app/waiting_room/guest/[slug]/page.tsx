@@ -2,7 +2,20 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link'
+import styles from '../../components/WaitingRoomButton.module.css';
 
+function WaitingRoomButton() {
+  return (
+      <main className={styles.container}>
+          <div className={styles.section}>
+              <div className={styles.text}>
+                  <div className={styles.character}>⚠️注意!</div>
+                  <div className={styles.character}>このアプリはビックリするような表現が含まれます。</div>
+              </div>
+          </div>
+      </main>
+  );
+}
 export default function Home({ params }: { params: { slug: string } }) {
   const [ws, setWs] = useState<WebSocket | null>(null);
   const router = useRouter();
@@ -35,6 +48,9 @@ export default function Home({ params }: { params: { slug: string } }) {
       }
     }
 
+    
+   
+
     checkRoomExists();
   }, [params.slug]);
 
@@ -47,13 +63,17 @@ export default function Home({ params }: { params: { slug: string } }) {
   return (
     <div
       className="h-screen w-full bg-cover"
-      style={{ backgroundImage: "url('/background.png')" }}
+      style={{ backgroundImage: "url('/Central.png')" }}
     >
+       <button className="my-button" >
+  <WaitingRoomButton></WaitingRoomButton> 
+  
+</button>
       <button onClick={clickReady}
-              className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-red-600 p-5 rounded-lg shadow-lg">
-        準備OK
+              className="game-start">
+        準備OK?
       </button>
-      <p>コード：{params.slug}</p>
+      <p className="code">CODE: {params.slug}</p>
     </div>
   );
 }

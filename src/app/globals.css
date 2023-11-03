@@ -94,7 +94,135 @@ body {
   cursor: pointer;
 }
 
+:root {
+	--red: rgb(59, 4, 255);
+	--blue: rgb(212, 41, 15);
+	--green: rgb(7, 108, 7);
+}
 
+.clean-my-button {
+  position: fixed; /* 画面に対して固定位置 */
+  left: 25%;       /* 左から画面の50%の位置 */
+  bottom: 400px;    /* 画面の下から20pxの位置 */
+  transform: translateX(-50%); /* X軸に沿って中央揃え */
+  /* その他のスタイリング（サイズ、色、フォント等） */
+}
+
+.dirty-my-button {
+  position: fixed; /* 画面に対して固定位置 */
+  left: 75%;       /* 左から画面の50%の位置 */
+  bottom: 400px;    /* 画面の下から20pxの位置 */
+  transform: translateX(-50%); /* X軸に沿って中央揃え */
+  /* その他のスタイリング（サイズ、色、フォント等） */
+}
+
+
+
+.my-button {
+  position: fixed; /* 画面に対して固定位置 */
+  left: 50%;       /* 左から画面の50%の位置 */
+  bottom: 300px;    /* 画面の下から20pxの位置 */
+  transform: translateX(-50%); /* X軸に沿って中央揃え */
+  /* その他のスタイリング（サイズ、色、フォント等） */
+}
+.my-buttons {
+  position: fixed; /* 画面に対して固定位置 */
+  left: 75%;       /* 左から画面の50%の位置 */
+  bottom: 300px;    /* 画面の下から20pxの位置 */
+  transform: translateX(-50%); /* X軸に沿って中央揃え */
+  /* その他のスタイリング（サイズ、色、フォント等） */
+}
+.game-start {
+  position: fixed; 
+  left: 50%;
+  bottom: 220px;
+  transform: translateX(-50%);
+
+  font-size: 24px;
+  color: #110f0f;
+  background: rgb(255, 5, 5); 
+  border-radius: 5px;
+  padding: 10px 20px;
+
+  box-shadow: 1px 1px #000, 
+              inset 2px 2px 0 rgba(255,255,255,0.5),
+              0 0 15px rgba(0,0,0,0.6);
+              
+  
+  text-shadow: 1px 1px 2px #000;
+  opacity: 0.6; 
+  transition: 0.5s;
+  transform: skewZ(-5deg);
+  text-shadow: 
+   1px 1px #ff0000,
+   2px 2px #800000,
+   3px 3px #400000;
+   animation: creepy-font 2s infinite;
+
+@keyframes creepy-font {
+  0% {font-size: 24px;}
+  50% {font-size: 30px;}
+  100% {font-size: 24px;}
+}
+}
+
+.game-start:active {
+  transform: translateX(-50%) scale(0.95);
+  box-shadow: 0 0 8px rgba(0,0,0,0.8);
+}
+
+.game-start:hover {
+  background: rgb(13, 13, 13);
+}
+
+@keyframes flutter {
+  0% {
+    text-shadow: 
+      1px 1px 2px #000,
+      0 0 4px rgba(215, 51, 51, 0.8);
+  }
+
+  50% {
+    text-shadow: 
+      1px 1px 2px #000,
+      0 0 8px rgba(234, 8, 8, 0.8);
+  }
+
+  100% {
+     text-shadow:
+      1px 1px 2px #000,
+      0 0 4px rgba(248, 16, 16, 0.8);
+  }
+}
+
+@keyframes flutter {
+  0% {transform: translateX(-50%);}
+  50% {transform: translateX(-52%);}
+  100% {transform: translateX(-50%);} 
+}
+.code{
+  position: fixed; 
+  left: 50%;
+  bottom: 150px;  
+  transform: translateX(-50%);
+
+  font-size: 12px;
+  color: #543e08;
+  background: #eee;
+  border-radius: 5px; 
+  padding: 10px 20px;
+  opacity: 0.8;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+
+  /* ホラーテイストのフォント */
+  
+  
+  /* 文字を傾けて不気味に */
+  font-style: oblique;
+
+  /* 文字サイズを揃えて不規則に */
+  letter-spacing: 1px;
+}
 
 
 

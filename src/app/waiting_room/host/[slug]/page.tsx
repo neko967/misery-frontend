@@ -2,6 +2,24 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link'
+import styles from '../../components/WaitingRoomButton.module.css';
+
+
+
+function WaitingRoomButton() {
+    return (
+        <main className={styles.container}>
+            <div className={styles.section}>
+                <div className={styles.text}>
+                    <div className={styles.character}>⚠️注意!</div>
+                    <div className={styles.character}>このアプリはビックリするような表現が含まれます。</div>
+                </div>
+            </div>
+        </main>
+    );
+}
+
+
 
 export default function Home({ params }: { params: { slug: string } }) {
   const [ws, setWs] = useState<WebSocket | null>(null);
@@ -54,23 +72,20 @@ export default function Home({ params }: { params: { slug: string } }) {
   return (
     <div
       className="h-screen w-full bg-cover"
-      style={{ backgroundImage: "url('/background.png')" }}
+      style={{ backgroundImage: "url('/Central.png')" }}
     >
-      <button onClick={goMysteryClean}
-              className="absolute top-3/4 left-1/3 transform -translate-x-1/2 -translate-y-1/2 bg-red-600 p-5 rounded-lg shadow-lg">
-        謎解き 綺麗な部屋に行く（作業用）
-      </button>
-      <button onClick={goMysteryDirty}
-              className="absolute top-3/4 left-2/3 transform -translate-x-1/2 -translate-y-1/2 bg-red-600 p-5 rounded-lg shadow-lg">
-        謎解き さびれた部屋に行く（作業用）
-      </button>
+    <button className="my-button" >
+  <WaitingRoomButton></WaitingRoomButton> 
+</button>
+
+
       {readyToPrologue &&
         <button onClick={goPrologue}
-                className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-red-600 p-5 rounded-lg shadow-lg">
-          ゲームスタート
+                className="game-start">
+          GAME START
         </button>
       }
-      <p>コード：{params.slug}</p>
+      <p className="code">CODE: {params.slug}</p>
     </div>
   );
 }
