@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation';
 import Image from "next/image";
 import localImage from "../../../../../public/horror_image.png";
 import Link from 'next/link';
+import { GetWindowSize } from "../../../../hooks/GetWindowSize";
 
 type pointerPosition = {
   x: number;
@@ -17,8 +18,8 @@ export default function Dealer({ params }: { params: { slug: string } }) {
   const keyImage = "/keyImage.png";
   const keyPositions: number[][] = [[],[8,14],[9,7],[18,5]];  //[[空の配列],[key1縦,key1横],[key2縦,key2横],[key3縦,key3横]]
   const doorPositions: number[][] = [[],[4,23],[5,12],[2,1]]; //[[空の配列],[door1縦,door1横],[door2縦,door2横],[door3縦,door3横]]
-  const [windowSize, setWindowSize] = useState({ width: window.innerWidth, height: window.innerHeight });
-  const cellSize = Math.min(windowSize.width, windowSize.height) / elements;
+  const { height, width } = GetWindowSize();
+  const cellSize = Math.min(width, height) / elements;
   const [ws, setWs] = useState<WebSocket | null>(null);
   const router = useRouter();
   const [playerPosition, setPlayerPosition] = useState<pointerPosition>({ x: 0, y: 0 });
@@ -31,16 +32,6 @@ export default function Dealer({ params }: { params: { slug: string } }) {
   // const [wallPositions, setWallPositions] = useState<number[][]>([[16, 13]]);
   // 壁の表示/非表示を管理するstateを追加
   const [showWall, setShowWall] = useState(false);
-
-  useEffect(() => {
-    const handleResize = () => {
-      setWindowSize({ width: window.innerWidth, height: window.innerHeight });
-    };
-    window.addEventListener('resize', handleResize);
-    return () => {
-      window.removeEventListener('resize', handleResize);
-    };
-  }, []);
 
   useEffect(() => {
     const startPosition = document.querySelector('[data-start]');
@@ -178,6 +169,9 @@ export default function Dealer({ params }: { params: { slug: string } }) {
 
   return (
     <main>
+      <div>
+        height:{height} width:{width}
+      </div>
       {!isGameStarted ? (
         // ゲームが開始されていない場合、スタートボタンを表示
         <button onClick={() => setIsGameStarted(true)}

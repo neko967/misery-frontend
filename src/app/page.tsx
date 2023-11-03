@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link'
+import { GetWindowSize } from "../hooks/GetWindowSize";
 
 type Room = {
   name: string;
@@ -11,6 +12,7 @@ type Room = {
 export default function Home() {
   const [rooms, setRooms] = useState<Room[]>([]);
   const router = useRouter();
+  const { height, width } = GetWindowSize();
 
   async function createRoom() {
     var S="ABCDEFGHIJKLMNOPQRSTUVWXYZ"
@@ -65,6 +67,9 @@ export default function Home() {
                 className="font-horror2 ml-10 text-3xl">
         JOIN ROOM
         </button>
+      </div>
+      <div>
+        height:{height} width:{width}
       </div>
     </div>
   );
