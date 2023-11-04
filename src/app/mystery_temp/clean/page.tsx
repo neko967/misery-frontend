@@ -21,6 +21,12 @@ type Item = {
   }[];
 };
 
+interface ChoicesProps {
+  onConfirm: () => void;
+  onCancel: () => void;
+  options: { confirmText: string; cancelText: string } | null; // この行を追加
+}
+
 // メッセージコンポーネント
 const Message = ({text}: {text: string}) => {
   return (
@@ -28,10 +34,11 @@ const Message = ({text}: {text: string}) => {
   )
 }
 
-// 選択肢コンポーネント  
-const Choices = ({onConfirm, onCancel, options}: any) => {
-  const confirmText = options?.confirmText;
-  const cancelText = options?.cancelText || "戻る";
+// 選択肢コンポーネント
+const Choices: React.FC<ChoicesProps> = ({ onConfirm, onCancel, options }) => {
+  // nullチェックを追加
+  const confirmText = options?.confirmText ?? "OK";
+  const cancelText = options?.cancelText ?? "戻る";
 
   return (
     <div className="flex flex-col space-y-4">
@@ -168,7 +175,8 @@ export default function Home() {
   const [currentItem, setCurrentItem] = useState<Item | null>(null); // 現在選択されているアイテムを管理する状態 毎回nullにリセット
   const [messageIndex, setMessageIndex] = useState<number>(0); // 現在のメッセージのインデックスを管理する状態
   const [isItemListVisible, setIsItemListVisible] = useState(false); // アイテムリストの表示・非表示を管理する状態
-  const [selectedItem, setSelectedItem] = useState<Item | null>(null); // 選択中のアイテムを管理する状態
+  const [selectedItems, setSelectedItems] = useState<{ id: number; name: string; }[]>([]);
+  const [additionalStyles, setAdditionalStyles] = useState({});
 
   let message: string | undefined;
   let choicesOptions: { confirmText: string; cancelText: string } | null = null;
@@ -181,20 +189,19 @@ export default function Home() {
 
   // アイテムがクリックされた時の処理
   const handleClick = (item: Item) => {
-    if (item.id === 5 && selectedItem && selectedItem.name === 'ナイフ') {
+    if (item.id === 5 && selectedItems && selectedItems.name === 'ナイフ') {
       setCurrentItem(item);
       setMessageIndex(1);
     } else if (item.id === 5) {
       setCurrentItem(item);
-      setMessageIndex(0); 
+      setMessageIndex(0);
     } else if (!acquiredItems.some(acquiredItem => acquiredItem.id === item.id)) {
       setCurrentItem(item);
-      setMessageIndex(0); 
+      setMessageIndex(0);
     }
   };
 
   // 選択肢の処理
-
 const handleConfirm = () => {
   if (currentItem?.id === 5) {
     let gem = items.find(item => item.id === 6);
@@ -217,12 +224,28 @@ const handleConfirm = () => {
     setCurrentItem(null);
   };
 
-  const handleItemSelect = (item: Item) => {
-    if (selectedItem && selectedItem.id === item.id) {
-      setSelectedItem(null); // 既に選択されているアイテムを再度クリックした場合、選択を解除
+  const handleItemSelect = (itemId: number) => {
+    if (selectedItems.includes(itemId)) {
+      // 既に選択されているアイテムを選択解除
+      setSelectedItems(selectedItems.filter(id => id !== itemId));
     } else {
-      setSelectedItem(item); // それ以外の場合、アイテムを選択
+      // 新しいアイテムを選択
+      setSelectedItems((prevSelectedItems) => {
+        // 青い箱 (id: 3) と鍵 (id: 2) のみ2つ選択できるように制限を設ける
+        if (itemId === 3 || itemId === 2) {
+          // idが3か2の場合、他の選択を維持します。
+          return [...prevSelectedItems, itemId];
+        } else {
+          // それ以外のアイテムの場合、そのアイテムのみを選択します。
+          return [itemId];
+        }
+      });
     }
+  };
+
+  // スタイルを更新する関数
+  const updateStyles = (newStyles) => {
+    setAdditionalStyles(newStyles);
   };
 
   return (
@@ -244,32 +267,32 @@ const handleConfirm = () => {
       ))}
 
       {/* 取得済みアイテム */}
-    <div className="absolute top-2/5 right-0 text-white">
-      <div className="bg-gray-800 bg-opacity-60 p-2 rounded-t-lg cursor-pointer hover:bg-opacity-70" onClick={() => setIsItemListVisible(!isItemListVisible)}>
-        <span>
-          アイテム一覧
-          <span className="ml-2">
-            {isItemListVisible ? '▲' : '▼'}
+      <div className="absolute top-2/5 right-0 text-white">
+        <div className="bg-gray-800 bg-opacity-60 p-2 rounded-t-lg cursor-pointer hover:bg-opacity-70" onClick={() => setIsItemListVisible(!isItemListVisible)}>
+          <span>
+            アイテム一覧
+            <span className="ml-2">
+              {isItemListVisible ? '▲' : '▼'}
+            </span>
           </span>
-        </span>
-      </div>
+        </div>
       {isItemListVisible && (
       <div className="bg-gray bg-opacity-60 p-2 rounded-b-lg shadow-xl border-t border-gray-500">
-        {acquiredItems.map(item => (
-          <div
-          className={`p-2 rounded-b-lg shadow-xl border-t ${selectedItem && selectedItem.id === item.id ? 'bg-red-600' : 'bg-gray-800 bg-opacity-60'}`} 
-          onClick={() => handleItemSelect(item)}
+        {acquiredItems.map((item) => ( // `item`に変更
+          <div key={item.id} // `item.id`に変更
+            className={`p-2 rounded-b-lg shadow-xl border-t ${selectedItems.includes(item.id) ? 'bg-red-600' : 'bg-gray-800 bg-opacity-60'}`} 
+            onClick={() => handleItemSelect(item.id)}
           >
-          {item.name}
-          </div>
-        ))}
-      </div>
-      )}
+            {item.name}
+            </div>
+          ))}
+        </div>
+        )}
 
 
       </div>
-      {selectedItem && selectedItem.imagePath && (
-          <img src={selectedItem.imagePath} alt={selectedItem.name} className="absolute top-1/2 left-1/2 translate-x-[-50%] translate-y-[-50%] w-1/4 h-2/4"/>
+      {selectedItems.includes(3) && (
+        <img src="/box_blue.png" alt="青い箱" className="absolute top-1/2 left-1/2 translate-x-[-50%] translate-y-[-50%] w-1/4 h-2/4"/>
       )}
 
       {/* ドア */}
@@ -293,8 +316,8 @@ const handleConfirm = () => {
               <div className="absolute top-0 left-0 w-full h-full border-4 border-gray-600 bg-gray-800 bg-opacity-50 flex flex-col items-center justify-center">
                 <Choices
                   onConfirm={handleConfirm}
-                  onCancel={handleCancel}  
-                  options={choicesOptions} 
+                  onCancel={handleCancel}
+                  options={choicesOptions}
                 />
               </div>
             </div>

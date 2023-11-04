@@ -1,7 +1,5 @@
 'use client'
 
-import { useState } from 'react';
-
 const IndexPage = () => {
   const playMusic = (file: string) => {
     const audio = new Audio(file);
@@ -32,12 +30,9 @@ const IndexPage = () => {
       textAlign: 'center',
       color: 'white'
     },
-    passwordButtons: {
-      marginTop: '20px',
-      display: 'grid',
-      gridTemplateColumns: 'repeat(3, 1fr)',
-      gap: '10px',
-      color: 'white'
+    musicButton: {
+      fontSize: '1.5rem',   // フォントサイズを大きくする
+      cursor: 'pointer',    // カーソルをポインターにする
     }
   };
 
@@ -45,8 +40,11 @@ const IndexPage = () => {
     <div style={styles.container}>
       <div style={styles.background}></div>
       <div style={styles.content}>
-        <button onClick={() => playMusic('/misery.m4a')}>
-          オルゴール
+        <button
+          className="btn btn-neutral"
+          style={styles.musicButton} // ここに新しいスタイルを適用
+          onClick={() => playMusic('/misery.m4a')}>
+          オルゴールを鳴らす
         </button>
       </div>
     </div>
