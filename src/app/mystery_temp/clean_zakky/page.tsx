@@ -13,11 +13,11 @@ type Item = {
   name: string;
   backgroundId: number;  // このアイテムが表示される背景のID
   position: {
-    x: number; // 0~100の値で指定 
+    x: number;
     y: number;
   },
   clickableArea: {
-    width: number; // 0~100の値で指定
+    width: number;
     height: number; 
   }
   messages?: ItemMessage[];
@@ -34,8 +34,37 @@ type ItemMessage = {
 const backgrounds: Background[] = [
   { id: 1, path: '/dirty_room.png', name: 'room1' },
   { id: 2, path: '/wall.png', name: 'room2' },
-  { id: 3, path: '/horror_image.png', name: 'room3' },
+  { id: 3, path: '/dark.png', name: 'room3' },
 ];
+
+const Message = ({text}: {text: string}) => (
+  <div className="fixed justify-center items-end bottom-4 left-0 right-0 flex">
+    <div className="mb-20 w-3/5 p-20 relative">
+      <div className="absolute top-0 left-0 w-full h-full border-4 border-gray-600 bg-gray-800 bg-opacity-50">
+      <div className="flex items-center justify-center h-full text-white text-xl">{text}</div>
+      </div>
+    </div>
+  </div>
+);
+
+const Choices = ({ confirmText, cancelText, onConfirm, onCancel }) => (
+  <div className="fixed top-0 left-0 right-0 bottom-0 flex items-center justify-center">
+    <div className="relative w-1/5 p-14">
+      <div className="absolute top-0 left-0 w-full h-full border-4 border-gray-600 bg-gray-800 bg-opacity-50 flex flex-col items-center justify-center">
+        <div className="flex flex-col space-y-4">
+          <button className="px-4 text-white rounded hover:bg-gray-700"
+                  onClick={onConfirm}>
+            {confirmText}
+          </button>
+          <button className="px-4 text-white rounded hover:bg-gray-700"
+                  onClick={onCancel}>
+            {cancelText}
+          </button>
+        </div>
+      </div>
+    </div>      
+  </div>
+);
 
 export default function Home() {  // この部分を変更しました
   const [currentBackground, setCurrentBackground] = useState<Background>(backgrounds[0]);
@@ -58,32 +87,32 @@ export default function Home() {  // この部分を変更しました
   }
 
 const items: Item[] = [
-  { id: 1, name: 'ハサミ', backgroundId: 1,
+  { id: 1, name: 'ハサミ', backgroundId: 2,
     position: {
-      x: 30, // 30%の位置
+      x: 400, // 30%の位置
       y: 80  // 80%の位置
     },
     clickableArea: {
-      width: 10, // 10%の幅
-      height: 5   // 5%の高さ
+      width: 100, // 10%の幅
+      height: 50   // 5%の高さ
     },
     messages: [
       {
       text: "ハサミがあります",
       choices: {
-        confirmText: "拾う",
+        confirmText: "拾",
         cancelText: "拾わない"
       }
     }]
   },
   { id: 2, name: 'くまの人形', backgroundId: 1,
     position: {
-      x: 50, // 30%の位置
+      x: 500, // 30%の位置
       y: 80  // 80%の位置
     },
     clickableArea: {
-      width: 10, // 10%の幅
-      height: 5   // 5%の高さ
+      width: 100, // 10%の幅
+      height: 50   // 5%の高さ
     },
     messages: [
       {
@@ -96,12 +125,12 @@ const items: Item[] = [
   },
   { id: 3, name: '鍵', backgroundId: 1,
     position: {
-      x: 70, // 30%の位置
+      x: 700, // 30%の位置
       y: 80  // 80%の位置
     },
     clickableArea: {
-      width: 10, // 10%の幅
-      height: 5   // 5%の高さ
+      width: 100, // 10%の幅
+      height: 50  // 5%の高さ
     },
     messages: [
       {
@@ -114,12 +143,12 @@ const items: Item[] = [
   },
   { id: 4, name: '銃', backgroundId: 1,
     position: {
-      x: 85, // 30%の位置
-      y: 50  // 80%の位置
+      x: 900, // 30%の位置
+      y: 80  // 80%の位置
     },
     clickableArea: {
-      width: 10, // 10%の幅
-      height: 5   // 5%の高さ
+      width: 100, // 10%の幅
+      height: 50   // 5%の高さ
     },
     messages: [
       {
@@ -133,9 +162,6 @@ const items: Item[] = [
   // 他のアイテム...
 ];
 
-const gems: Item[] = [
-  { id: 4, name: 'gem', backgroundId: 1, position: null, clickableArea: null, messages: [] }
-];
 
 const handleBackgroundClick = (e: any) => {
   const clickX = e.clientX - e.currentTarget.getBoundingClientRect().left;
@@ -190,13 +216,14 @@ function handleItemSelect(item: Item) {
 }
 
 
-
 return (
   <div className="relative h-screen w-screen">
     {/* 背景の表示 */}
     <div 
-      className="bg-cover bg-center bg-image relative w-full h-full"
-      style={{ backgroundImage: `url(${currentBackground.path})` }}
+      className="bg-contain bg-center bg-no-repeat bg-black absolute top-1/2 left-1/2 translate-x-[-50%] translate-y-[-50%]"
+      style={{ backgroundImage: `url(${currentBackground.path})`,
+      width: `1400px`,
+      height: `750px` }}
       onClick={handleBackgroundClick}
     >
       {/* 現在の背景に関連するアイテムを表示 */}
@@ -207,61 +234,62 @@ return (
             key={item.id}
             className="absolute cursor-pointer bg-red-500 opacity-50" 
             style={{
-              left: `${item.position.x}%`,
-              top: `${item.position.y}%`,
-              width: `${item.clickableArea.width}%`,
-              height: `${item.clickableArea.height}%`,
+              left: `${item.position.x}px`,
+              top: `${item.position.y}px`,
+              width: `${item.clickableArea.width}px`,
+              height: `${item.clickableArea.height}px`,
             }}
             onClick={() => handleItemClick(item)}
-          ></div>
+          >
+            {item.name}
+          </div>
         ))
       }
-    </div>
-    
-    {/* 取得済みアイテムリストの表示 */}
-    <div className="absolute top-0 right-0 text-white">
-      <div className="bg-gray-800 bg-opacity-60 p-2 rounded-t-lg cursor-pointer hover:bg-opacity-70" onClick={() => setIsItemListVisible(!isItemListVisible)}>
-        <span>
-          アイテム一覧
-          <span className="ml-2">
-            {isItemListVisible ? '▲' : '▼'}
+      {/* 取得済みアイテムリストの表示 */}
+      <div className="absolute top-0 right-0 text-white">
+        <div className="bg-gray-800 bg-opacity-60 p-2 rounded-t-lg cursor-pointer hover:bg-opacity-70" onClick={() => setIsItemListVisible(!isItemListVisible)}>
+          <span>
+            アイテム一覧
+            <span className="ml-2">
+              {isItemListVisible ? '▲' : '▼'}
+            </span>
           </span>
-        </span>
-      </div>
-      {isItemListVisible && (
-        <div className="bg-gray bg-opacity-60 p-2 rounded-b-lg shadow-xl border-t border-gray-500">
-          {acquiredItems.map(item => (
-            <div
-              className={`p-2 rounded-b-lg shadow-xl border-t ${selectedItemList && selectedItemList.id === item.id ? 'bg-red-600' : 'bg-gray-800 bg-opacity-60'}`}
-              onClick={() => handleItemSelect(item)}
-            >
-              {item.name}
-            </div>
-          ))}
         </div>
-      )}
-    </div>
-
-    {/* 背景を切り替えるための矢印ボタン */}
-    <button className="absolute top-2 left-2" onClick={() => changeBackground("prev")}>←</button>
-    <button className="absolute top-2 right-2" onClick={() => changeBackground("next")}>→</button>
+        {isItemListVisible && (
+          <div className="bg-gray bg-opacity-60 p-2 rounded-b-lg shadow-xl border-t border-gray-500">
+            {acquiredItems.map(item => (
+              <div
+                className={`p-2 rounded-b-lg shadow-xl border-t ${selectedItemList && selectedItemList.id === item.id ? 'bg-red-600' : 'bg-gray-800 bg-opacity-60'}`}
+                onClick={() => handleItemSelect(item)}
+              >
+                {item.name}
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+      {/* 背景を切り替えるための矢印ボタン */}
+      <button className="absolute top-2 left-2" onClick={() => changeBackground("prev")}>←</button>
+      <button className="absolute top right-2" onClick={() => changeBackground("next")}>→</button>
     
-    {/* メッセージの表示 */}
-    {showMessage && selectedItem && selectedItem.messages && (
-    <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white p-4">
-    <p>{selectedItem.messages[selectedMessageIndex]?.text}</p>
-      {selectedItem.messages[selectedMessageIndex]?.choices && (
-      <>
-      <button onClick={handleConfirmChoice}>
-        {selectedItem.messages[selectedMessageIndex]?.choices?.confirmText}
-      </button>
-      <button onClick={() => setShowMessage(false)}>
-        {selectedItem.messages[selectedMessageIndex]?.choices?.cancelText}
-      </button>
-      </>
-    )}
-    </div>
-    )}
+      {/* メッセージの表示 */}
+      {showMessage && selectedItem && selectedItem.messages && (
+        <>
+          {selectedItem.messages[selectedMessageIndex] && (
+            <Message text={selectedItem.messages[selectedMessageIndex].text} />
+          )}
+          
+          {selectedItem.messages[selectedMessageIndex]?.choices && (
+            <Choices
+              confirmText={selectedItem.messages[selectedMessageIndex].choices.confirmText}
+              cancelText={selectedItem.messages[selectedMessageIndex].choices.cancelText || 'キャンセル'}
+              onConfirm={handleConfirmChoice}
+              onCancel={() => setShowMessage(false)}
+            />
+          )}
+        </>
+      )}
+  </div>    
 </div>
 );
 }
