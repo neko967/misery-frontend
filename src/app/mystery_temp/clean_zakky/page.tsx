@@ -100,7 +100,7 @@ const items: Item[] = [
       {
       text: "ハサミがあります",
       choices: {
-        confirmText: "拾う",
+        confirmText: "拾",
         cancelText: "拾わない"
       }
     }]
