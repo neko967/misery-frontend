@@ -94,25 +94,7 @@ export default function Home({ params }: { params: { slug: string } }) {
     },
     {
       id: 2,
-      name: '鍵',
-      positionClasses: "absolute top-1/2 left-1/2 translate-x-[calc(-50%+480px)] translate-y-[calc(-50%+120px)]",
-      width: "w-80",
-      height: "h-16",
-      // コメントアウトで、クリック部分の色を消す
-      additionalStyles: { background: 'rgba(255, 255, 255, 0.1)', borderRadius: '8px' },
-      messages: [
-        {
-          text: "鍵を取得しますか？",
-          choices: {
-            confirmText: "取得する",
-            cancelText: "取得しない"
-          }
-        }
-      ]
-    },
-    {
-      id: 3,
-      name: '青い箱',
+      name: '赤い箱',
       imagePath: '/box_blue.png',
       positionClasses: "absolute top-1/2 left-1/2 translate-x-[calc(-50%+50px)] translate-y-[calc(-50%-120px)]",
       width: "w-20",
@@ -249,6 +231,14 @@ export default function Home({ params }: { params: { slug: string } }) {
     }
   };
 
+  const handleClickHole = () => {
+    if (ws && ws.readyState === WebSocket.OPEN) {
+      if (selectedItem && selectedItem.name === 'ナイフ') {
+        ws.send('sendKnifeFromCleanToDirty');
+      }
+    }
+  };
+
   useEffect(() => {
     async function checkRoomExists() {
       const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_HTTP_URL}/api/room-exists/${params.slug}`);
@@ -266,6 +256,17 @@ export default function Home({ params }: { params: { slug: string } }) {
             setIsCleanDoorOpen(true);
           } else if (event.data == "openDirtyDoor") {
             setIsDirtyDoorOpen(true);
+          } else if (event.data == "sendKnifeFromDirtyToClean") {
+            if (items[2]) {
+              setAcquiredItems([...acquiredItems, items[2]]);
+            }
+          } else if (event.data == "sendKnifeFromCleanToDirty") {
+            if (selectedItem && selectedItem.name === 'ナイフ') {
+              let result = acquiredItems.filter(function( item ) {
+                return item.name !== 'ナイフ';
+              });
+              setAcquiredItems(result);
+            }
           }
         };
 
@@ -276,7 +277,7 @@ export default function Home({ params }: { params: { slug: string } }) {
     }
 
     checkRoomExists();
-  }, [params.slug]);
+  }, [params.slug, selectedItem]);
 
   async function openDirtyDoor() {
     if (ws && ws.readyState === WebSocket.OPEN) {
@@ -353,6 +354,11 @@ export default function Home({ params }: { params: { slug: string } }) {
         {/* 条件に基づいて右の三角形ボタンを表示 */}
         {backgroundImage === '/wall.png' && (
           <>
+            <button onClick={handleClickHole}
+                    className="text-white absolute top-1/2 left-1/2 translate-x-[calc(-50%+10px)] translate-y-[calc(-50%)] w-36 h-36"
+            >
+              壁の穴
+            </button>
             <TriangleButton direction="right" handleClickTriangle={() => switchBackgroundImage('right')} />
           </>
         )}
