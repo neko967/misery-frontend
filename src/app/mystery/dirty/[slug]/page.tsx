@@ -59,11 +59,12 @@ export default function Home({ params }: { params: { slug: string } }) {
   const router = useRouter();
   const [isCleanDoorOpen, setIsCleanDoorOpen] = useState(false);
   const [isDirtyDoorOpen, setIsDirtyDoorOpen] = useState(false);
+  const [isKeyBroken, setIsKeyBroken] = useState(false);
   const [acquiredItems, setAcquiredItems] = useState<Item[]>([]); // 取得済みのアイテムを管理する状態
   const [currentItem, setCurrentItem] = useState<Item | null>(null); // 現在選択されているアイテムを管理する状態 毎回nullにリセット
   const [messageIndex, setMessageIndex] = useState<number>(0); // 現在のメッセージのインデックスを管理する状態
   const [isItemListVisible, setIsItemListVisible] = useState(false); // アイテムリストの表示・非表示を管理する状態
-  const [selectedItem, setSelectedItem] = useState<Item | null>(null); // 選択中のアイテムを管理する状態
+  const [selectedItem, setSelectedItem] = useState<Item | null>(null); // アイテムリストからアイテムを選択するときに使う
   const [backgroundImage, setBackgroundImage] = useState('/dirty_room.png');
   const { height, width } = GetWindowSize();
   const x_number = width*70/width
@@ -189,10 +190,10 @@ export default function Home({ params }: { params: { slug: string } }) {
 
   // アイテムがクリックされた時の処理
   const handleClick = (item: Item) => {
-    if (item.id === 5 && selectedItem && selectedItem.name === 'ナイフ') {
+    if (item.name === '壁' && selectedItem && selectedItem.name === 'ナイフ') {
       setCurrentItem(item);
       setMessageIndex(1);
-    } else if (item.id === 5) {
+    } else if (item.name === '壁') {
       setCurrentItem(item);
       setMessageIndex(0); 
     } else if (!acquiredItems.some(acquiredItem => acquiredItem.id === item.id)) {
@@ -203,7 +204,7 @@ export default function Home({ params }: { params: { slug: string } }) {
 
   // 選択肢の処理
   const handleConfirm = () => {
-    if (currentItem?.id === 5) {
+    if (currentItem?.name === '壁') {
       let gem = items.find(item => item.id === 6);
       if (gem) {
         gem.additionalStyles = {}; // Show the gem
@@ -240,6 +241,14 @@ export default function Home({ params }: { params: { slug: string } }) {
     }
   };
 
+  const handleClickHole = () => {
+    if (ws && ws.readyState === WebSocket.OPEN) {
+      if (selectedItem && selectedItem.name === 'ナイフ') {
+        ws.send('sendKnifeFromDirtyToClean');
+      }
+    }
+  };
+
   useEffect(() => {
     async function checkRoomExists() {
       const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_HTTP_URL}/api/room-exists/${params.slug}`);
@@ -257,6 +266,17 @@ export default function Home({ params }: { params: { slug: string } }) {
             setIsCleanDoorOpen(true);
           } else if (event.data == "openDirtyDoor") {
             setIsDirtyDoorOpen(true);
+          } else if (event.data == "sendKnifeFromCleanToDirty") {
+            if (items[2]) {
+              setAcquiredItems([...acquiredItems, items[2]]);
+            }
+          } else if (event.data == "sendKnifeFromDirtyToClean") {
+            if (selectedItem && selectedItem.name === 'ナイフ') {
+              let result = acquiredItems.filter(function( item ) {
+                return item.name !== 'ナイフ';
+              });
+              setAcquiredItems(result);
+            }
           }
         };
 
@@ -267,7 +287,7 @@ export default function Home({ params }: { params: { slug: string } }) {
     }
 
     checkRoomExists();
-  }, [params.slug]);
+  }, [params.slug, selectedItem]);
 
   async function openCleanDoor() {
     if (ws && ws.readyState === WebSocket.OPEN) {
@@ -295,6 +315,11 @@ export default function Home({ params }: { params: { slug: string } }) {
         {/* 条件に基づいて左の三角形ボタンを表示 */}
         {backgroundImage === '/wall.png' && (
           <>
+            <button onClick={handleClickHole}
+                    className="text-white absolute top-1/2 left-1/2 translate-x-[calc(-50%+10px)] translate-y-[calc(-50%)] w-36 h-36"
+            >
+              壁の穴
+            </button>
             <TriangleButton direction="left" handleClickTriangle={() => switchBackgroundImage('left')} />
           </>
         )}
@@ -371,7 +396,7 @@ export default function Home({ params }: { params: { slug: string } }) {
           </div>
           )}
         </div>
-        {/* 選んだアイテムが画像を表示するもの（ぬいぐるみ、箱）の場合、画像を表示する */}
+        {/* アイテムリストから選んだアイテムが画像を表示するもの（ぬいぐるみ、箱）の場合、画像を表示する */}
         {selectedItem && selectedItem.imagePath && (
           <Image src={selectedItem.imagePath} 
                  alt={selectedItem.name}
