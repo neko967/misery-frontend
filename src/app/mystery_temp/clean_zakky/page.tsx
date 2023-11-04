@@ -2,6 +2,8 @@
 
 import { useState } from 'react';
 
+type AcquiredItems = Item[];
+
 type Background = {
   id: number;
   path: string;
@@ -31,6 +33,13 @@ type ItemMessage = {
   };
 };
 
+type Props = {
+  confirmText: string;
+  cancelText?: string;
+  onConfirm: () => void; 
+  onCancel: () => void;
+}
+
 const backgrounds: Background[] = [
   { id: 1, path: '/dirty_room.png', name: 'room1' },
   { id: 2, path: '/wall.png', name: 'room2' },
@@ -47,7 +56,7 @@ const Message = ({text}: {text: string}) => (
   </div>
 );
 
-const Choices = ({ confirmText, cancelText, onConfirm, onCancel }) => (
+const Choices = ({ confirmText, cancelText, onConfirm, onCancel }: Props) => (
   <div className="fixed top-0 left-0 right-0 bottom-0 flex items-center justify-center">
     <div className="relative w-1/5 p-14">
       <div className="absolute top-0 left-0 w-full h-full border-4 border-gray-600 bg-gray-800 bg-opacity-50 flex flex-col items-center justify-center">
@@ -71,10 +80,13 @@ export default function Home() {  // この部分を変更しました
   const [selectedItem, setSelectedItem] = useState<Item | null>(null);
   const [showMessage, setShowMessage] = useState<boolean>(false);
   const [selectedMessageIndex, setSelectedMessageIndex] = useState<number>(0); // アイテムごとに複数のメッセージを持つ場合に使用する。
-  const [acquiredItems, setAcquiredItems] = useState([]); // 取得済みのアイテムを管理するステート
+  const [acquiredItems, setAcquiredItems] = useState<AcquiredItems>([]); // 取得済みのアイテムを管理するステート
   const [isItemListVisible, setIsItemListVisible] = useState(false); //アイテムリストの表示/非表示
   const [selectedItemList, setSelectedItemList] = useState<Item | null>(null);
 
+  
+  
+  // 背景画像をループで行き来できる。※更にview側で、id:1とid:2のみ行き来できる制御にしている。
   const changeBackground = (direction: "next" | "prev") => {
     const currentIndex = backgrounds.findIndex(bg => bg.id === currentBackground.id);
     if (direction === "next") {
@@ -87,9 +99,9 @@ export default function Home() {  // この部分を変更しました
   }
 
 const items: Item[] = [
-  { id: 1, name: 'ハサミ', backgroundId: 2,
+  { id: 1, name: 'ハサミ', backgroundId: 1,
     position: {
-      x: 400, // 30%の位置
+      x: 300, // 30%の位置
       y: 80  // 80%の位置
     },
     clickableArea: {
@@ -162,7 +174,6 @@ const items: Item[] = [
   // 他のアイテム...
 ];
 
-
 const handleBackgroundClick = (e: any) => {
   const clickX = e.clientX - e.currentTarget.getBoundingClientRect().left;
   const clickY = e.clientY - e.currentTarget.getBoundingClientRect().top;
@@ -214,7 +225,6 @@ function handleItemSelect(item: Item) {
     setSelectedItemList(item);
   }
 }
-
 
 return (
   <div className="relative h-screen w-screen">
@@ -269,9 +279,13 @@ return (
         )}
       </div>
       {/* 背景を切り替えるための矢印ボタン */}
-      <button className="absolute top-2 left-2" onClick={() => changeBackground("prev")}>←</button>
-      <button className="absolute top right-2" onClick={() => changeBackground("next")}>→</button>
-    
+      {currentBackground.id === 1 && (
+        <button className="text-white absolute ml-2 top-1/2 right-2" onClick={() => changeBackground("next")}>▷</button>
+      )}
+
+      {currentBackground.id === 2 && (
+        <button className="text-white absolute ml-2 top-1/2 left-2" onClick={() => changeBackground("prev")}>◁</button>
+      )}
       {/* メッセージの表示 */}
       {showMessage && selectedItem && selectedItem.messages && (
         <>
@@ -281,8 +295,8 @@ return (
           
           {selectedItem.messages[selectedMessageIndex]?.choices && (
             <Choices
-              confirmText={selectedItem.messages[selectedMessageIndex].choices.confirmText}
-              cancelText={selectedItem.messages[selectedMessageIndex].choices.cancelText || 'キャンセル'}
+              confirmText={selectedItem?.messages[selectedMessageIndex]?.choices?.confirmText}
+              cancelText={selectedItem?.messages[selectedMessageIndex]?.choices?.cancelText || 'キャンセル'}
               onConfirm={handleConfirmChoice}
               onCancel={() => setShowMessage(false)}
             />
