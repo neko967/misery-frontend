@@ -1,16 +1,14 @@
-@function rand($min, $max) {
-    @return random() * ($max - $min) + $min;
-  }
+
   
-  $animation-duration: 3s;
-  $glitch-duration: 20%;
-  $glitch-frequency: 10;
-  $glitch-interval: $glitch-duration / $glitch-frequency;
+  animation-duration: 3s;
+  glitch-duration: 20%;
+  glitch-frequency: 10;
+  glitch-interval: glitch-duration / glitch-frequency;
   
   @mixin rgb-shift($name) {
     @keyframes rgb-shift-#{$name} {
-      @for $i from 0 to $glitch-frequency {
-        #{$i * $glitch-interval} {
+      @for i from 0 to glitch-frequency {
+        #{i * $glitch-interval} {
           transform: translate(
             #{rand(-2, 2) * 1%},
             #{rand(-0.5, 0.5) * 1%}
