@@ -32,6 +32,16 @@ export default function Dealer({ params }: { params: { slug: string } }) {
   // const [wallPositions, setWallPositions] = useState<number[][]>([[16, 13]]);
   // 壁の表示/非表示を管理するstateを追加
   const [showWall, setShowWall] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  useEffect(() => {
+    setIsModalOpen(true);
+  }, []);
+
+  // モーダルを閉じる関数
+  const closeModal = () => {
+    setIsModalOpen(false);
+  };
 
   useEffect(() => {
     const startPosition = document.querySelector('[data-start]');
@@ -108,7 +118,7 @@ export default function Dealer({ params }: { params: { slug: string } }) {
       const interval = setInterval(() => {
         setShowWall(prev => !prev); 
       }, 2000);
-    
+
       return () => clearInterval(interval);
     }, []);
 
@@ -170,9 +180,29 @@ export default function Dealer({ params }: { params: { slug: string } }) {
 
   return (
     <main>
+      <div>
+        height:{height} width:{width}
+        <div>
+      {isModalOpen && (
+        <div className="modal modal-open">
+          <div className="modal-box">
+            <p>閉ざされた屋敷の扉を押し開けると、そこはもはやただの屋敷ではなかった。<br/>
+              廊下は歪み、部屋は迷路と化し、二人の冒険者を待ち受ける。<br/>
+              挑戦を開始するには、一歩を踏み出し、赤いゴールを目指し、壁に触れぬよう慎重に進まねばならない。<br/>
+              しかし、一人の力では脱出の望みは薄い。絆と信頼を武器に、二人で協力し合ってこの屋敷からの脱出を目指そう。<br/>
+              その先には、予想もしない真実が二人を待っているかもしれない。</p>
+          <div className="text-right">
+          <button className="btn" onClick={closeModal}>閉じる</button>
+        </div>
+      </div>
+    </div>
+      )}
+    </div>
+      </div>
       {!isGameStarted ? (
         // ゲームが開始されていない場合、スタートボタンを表示
         <button onClick={() => setIsGameStarted(true)}
+        className="btn btn-error"
         style={{
           position: 'absolute',
           top: 18 * cellSize + 'px',
@@ -229,7 +259,7 @@ export default function Dealer({ params }: { params: { slug: string } }) {
                         'white',
                     cursor: `url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="5" height="5" viewBox="0 0 2 2"><circle cx="1" cy="1" r="1" fill="black" /></svg>') 1 1, auto`,
                     backgroundSize: 'cover',
-                    backgroundImage: 
+                    backgroundImage:
                         cell === '#' ? `url(${brickImage})` :
                         cell === 'K' ? (
                           rowIndex === keyPositions[1][0] && cellIndex === keyPositions[1][1] && !keys.key1 ? `url(${keyImage})` :
@@ -240,8 +270,8 @@ export default function Dealer({ params }: { params: { slug: string } }) {
                           rowIndex === doorPositions[1][0] && cellIndex === doorPositions[1][1] && !keys.key1 ? `url(${doorImage})` :
                           rowIndex === doorPositions[2][0] && cellIndex === doorPositions[2][1] && !keys.key2 ? `url(${doorImage})` :
                           rowIndex === doorPositions[3][0] && cellIndex === doorPositions[3][1] && !keys.key3 ? `url(${doorImage})` : undefined
-                        ) : 
-                        undefined,                          
+                        ) :
+                        undefined,
                 }}
               ></div>
             ))
