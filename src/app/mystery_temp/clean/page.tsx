@@ -252,7 +252,7 @@ const handleConfirm = () => {
     <div
       // 背景画像
       className="h-screen w-full bg-contain bg-center bg-no-repeat"
-      style={{ backgroundImage: "url('/dirty_house.png')" }}
+      style={{ backgroundImage: "url('/dirty_room.png')" }}
     >
       {/* アイテム配置 */}
       {items.map(item => (
