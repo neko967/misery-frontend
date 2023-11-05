@@ -67,14 +67,12 @@ export default function Home({ params }: { params: { slug: string } }) {
   const [selectedItem, setSelectedItem] = useState<Item | null>(null); // アイテムリストからアイテムを選択するときに使う
   const [backgroundImage, setBackgroundImage] = useState('/dirty_room.png');
   const { height, width } = GetWindowSize();
-  const x_number = width*70/width
-  const y_number = height*90/height
 
   // 配列にて、アイテム、メッセージ、選択肢等をオブジェクトの形で管理。
   const items: Item[] = [
     {
       id: 1,
-      name: '本',
+      name: '日記',
       positionClasses: "absolute top-1/2 left-1/2 translate-x-[calc(-50%+360px)] translate-y-[calc(-50%+350px)]",
       width: "w-64",
       height: "h-20",
@@ -82,14 +80,14 @@ export default function Home({ params }: { params: { slug: string } }) {
       additionalStyles: { background: 'rgba(255, 255, 255, 0.1)', borderRadius: '8px' },
       messages: [
         {
-          text: "本を開きますか？",
+          text: "日記を開きますか？",
           choices: {
             confirmText: "開く",
             cancelText: "開かない"
           }
         },
         {
-          text: "本の内容を読みますか？",
+          text: "日記の内容を読みますか？",
           choices: {
             confirmText: "読む",
             cancelText: "読まない"
@@ -121,9 +119,45 @@ export default function Home({ params }: { params: { slug: string } }) {
       ]
     },
     {
+      id: 3,
+      name: 'ドア',
+      positionClasses: "absolute top-1/2 left-2/3 translate-x-[calc(-50%+120px)] translate-y-[calc(-50%)] w-36 h-96 opacity-0 text-white",
+      width: "w-24",
+      height: "h-12",
+      // コメントアウトで、クリック部分の色を消す
+      additionalStyles: { background: 'rgba(255, 255, 255, 0.1)', borderRadius: '8px' },
+      messages: [
+        {
+          text: "",
+          choices: {
+            confirmText: "ドアを開ける",
+            cancelText: "やめておく"
+          }
+        }
+      ]
+    },
+    {
       id: 4,
+      name: 'オルゴール',
+      positionClasses: `absolute top-1/2 left-1/2 translate-x-[calc(-50%+90px)] translate-y-[calc(-50%+30px)]`,
+      width: "w-24",
+      height: "h-12",
+      // コメントアウトで、クリック部分の色を消す
+      additionalStyles: { background: 'rgba(255, 255, 255, 0.1)', borderRadius: '8px' },
+      messages: [
+        {
+          text: "引き出しを開けた。オルゴールがある。鳴らしてみますか？",
+          choices: {
+            confirmText: "鳴らす",
+            cancelText: "やめておく"
+          }
+        }
+      ]
+    },
+    {
+      id: 5,
       name: 'ナイフ',
-      positionClasses: `absolute top-1/2 left-1/2 translate-x-[calc(-50%-${x_number}px)] translate-y-[calc(-50%+${y_number}px)]`,
+      positionClasses: `absolute top-1/2 left-1/2 translate-x-[calc(-50%-70px)] translate-y-[calc(-50%+90px)]`,
       width: "w-44",
       height: "h-12",
       // コメントアウトで、クリック部分の色を消す
@@ -139,7 +173,7 @@ export default function Home({ params }: { params: { slug: string } }) {
       ]
     },
     {
-      id: 5,
+      id: 6,
       name: '壁',
       positionClasses: "absolute top-1/2 left-1/2 translate-x-[calc(-50%-400px)] translate-y-[calc(-50%+80px)]",
       width: "w-28",
@@ -160,7 +194,7 @@ export default function Home({ params }: { params: { slug: string } }) {
       ]
     },
     {
-      id: 6,
+      id: 7,
       name: 'ぬいぐるみ',
       imagePath: '/stuffed_bear.png',
       positionClasses: "absolute top-1/2 left-1/2 translate-x-[calc(-50%-150px)] translate-y-[calc(-50%+200px)] -skew-y-12 opacity-50",
@@ -174,6 +208,10 @@ export default function Home({ params }: { params: { slug: string } }) {
             confirmText: "手を伸ばす",
             cancelText: "やめておく"
           }
+        },
+        {
+          text: "ぬいぐるみを手に入れた",
+          choices: null
         }
       ]
     }
@@ -190,10 +228,10 @@ export default function Home({ params }: { params: { slug: string } }) {
 
   // アイテムがクリックされた時の処理
   const handleClick = (item: Item) => {
-    if (item.name === '壁' && selectedItem && selectedItem.name === 'ナイフ') {
+    if (item.name === '青い箱' && isKeyBroken) {
       setCurrentItem(item);
       setMessageIndex(1);
-    } else if (item.name === '壁') {
+    } else if (item.name === '青い箱') {
       setCurrentItem(item);
       setMessageIndex(0); 
     } else if (!acquiredItems.some(acquiredItem => acquiredItem.id === item.id)) {
@@ -211,7 +249,12 @@ export default function Home({ params }: { params: { slug: string } }) {
       }
       setCurrentItem(null);
     } else if (currentItem && messageIndex < currentItem.messages.length - 1) {
+      if (currentItem && currentItem.name === 'ぬいぐるみ') {
+        setAcquiredItems([...acquiredItems, currentItem])
+      }
       setMessageIndex(prevIndex => prevIndex + 1);
+    } else if (currentItem && currentItem.name === 'オルゴール') {
+      playMusic('/misery.m4a')
     } else {
       if (currentItem) {
         setAcquiredItems([...acquiredItems, currentItem]);
@@ -249,6 +292,11 @@ export default function Home({ params }: { params: { slug: string } }) {
     }
   };
 
+  const playMusic = (file: string) => {
+    const audio = new Audio(file);
+    audio.play();
+  };
+
   useEffect(() => {
     async function checkRoomExists() {
       const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_HTTP_URL}/api/room-exists/${params.slug}`);
@@ -267,8 +315,8 @@ export default function Home({ params }: { params: { slug: string } }) {
           } else if (event.data == "openDirtyDoor") {
             setIsDirtyDoorOpen(true);
           } else if (event.data == "sendKnifeFromCleanToDirty") {
-            if (items[2]) {
-              setAcquiredItems([...acquiredItems, items[2]]);
+            if (items[3]) {
+              setAcquiredItems([...acquiredItems, items[3]]);
             }
           } else if (event.data == "sendKnifeFromDirtyToClean") {
             if (selectedItem && selectedItem.name === 'ナイフ') {
@@ -338,13 +386,6 @@ export default function Home({ params }: { params: { slug: string } }) {
                 {item.name}
               </div>
             ))}
-  
-            {/* ドア */}
-            <button onClick={goMazeDirty}
-                    className="text-white absolute top-1/2 left-2/3 translate-x-[calc(-50%+120px)] translate-y-[calc(-50%)] w-36 h-96"
-            >
-              ドア
-            </button>
             {/* currentItemに値がある場合、以降のメッセージと選択を描画する */}
             {currentItem && (
               <>

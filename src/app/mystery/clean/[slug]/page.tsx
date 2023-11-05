@@ -58,8 +58,10 @@ export default function Home({ params }: { params: { slug: string } }) {
   const router = useRouter();
   const [isCleanDoorOpen, setIsCleanDoorOpen] = useState(false);
   const [isDirtyDoorOpen, setIsDirtyDoorOpen] = useState(false);
+  const [isKeyBroken, setIsKeyBroken] = useState(false);
   const [acquiredItems, setAcquiredItems] = useState<Item[]>([]); // 取得済みのアイテムを管理する状態
   const [currentItem, setCurrentItem] = useState<Item | null>(null); // 現在選択されているアイテムを管理する状態 毎回nullにリセット
+  const [focusItem, setFocusItem] = useState<Item | null>(null); // 特定のアイテムにフォーカスする 毎回nullにリセット
   const [messageIndex, setMessageIndex] = useState<number>(0); // 現在のメッセージのインデックスを管理する状態
   const [isItemListVisible, setIsItemListVisible] = useState(false); // アイテムリストの表示・非表示を管理する状態
   const [selectedItem, setSelectedItem] = useState<Item | null>(null); // 選択中のアイテムを管理する状態
@@ -69,7 +71,7 @@ export default function Home({ params }: { params: { slug: string } }) {
   const items: Item[] = [
     {
       id: 1,
-      name: '本',
+      name: '日記',
       positionClasses: "absolute top-1/2 left-1/2 translate-x-[calc(-50%+360px)] translate-y-[calc(-50%+350px)]",
       width: "w-64",
       height: "h-20",
@@ -77,14 +79,14 @@ export default function Home({ params }: { params: { slug: string } }) {
       additionalStyles: { background: 'rgba(255, 255, 255, 0.1)', borderRadius: '8px' },
       messages: [
         {
-          text: "本を開きますか？",
+          text: "日記を開きますか？",
           choices: {
             confirmText: "開く",
             cancelText: "開かない"
           }
         },
         {
-          text: "本の内容を読みますか？",
+          text: "日記の内容を読みますか？",
           choices: {
             confirmText: "読む",
             cancelText: "読まない"
@@ -95,7 +97,7 @@ export default function Home({ params }: { params: { slug: string } }) {
     {
       id: 2,
       name: '赤い箱',
-      imagePath: '/box_blue.png',
+      imagePath: '/box_red.png',
       positionClasses: "absolute top-1/2 left-1/2 translate-x-[calc(-50%+50px)] translate-y-[calc(-50%-120px)]",
       width: "w-20",
       height: "h-12",
@@ -103,17 +105,58 @@ export default function Home({ params }: { params: { slug: string } }) {
       additionalStyles: { background: 'rgba(255, 255, 255, 0.1)', borderRadius: '8px' },
       messages: [
         {
-          text: "青い箱を取得しますか？",
+          text: "ボロボロの鍵がかかっている...衝撃を加えれば壊れそうだ。",
+          choices: null
+        },
+        {
+          text: "鍵が壊れている...開けますか？",
           choices: {
-            confirmText: "取得する",
-            cancelText: "取得しない"
+            confirmText: "開ける",
+            cancelText: "開けない"
+          }
+        }
+      ]
+    },
+    {
+      id: 3,
+      name: 'ドア',
+      positionClasses: "absolute top-1/2 left-2/3 translate-x-[calc(-50%+120px)] translate-y-[calc(-50%)] w-36 h-96 text-white",
+      width: "w-24",
+      height: "h-12",
+      // コメントアウトで、クリック部分の色を消す
+      additionalStyles: { background: 'rgba(255, 255, 255, 0.1)', borderRadius: '8px' },
+      messages: [
+        {
+          text: "",
+          choices: {
+            confirmText: "鳴らす",
+            cancelText: "やめておく"
           }
         }
       ]
     },
     {
       id: 4,
-      name: 'ナイフ',
+      name: 'パスワード付きの箱',
+      imagePath: '/passwordbox.png',
+      positionClasses: "absolute top-1/2 left-1/2 translate-x-[calc(-50%+140px)] translate-y-[calc(-50%+180px)]",
+      width: "w-44",
+      height: "h-12",
+      // コメントアウトで、クリック部分の色を消す
+      additionalStyles: { background: 'rgba(255, 255, 255, 0.1)', borderRadius: '8px' },
+      messages: [
+        {
+          text: "大きな箱だ。パスワードがかけられている。",
+          choices: {
+            confirmText: "見てみる",
+            cancelText: "やめておく"
+          }
+        }
+      ]
+    },
+    {
+      id: 5,
+      name: 'はさみ',
       positionClasses: "absolute top-1/2 left-1/2 translate-x-[calc(-50%+40px)] translate-y-[calc(-50%+80px)]",
       width: "w-44",
       height: "h-12",
@@ -121,7 +164,7 @@ export default function Home({ params }: { params: { slug: string } }) {
       additionalStyles: { background: 'rgba(255, 255, 255, 0.1)', borderRadius: '8px' },
       messages: [
         {
-          text: "ナイフを取得しますか？",
+          text: "はさみを取得しますか？",
           choices: {
             confirmText: "取得する",
             cancelText: "取得しない"
@@ -130,7 +173,7 @@ export default function Home({ params }: { params: { slug: string } }) {
       ]
     },
     {
-      id: 5,
+      id: 6,
       name: '壁',
       positionClasses: "absolute top-1/2 left-1/2 translate-x-[calc(-50%-400px)] translate-y-[calc(-50%+80px)]",
       width: "w-28",
@@ -151,7 +194,7 @@ export default function Home({ params }: { params: { slug: string } }) {
       ]
     },
     {
-      id: 6,
+      id: 7,
       name: '宝石',
       positionClasses: "absolute top-1/2 left-1/2 translate-x-[calc(-50%-400px)] translate-y-[calc(-50%-100px)]",
       width: "w-28",
@@ -180,7 +223,7 @@ export default function Home({ params }: { params: { slug: string } }) {
 
   // アイテムがクリックされた時の処理
   const handleClick = (item: Item) => {
-    if (item.id === 5 && selectedItem && selectedItem.name === 'ナイフ') {
+    if (item.name === '赤い箱' && isKeyBroken) {
       setCurrentItem(item);
       setMessageIndex(1);
     } else if (item.id === 5) {
@@ -386,13 +429,23 @@ export default function Home({ params }: { params: { slug: string } }) {
           </div>
           )}
         </div>
+        {/* 選んだアイテムがフォーカスするもの（パスワード付きの箱）の場合、画像とモーダルを表示する */}
+        {focusItem && focusItem.imagePath && (
+          <Image src={focusItem.imagePath} 
+                 alt={focusItem.name}
+                 width={1280} 
+                 height={852}
+                 className="absolute top-1/2 left-1/2 translate-x-[-50%] translate-y-[-50%] w-1/2 h-2/4"
+                 priority
+          />
+        )}
         {/* 選んだアイテムが画像を表示するもの（ぬいぐるみ、箱）の場合、画像を表示する */}
         {selectedItem && selectedItem.imagePath && (
           <Image src={selectedItem.imagePath} 
                  alt={selectedItem.name}
                  width={1280} 
                  height={852}
-                 className="absolute top-1/2 left-1/2 translate-x-[-50%] translate-y-[-50%] w-1/4 h-2/4"
+                 className="absolute top-1/2 left-1/2 translate-x-[-50%] translate-y-[-50%] w-1/2 h-2/4"
                  priority
           />
         )}
