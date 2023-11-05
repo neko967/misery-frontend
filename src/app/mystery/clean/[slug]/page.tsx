@@ -8,7 +8,7 @@ type Item = {
   id: number;
   name: string;
   imagePath?: string;
-  positionClasses: string;
+  positionClasses?: string;
   width?: string; // 例: "w-32"
   height?: string; // 例: "h-32"
   additionalStyles?: React.CSSProperties;
@@ -20,6 +20,25 @@ type Item = {
     }| null;
   }[];
 };
+
+const PasswordButton = ({ value, onClick }: any) => (
+  <button
+    className="btn btn-square"
+    onClick={() => onClick(value)}
+  >
+    {value}
+  </button>
+);
+
+const PasswordDisplay = ({ password }: any) => (
+  <div className="mt-2.5 text-5x1 text-yellow-200">
+    {password}
+  </div>
+);
+
+const ErrorMessage = ({ showError }: any) => (
+  showError && <div style={{ color: 'red' }}>パスワードが違います</div>
+);
 
 // メッセージコンポーネント
 const Message = ({text}: {text: string}) => {
@@ -66,6 +85,11 @@ export default function Home({ params }: { params: { slug: string } }) {
   const [isItemListVisible, setIsItemListVisible] = useState(false); // アイテムリストの表示・非表示を管理する状態
   const [selectedItem, setSelectedItem] = useState<Item | null>(null); // 選択中のアイテムを管理する状態
   const [backgroundImage, setBackgroundImage] = useState('/clean_room.png');
+  const [showPasswordButtons, setShowPasswordButtons] = useState<boolean>(false); //ここからパスワード付きの箱
+  const [password, setPassword] = useState<string>('');
+  const [passwordAttempted, setPasswordAttempted] = useState<boolean>(false);
+  const correctSequence: string = '7305*7'; // 正しいパスワード
+  const [showError, setShowError] = useState<boolean>(false); //ここまでパスワード付きの箱
 
   // 配列にて、アイテム、メッセージ、選択肢等をオブジェクトの形で管理。
   const items: Item[] = [
@@ -139,9 +163,9 @@ export default function Home({ params }: { params: { slug: string } }) {
       id: 4,
       name: 'パスワード付きの箱',
       imagePath: '/passwordbox.png',
-      positionClasses: "absolute top-1/2 left-1/2 translate-x-[calc(-50%+140px)] translate-y-[calc(-50%+180px)]",
-      width: "w-44",
-      height: "h-12",
+      positionClasses: "absolute top-1/2 left-1/2 translate-x-[calc(-50%-35px)] translate-y-[calc(-50%+195px)]",
+      width: "w-32",
+      height: "h-16",
       // コメントアウトで、クリック部分の色を消す
       additionalStyles: { background: 'rgba(255, 255, 255, 0.1)', borderRadius: '8px' },
       messages: [
@@ -156,15 +180,10 @@ export default function Home({ params }: { params: { slug: string } }) {
     },
     {
       id: 5,
-      name: 'はさみ',
-      positionClasses: "absolute top-1/2 left-1/2 translate-x-[calc(-50%+40px)] translate-y-[calc(-50%+80px)]",
-      width: "w-44",
-      height: "h-12",
-      // コメントアウトで、クリック部分の色を消す
-      additionalStyles: { background: 'rgba(255, 255, 255, 0.1)', borderRadius: '8px' },
+      name: '銃',
       messages: [
         {
-          text: "はさみを取得しますか？",
+          text: "銃を取得しますか？",
           choices: {
             confirmText: "取得する",
             cancelText: "取得しない"
@@ -245,6 +264,9 @@ export default function Home({ params }: { params: { slug: string } }) {
       setCurrentItem(null);
     } else if (currentItem && messageIndex < currentItem.messages.length - 1) {
       setMessageIndex(prevIndex => prevIndex + 1);
+    } else if (currentItem && currentItem.name === 'パスワード付きの箱') {
+      setShowPasswordButtons(true)
+      setCurrentItem(null);
     } else {
       if (currentItem) {
         setAcquiredItems([...acquiredItems, currentItem]);
@@ -336,6 +358,60 @@ export default function Home({ params }: { params: { slug: string } }) {
     }
   }
 
+  ///ここからパスワード付きの箱の挙動
+  useEffect(() => {
+    if (showError) {
+      const timer = setTimeout(() => {
+        setShowError(false);
+      }, 2000);
+      return () => clearTimeout(timer);
+    }
+  }, [showError]);
+
+  const playMusic = (file: string): void => {
+    const audio = new Audio(file);
+    audio.play();
+  };
+
+  const handleButtonClick = (key: string): void => {
+    if (password.length < 6) {
+      playMusic(`/sound${key}.m4a`);
+      setPassword((prev: string) => prev + key); // パスワードに文字を追加
+    }
+  };
+
+  const checkPassword = (): void => {
+    setPasswordAttempted(true); // パスワードの試行状態を true に設定
+    if (password === correctSequence) {
+      // パスワードが正しい場合
+      setShowPasswordButtons(false);
+      setShowError(false); // エラーメッセージが表示されていれば消去
+      setAcquiredItems([...acquiredItems, items[4]]);
+    } else {
+      setShowError(true); // エラーを表示
+    }
+  };
+
+  const handleRetry = (): void => {
+    setPassword(''); // パスワードをリセット
+    setPasswordAttempted(false); // 試行状態をリセット
+    setShowPasswordButtons(true); // ボタンを再表示
+  };
+
+  // パスワードの変更をハンドルする
+  const handlePasswordChange = (event: React.ChangeEvent<HTMLInputElement>): void => {
+    setPassword(event.target.value);
+  };
+
+  // パスワードの送信をハンドルする
+  const handleSubmit = (): void => {
+    checkPassword();
+  };
+
+  // 箱が開いたかどうかの状態は、passwordAttempted とパスワードが正しいかで判断する
+  const isUnlocked: boolean = passwordAttempted && password === correctSequence;
+  const passwordKeys = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '*', '＃'];
+
   return (
     <div className="relative h-screen w-screen">
       <div
@@ -390,6 +466,36 @@ export default function Home({ params }: { params: { slug: string } }) {
                 </div>
               </>
             )}
+            {showPasswordButtons && (
+              <>
+                <div className="relative flex flex-col items-center justify-center min-h-screen">
+                  <div className="z-50 text-center text-white text-3x1">
+                    <div className="bg-black bg-opacity-50 mt-5 grid grid-cols-3 gap-8 text-white">
+                      {passwordKeys.map((key) => (
+                        <PasswordButton key={key} value={key} onClick={handleButtonClick} />
+                      ))}
+                    </div>
+                    <div style={{ marginTop: '30px' , marginBottom: '40px'}}>
+                      <PasswordDisplay password={password} />
+                      {/* passwordAttempted が false の場合のみ「確認」ボタンを表示 */}
+                      {!passwordAttempted && (
+                      <button
+                        className="btn btn-neutral border-none cursor-pointer text-center text-x1"
+                        onClick={handleSubmit}>
+                        確認
+                      </button>
+                      )}
+                      <ErrorMessage showError={showError} />
+                    </div>
+                    {passwordAttempted && !isUnlocked && (
+                      <div>
+                        <button onClick={handleRetry}>もう一度入力する</button>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </>
+            )}
             <TriangleButton direction="left" handleClickTriangle={() => switchBackgroundImage('left')} />
           </>
         )}
@@ -429,16 +535,6 @@ export default function Home({ params }: { params: { slug: string } }) {
           </div>
           )}
         </div>
-        {/* 選んだアイテムがフォーカスするもの（パスワード付きの箱）の場合、画像とモーダルを表示する */}
-        {focusItem && focusItem.imagePath && (
-          <Image src={focusItem.imagePath} 
-                 alt={focusItem.name}
-                 width={1280} 
-                 height={852}
-                 className="absolute top-1/2 left-1/2 translate-x-[-50%] translate-y-[-50%] w-1/2 h-2/4"
-                 priority
-          />
-        )}
         {/* 選んだアイテムが画像を表示するもの（ぬいぐるみ、箱）の場合、画像を表示する */}
         {selectedItem && selectedItem.imagePath && (
           <Image src={selectedItem.imagePath} 
