@@ -1,19 +1,17 @@
-
-
 .text {
-  font-size: 14px;
+  font-size: 20px;
   background-color: #ee0909;
   line-height: 1.6;
   margin-bottom: 20px;
   position: relative;
   top: -80px;
+  text-align: center; /* テキストを中央寄せにする */
 
   /* ホラー要素のスタイル */
   color: #ede7e7; /* 赤い文字色 */
   text-shadow: 1px 1px #000; /* 微妙に影を付ける */
   font-family: "CreepyFont", cursive; /* ホラーフォント */
-  
   }
-  
+
 
 

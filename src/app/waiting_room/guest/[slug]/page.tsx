@@ -91,7 +91,7 @@ export default function Home({ params }: { params: { slug: string } }) {
           transform: 'translate(-50%, -50%)',
           backgroundColor: 'rgba(0, 0, 0, 0.56)',
           color: 'white',
-          padding: '50px',
+          padding: '20px',
           borderRadius: '10px',
           textAlign: 'center',
           width: '800px',
