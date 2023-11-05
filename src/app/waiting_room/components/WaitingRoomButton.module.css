@@ -1,10 +1,11 @@
 .text {
-  font-size: 14px;
+  font-size: 20px;
   background-color: #ee0909;
   line-height: 1.6;
   margin-bottom: 20px;
   position: relative;
   top: -80px;
+  text-align: center; /* テキストを中央寄せにする */
 
   /* ホラー要素のスタイル */
   color: #ede7e7; /* 赤い文字色 */
