@@ -128,9 +128,17 @@ export default function Home({ params }: { params: { slug: string } }) {
       additionalStyles: { background: 'rgba(255, 255, 255, 0.1)', borderRadius: '8px' },
       messages: [
         {
-          text: "",
+          text: "ドアは不思議な力で固く閉ざされている",
+          choices: null
+        },
+        {
+          text: "ドアが開いているが、もう一人を置いていくわけにはいかない...",
+          choices: null
+        },
+        {
+          text: "ドアが開いている。ここから抜け出せそうだ",
           choices: {
-            confirmText: "ドアを開ける",
+            confirmText: "出る",
             cancelText: "やめておく"
           }
         }
@@ -228,12 +236,21 @@ export default function Home({ params }: { params: { slug: string } }) {
 
   // アイテムがクリックされた時の処理
   const handleClick = (item: Item) => {
-    if (item.name === '青い箱' && isKeyBroken) {
+    if (item.name === '青い箱' && !isKeyBroken) {
+      setCurrentItem(item);
+      setMessageIndex(0);
+    } else if (item.name === '青い箱' && isKeyBroken ) {
       setCurrentItem(item);
       setMessageIndex(1);
-    } else if (item.name === '青い箱') {
+    } else if (item.name === 'ドア' && !isDirtyDoorOpen && !isCleanDoorOpen) {
       setCurrentItem(item);
-      setMessageIndex(0); 
+      setMessageIndex(0);
+    } else if (item.name === 'ドア' && isDirtyDoorOpen && !isCleanDoorOpen) {
+      setCurrentItem(item);
+      setMessageIndex(1);
+    } else if (item.name === 'ドア' && isDirtyDoorOpen && isCleanDoorOpen) {
+      setCurrentItem(item);
+      setMessageIndex(2);
     } else if (!acquiredItems.some(acquiredItem => acquiredItem.id === item.id)) {
       setCurrentItem(item);
       setMessageIndex(0); 
@@ -255,6 +272,8 @@ export default function Home({ params }: { params: { slug: string } }) {
       setMessageIndex(prevIndex => prevIndex + 1);
     } else if (currentItem && currentItem.name === 'オルゴール') {
       playMusic('/misery.m4a')
+    } else if (currentItem && currentItem.name === 'ドア') {
+      router.push(`/maze/dirty/${params.slug}`);
     } else {
       if (currentItem) {
         setAcquiredItems([...acquiredItems, currentItem]);
@@ -340,14 +359,6 @@ export default function Home({ params }: { params: { slug: string } }) {
   async function openCleanDoor() {
     if (ws && ws.readyState === WebSocket.OPEN) {
       ws.send('openCleanDoor');
-    }
-  }
-
-  async function goMazeDirty() {
-    if (isCleanDoorOpen) {
-      router.push(`/maze/dirty/${params.slug}`);
-    } else {
-      alert("相方を置いていくわけにはいかない！");
     }
   }
 
