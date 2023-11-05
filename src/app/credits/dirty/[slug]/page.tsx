@@ -1,6 +1,8 @@
 'use client';
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
+import TwitterIcon from '@mui/icons-material/Twitter';
 
 export default function Home({ params }: { params: { slug: string } }) {
   const [ws, setWs] = useState<WebSocket | null>(null);
@@ -30,19 +32,30 @@ export default function Home({ params }: { params: { slug: string } }) {
     checkRoomExists();
   }, [params.slug]);
 
-  async function goCreditsClean() {
-    router.push(`/credits/dirty/${params.slug}`);
-  }
-
   return (
     <div
       className="h-screen w-full bg-cover"
-      style={{ backgroundImage: "url('/ending.png')" }}
+      style={{ backgroundImage: "url('/credits.png')" }}
     >
-      <button onClick={goCreditsClean}
-        className="absolute top-1/4 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-red-600 p-5 rounded-lg shadow-lg">
-        クレジット
+      {/* Twitterリンク */}
+      <button className="absolute top-2/4 left-1/2 transform -translate-x1/2 -translate-y-1/2 bg-red-600 p-5 rounded-lg shadow-lg"
+        onClick={() => {
+        const tweetText = "脱出成功したよ。遊んでくれてありがとう👻"
+        const url = window.location.origin;
+            window.open(
+              `https://twitter.com/intent/tweet?text=${tweetText}%0A%0A${url}`,
+              '_blank'
+            );
+          }}
+        >
+          <TwitterIcon />
       </button>
+
+      {/* トップページへのリンク */}
+      <Link href="/"
+        className="absolute top-3/4 left-1/2 transform -translate-x1/2 -translate-y-1/2 bg-red-600 p-5 rounded-lg shadow-lg">
+        トップページに戻る
+      </Link>
     </div>
   );
 }
