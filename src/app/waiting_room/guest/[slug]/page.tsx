@@ -9,8 +9,8 @@ function WaitingRoomButton() {
       <main className={styles.container}>
           <div className={styles.section}>
               <div className={styles.text}>
-                  <div className={styles.character}>⚠️注意!</div>
-                  <div className={styles.character}>このアプリはビックリするような表現が含まれます。</div>
+                  <div className={styles.character}>⚠️本アプリにはショックの強い表現が含まれています。</div>
+                  <div className={styles.character}>苦手な方や心臓の弱い方はご注意ください。</div>
               </div>
           </div>
       </main>

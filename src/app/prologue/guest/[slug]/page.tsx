@@ -93,12 +93,12 @@ export default function Home({ params }: { params: { slug: string } }) {
   return (
     <div
       className="h-screen w-full bg-cover"
-      style={{ backgroundImage: "url('/background.png')" }}
+      style={{ backgroundImage: "url('/prologue.png')" }}
     >
-      <GlitchEffect />
+    <GlitchEffect />
   
-      <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white bg-opacity-50 p-10 rounded-lg shadow-lg">
-        <TextEffect>ここに特殊効果のテキスト</TextEffect>
+      <div className="text-container">
+        <TextEffect></TextEffect>
       </div>
     
       <button className="clean-my-button" onClick={clickMysteryClean} type="button">

@@ -15,6 +15,10 @@
     --background-end-rgb: 0, 0, 0;
   }
 }
+.text {
+  position: absolute;
+  left: 0; 
+}
 
 body {
   color: rgb(var(--foreground-rgb));
@@ -145,11 +149,15 @@ body {
 
 
 .my-button {
+  font-family: font-horror2;
+  margin-left: 10px;
+  font-size: 3xl;
   position: fixed; /* 画面に対して固定位置 */
   left: 50%;       /* 左から画面の50%の位置 */
   bottom: 300px;    /* 画面の下から20pxの位置 */
   transform: translateX(-50%); /* X軸に沿って中央揃え */
   /* その他のスタイリング（サイズ、色、フォント等） */
+  
 }
 .my-buttons {
   position: fixed; /* 画面に対して固定位置 */
@@ -166,7 +174,7 @@ body {
 
   font-size: 24px;
   color: #110f0f;
-  background: rgb(255, 5, 5); 
+  background: rgb(233, 224, 224); 
   border-radius: 5px;
   padding: 10px 20px;
 
@@ -174,15 +182,21 @@ body {
               inset 2px 2px 0 rgba(255,255,255,0.5),
               0 0 15px rgba(0,0,0,0.6);
               
+              background-color: #f60b0b; /* ダークグレーのボタン背景 */
+              color: #e8dcdc;
+              border: none;
+              padding: 10px 20px;
+              text-transform: uppercase;
+              font-size: 18px;
+              cursor: pointer;
+              border-radius: 5px;
+              box-shadow: 0 4px 8px rgba(0, 0, 0, 0.6); /* 影をつけて立体感を出す */
+              transition: background-color 0.3s ease;
   
-  text-shadow: 1px 1px 2px #000;
-  opacity: 0.6; 
+  
   transition: 0.5s;
   transform: skewZ(-5deg);
-  text-shadow: 
-   1px 1px #ff0000,
-   2px 2px #800000,
-   3px 3px #400000;
+  text-shadow: 1px 1px rgb(23, 16, 16);
    animation: creepy-font 2s infinite;
 
 @keyframes creepy-font {
@@ -190,6 +204,7 @@ body {
   50% {font-size: 30px;}
   100% {font-size: 24px;}
 }
+
 }
 
 .game-start:active {
@@ -248,4 +263,23 @@ body {
 
   /* 文字サイズを揃えて不規則に */
   letter-spacing: 1px;
+}
+
+.typing {
+  width: 50ch; 
+  animation: typing 2s steps(16), blink .5s step-end infinite alternate; 
+  
+  border-right: 3px solid; 
+  font-size: 2em;
+  
+}
+.text-container {
+  position: relative;
+  bottom: 650px
+}
+
+.text-container .text {
+  position: absolute;
+  left: 0;
+  bottom: 0; 
 }
