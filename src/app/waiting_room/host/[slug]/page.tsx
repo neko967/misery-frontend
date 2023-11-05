@@ -12,7 +12,7 @@ function WaitingRoomButton() {
             <div className={styles.section}>
                 <div className={styles.text}>
                     <div className={styles.character}>⚠️注意!</div>
-                    <div className={styles.character}>このアプリはビックリするような表現が含まれます。</div>
+                    <div className={styles.character}>心臓の弱い方は注意してください。</div>
                 </div>
             </div>
         </main>
@@ -74,7 +74,7 @@ export default function Home({ params }: { params: { slug: string } }) {
       className="h-screen w-full bg-cover"
       style={{ backgroundImage: "url('/Central.png')" }}
     >
-    <button className="my-button" >
+    <button className="my-button">
   <WaitingRoomButton></WaitingRoomButton> 
 </button>
 
