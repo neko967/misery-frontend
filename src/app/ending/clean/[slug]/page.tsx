@@ -30,12 +30,19 @@ export default function Home({ params }: { params: { slug: string } }) {
     checkRoomExists();
   }, [params.slug]);
 
+  async function goCreditsClean() {
+    router.push(`/credits/clean/${params.slug}`);
+  }
+
   return (
     <div
       className="h-screen w-full bg-cover"
-      style={{ backgroundImage: "url('/background.png')" }}
+      style={{ backgroundImage: "url('/ending.png')" }}
     >
-
+      <button onClick={goCreditsClean}
+        className="absolute top-1/4 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-red-600 p-5 rounded-lg shadow-lg">
+        クレジット
+      </button>
     </div>
   );
 }
