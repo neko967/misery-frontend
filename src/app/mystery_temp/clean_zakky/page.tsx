@@ -28,13 +28,13 @@ type Item = {
 type ItemMessage = {
   text: string;
   choices?: {
-    confirmText: string;
+    confirmText?: string;
     cancelText?: string;
   };
 };
 
 type Props = {
-  confirmText: string;
+  confirmText?: string;
   cancelText?: string;
   onConfirm: () => void; 
   onCancel: () => void;
@@ -85,8 +85,7 @@ export default function Home() {  // この部分を変更しました
   const [selectedItemList, setSelectedItemList] = useState<Item | null>(null);
 
   
-  
-  // 背景画像をループで行き来できる。※更にview側で、id:1とid:2のみ行き来できる制御にしている。
+  // 背景遷移の処理
   const changeBackground = (direction: "next" | "prev") => {
     const currentIndex = backgrounds.findIndex(bg => bg.id === currentBackground.id);
     if (direction === "next") {
@@ -171,8 +170,35 @@ const items: Item[] = [
       }
     }]
   },
+  // 壁の穴をクリックするとid:3の壁に移動する。
+  { id: 5, name: '壁の穴', backgroundId: 2,
+    position: {
+      x: 900, // 30%の位置
+      y: 280 // 80%の位置
+    },
+    clickableArea: {
+      width: 160, // 10%の幅
+      height: 160   // 5%の高さ
+    },
+    messages: [
+      {
+        text: "向こうの部屋が見える",
+        choices: {
+          cancelText: "戻る"
+        }
+      },
+      {
+        text: "アイテムを渡しますか",
+        choices: {
+          confirmText: "渡す",
+          cancelText: "やめる"
+        }
+      }
+    ]
+  },
   // 他のアイテム...
 ];
+
 
 const handleBackgroundClick = (e: any) => {
   const clickX = e.clientX - e.currentTarget.getBoundingClientRect().left;
@@ -195,17 +221,25 @@ const handleBackgroundClick = (e: any) => {
 }
 
 const handleItemClick = (item: Item) => {
-  setSelectedItem(item);
+  // もし選択リストにアイテムがあり、選択されているアイテムが銃(id:4)で、
+  // クリックされたアイテムが壁の穴(id:5)ならば、背景id:3に遷移する
+  if (selectedItemList && selectedItemList.id === 4 && item.id === 5) {
+    // 背景id:3を見つける
+    const darkBackground = backgrounds.find(bg => bg.id === 3);
+    if (darkBackground) setCurrentBackground(darkBackground);
+    return; // 遷移後は他の処理をスキップ
+  }
 
-  // 既に取得しているアイテムかをチェック
+  // もしクリックされたアイテムが既に取得しているアイテムでなければ、選択状態を更新し、メッセージを表示する
   const isAlreadyAcquired = acquiredItems.some(acquiredItem => acquiredItem.id === item.id);
-  
-  if (isAlreadyAcquired) {
-    // すでに取得しているアイテムの場合、その旨を通知
-    console.log(`${item.name} is already acquired!`);
-    // 他の処理（例: そのアイテムの特別なアクションやメッセージを表示する等）
+  if (!isAlreadyAcquired) {
+    // 選択リストのアイテムを更新するには setSelectedItemList を使う
+    setSelectedItemList(item); // ここで選択されたアイテムの状態を更新する
+    setSelectedItem(item); // これは選択アイテムを設定する別のアクションに必要かもしれない
+    setShowMessage(true); // メッセージ表示をトリガーする
   } else {
-    setShowMessage(true);
+    // すでに取得しているアイテムの場合は、通知する
+    console.log(`${item.name} is already acquired!`);
   }
 };
 
@@ -213,6 +247,7 @@ const handleConfirmChoice = () => {
   if (selectedItem) {
     // 取得済みアイテムリストに追加
     setAcquiredItems(prevItems => [...prevItems, selectedItem]);
+    setSelectedItemList(null);
     setShowMessage(false);
   }
 };
@@ -225,6 +260,7 @@ function handleItemSelect(item: Item) {
     setSelectedItemList(item);
   }
 }
+
 
 return (
   <div className="relative h-screen w-screen">
@@ -286,6 +322,7 @@ return (
       {currentBackground.id === 2 && (
         <button className="text-white absolute ml-2 top-1/2 left-2" onClick={() => changeBackground("prev")}>◁</button>
       )}
+    
       {/* メッセージの表示 */}
       {showMessage && selectedItem && selectedItem.messages && (
         <>
