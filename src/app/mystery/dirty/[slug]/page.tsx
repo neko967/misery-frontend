@@ -59,7 +59,8 @@ export default function Home({ params }: { params: { slug: string } }) {
   const router = useRouter();
   const [isCleanDoorOpen, setIsCleanDoorOpen] = useState(false);
   const [isDirtyDoorOpen, setIsDirtyDoorOpen] = useState(false);
-  const [isKeyBroken, setIsKeyBroken] = useState(false);
+  const [isBlueBoxBroken, setIsBlueBoxBroken] = useState(false);
+  const [acquiredBlueBox, setAcquiredBlueBox] = useState(false);
   const [acquiredItems, setAcquiredItems] = useState<Item[]>([]); // 取得済みのアイテムを管理する状態
   const [currentItem, setCurrentItem] = useState<Item | null>(null); // 現在選択されているアイテムを管理する状態 毎回nullにリセット
   const [messageIndex, setMessageIndex] = useState<number>(0); // 現在のメッセージのインデックスを管理する状態
@@ -115,7 +116,19 @@ export default function Home({ params }: { params: { slug: string } }) {
             confirmText: "開ける",
             cancelText: "開けない"
           }
-        }
+        },
+        {
+          text: "青い箱を手に入れた",
+          choices: null
+        },
+        {
+          text: "引き出しの中は空っぽだ。",
+          choices: null
+        },
+        {
+          text: "何かが砕け散る音がした。",
+          choices: null
+        },
       ]
     },
     {
@@ -205,7 +218,7 @@ export default function Home({ params }: { params: { slug: string } }) {
       id: 7,
       name: 'ぬいぐるみ',
       imagePath: '/stuffed_bear.png',
-      positionClasses: "absolute top-1/2 left-1/2 translate-x-[calc(-50%-150px)] translate-y-[calc(-50%+200px)] -skew-y-12 opacity-50",
+      positionClasses: "absolute top-1/2 left-1/2 translate-x-[calc(-50%-150px)] translate-y-[calc(-50%+200px)] -skew-y-12 opacity-0",
       width: "w-64",
       height: "h-12",
       additionalStyles: { background: 'rgba(255, 255, 255, 0.1)', borderRadius: '8px' },
@@ -236,10 +249,10 @@ export default function Home({ params }: { params: { slug: string } }) {
 
   // アイテムがクリックされた時の処理
   const handleClick = (item: Item) => {
-    if (item.name === '青い箱' && !isKeyBroken) {
+    if (item.name === '青い箱' && !isBlueBoxBroken) {
       setCurrentItem(item);
       setMessageIndex(0);
-    } else if (item.name === '青い箱' && isKeyBroken ) {
+    } else if (item.name === '青い箱' && isBlueBoxBroken ) {
       setCurrentItem(item);
       setMessageIndex(1);
     } else if (item.name === 'ドア' && !isDirtyDoorOpen && !isCleanDoorOpen) {
@@ -259,19 +272,16 @@ export default function Home({ params }: { params: { slug: string } }) {
 
   // 選択肢の処理
   const handleConfirm = () => {
-    if (currentItem?.name === '壁') {
-      let gem = items.find(item => item.id === 6);
-      if (gem) {
-        gem.additionalStyles = {}; // Show the gem
-      }
-      setCurrentItem(null);
-    } else if (currentItem && messageIndex < currentItem.messages.length - 1) {
-      if (currentItem && currentItem.name === 'ぬいぐるみ') {
-        setAcquiredItems([...acquiredItems, currentItem])
-      }
+    if (currentItem && currentItem.name === 'ぬいぐるみ') {
+      setAcquiredItems([...acquiredItems, currentItem])
+      setMessageIndex(prevIndex => prevIndex + 1);
+    } else if (currentItem && currentItem.name === '青い箱' && isBlueBoxBroken) {
+      setAcquiredItems([...acquiredItems, currentItem]);
+      setAcquiredBlueBox(true);
       setMessageIndex(prevIndex => prevIndex + 1);
     } else if (currentItem && currentItem.name === 'オルゴール') {
       playMusic('/misery.m4a')
+      setCurrentItem(null);
     } else if (currentItem && currentItem.name === 'ドア') {
       router.push(`/maze/dirty/${params.slug}`);
     } else {
@@ -333,6 +343,11 @@ export default function Home({ params }: { params: { slug: string } }) {
             setIsCleanDoorOpen(true);
           } else if (event.data == "openDirtyDoor") {
             setIsDirtyDoorOpen(true);
+          } else if (event.data == "breakBlueBox") {
+            playGunSound();
+            setCurrentItem(items[1]);
+            setMessageIndex(4);
+            setIsBlueBoxBroken(true);
           } else if (event.data == "sendKnifeFromCleanToDirty") {
             if (items[3]) {
               setAcquiredItems([...acquiredItems, items[3]]);
@@ -361,6 +376,12 @@ export default function Home({ params }: { params: { slug: string } }) {
       ws.send('openCleanDoor');
     }
   }
+
+  //音
+  const playGunSound = () => {
+    const sound = new Audio("/se_gun_fire10.wav");
+    sound.play();
+  };
 
   return (
     <div className="relative h-screen w-screen">
@@ -454,7 +475,7 @@ export default function Home({ params }: { params: { slug: string } }) {
                  alt={selectedItem.name}
                  width={1280} 
                  height={852}
-                 className="absolute top-1/2 left-1/2 translate-x-[-50%] translate-y-[-50%] w-1/4 h-2/4"
+                 className="absolute top-1/2 left-1/2 translate-x-[-50%] translate-y-[-50%] w-96 h-96"
                  priority
           />
         )}
