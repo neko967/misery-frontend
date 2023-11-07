@@ -61,6 +61,7 @@ export default function Home({ params }: { params: { slug: string } }) {
   const [isDirtyDoorOpen, setIsDirtyDoorOpen] = useState(false);
   const [isBlueBoxBroken, setIsBlueBoxBroken] = useState(false);
   const [acquiredBlueBox, setAcquiredBlueBox] = useState(false);
+  const [isBearCutted, setIsBearCutted] = useState(false);
   const [acquiredItems, setAcquiredItems] = useState<Item[]>([]); // 取得済みのアイテムを管理する状態
   const [currentItem, setCurrentItem] = useState<Item | null>(null); // 現在選択されているアイテムを管理する状態 毎回nullにリセット
   const [messageIndex, setMessageIndex] = useState<number>(0); // 現在のメッセージのインデックスを管理する状態
@@ -75,7 +76,7 @@ export default function Home({ params }: { params: { slug: string } }) {
     {
       id: 1,
       name: '日記',
-      positionClasses: "absolute top-1/2 left-1/2 translate-x-[calc(-50%+360px)] translate-y-[calc(-50%+350px)]",
+      positionClasses: "invisible absolute top-1/2 left-1/2 translate-x-[calc(-50%+360px)] translate-y-[calc(-50%+350px)]",
       width: "w-64",
       height: "h-20",
       // コメントアウトで、クリック部分の色を消す
@@ -195,6 +196,10 @@ export default function Home({ params }: { params: { slug: string } }) {
         {
           text: "ぬいぐるみを手に入れた",
           choices: null
+        },
+        {
+          text: "ぬいぐるみをハサミで切った。中からカギが2本出てきた",
+          choices: null
         }
       ]
     },
@@ -209,6 +214,22 @@ export default function Home({ params }: { params: { slug: string } }) {
           text: "ベッドの上にはさみがある。拾いますか？",
           choices: null
         }
+      ]
+    },
+    {
+      id: 7,
+      name: '青いカギ',
+      positionClasses: "invisible",
+      // コメントアウトで、クリック部分の色を消す
+      messages: [
+      ]
+    },
+    {
+      id: 8,
+      name: '赤いカギ',
+      positionClasses: "invisible",
+      // コメントアウトで、クリック部分の色を消す
+      messages: [
       ]
     },
   ];
@@ -302,9 +323,24 @@ export default function Home({ params }: { params: { slug: string } }) {
   const handleClickHole = () => {
     if (ws && ws.readyState === WebSocket.OPEN) {
       if (selectedItem && selectedItem.name === 'はさみ') {
-        ws.send('sendScissorFromDirtyToClean');
+        ws.send('sendScissorFromDirty');
+      } else if (selectedItem && selectedItem.name === '青いカギ') {
+        ws.send('sendBlueKeyFromDirty');
+      } else if (selectedItem && selectedItem.name === '赤いカギ') {
+        ws.send('sendRedKeyFromDirty');
       }
     }
+    setSelectedItem(null);
+  };
+
+  const handleClickItemImage = () => {
+    if (putImageItem && putImageItem.name === "ぬいぐるみ" && selectedItem && selectedItem.name === "はさみ" && !isBearCutted) {
+      setCurrentItem(items[4]);
+      setMessageIndex(2);
+      setAcquiredItems([...acquiredItems, items[6], items[7]]);
+      setPutImageItem(null);
+      setIsBearCutted(true);
+    } 
   };
 
   const playMusic = (file: string) => {
@@ -334,14 +370,30 @@ export default function Home({ params }: { params: { slug: string } }) {
             setCurrentItem(items[1]);
             setMessageIndex(4);
             setIsBlueBoxBroken(true);
-          } else if (event.data == "sendScissorFromCleanToDirty") {
-            if (items[5]) {
-              setAcquiredItems([...acquiredItems, items[5]]);
-            }
-          } else if (event.data == "sendScissorFromDirtyToClean") {
+          } else if (event.data == "sendScissorFromClean") {
+            setAcquiredItems([...acquiredItems, items[5]]);
+          } else if (event.data == "sendBlueKeyFromClean") {
+            setAcquiredItems([...acquiredItems, items[6]]);
+          } else if (event.data == "sendRedKeyFromClean") {
+            setAcquiredItems([...acquiredItems, items[7]]);
+          } else if (event.data == "sendScissorFromDirty") {
             if (selectedItem && selectedItem.name === 'はさみ') {
               let result = acquiredItems.filter(function( item ) {
                 return item.name !== 'はさみ';
+              });
+              setAcquiredItems(result);
+            }
+          } else if (event.data == "sendBlueKeyFromDirty") {
+            if (selectedItem && selectedItem.name === '青いカギ') {
+              let result = acquiredItems.filter(function( item ) {
+                return item.name !== '青いカギ';
+              });
+              setAcquiredItems(result);
+            }
+          } else if (event.data == "sendRedKeyFromDirty") {
+            if (selectedItem && selectedItem.name === '赤いカギ') {
+              let result = acquiredItems.filter(function( item ) {
+                return item.name !== '赤いカギ';
               });
               setAcquiredItems(result);
             }
@@ -433,7 +485,7 @@ export default function Home({ params }: { params: { slug: string } }) {
         )}
         
         {/* 取得済みアイテム */}
-        <div className="absolute top-2/5 right-0 text-white">
+        <div className="absolute top-0 right-0 text-white">
           <div className="bg-gray-800 bg-opacity-60 p-2 rounded-t-lg cursor-pointer hover:bg-opacity-70" onClick={() => setIsItemListVisible(!isItemListVisible)}>
             <span>
               アイテム一覧
@@ -463,6 +515,7 @@ export default function Home({ params }: { params: { slug: string } }) {
                  height={852}
                  className="absolute top-1/2 left-1/2 translate-x-[-50%] translate-y-[-50%] w-96 h-96 z-10 cursor-pointer"
                  priority
+                 onClick={handleClickItemImage}
           />
         )}
         {!isCleanDoorOpen &&
@@ -471,9 +524,6 @@ export default function Home({ params }: { params: { slug: string } }) {
             相手のドアの鍵を開ける
           </button>
         }
-        <div>
-          height:{height} width:{width}
-        </div>
       </div>
     </div>
   );
