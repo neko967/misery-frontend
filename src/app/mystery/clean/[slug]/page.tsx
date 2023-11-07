@@ -107,6 +107,7 @@ export default function Home({ params }: { params: { slug: string } }) {
   const [messageIndex, setMessageIndex] = useState<number>(0); // 現在のメッセージのインデックスを管理する状態
   const [isItemListVisible, setIsItemListVisible] = useState(false); // アイテムリストの表示・非表示を管理する状態
   const [selectedItem, setSelectedItem] = useState<Item | null>(null); // 選択中のアイテムを管理する状態
+  const [putImageItem, setPutImageItem] = useState<Item | null>(null); // アイテムリストから画像付きのアイテムを置くときに使う
   const [backgroundImage, setBackgroundImage] = useState('/clean_room.png');
   const [showPasswordButtons, setShowPasswordButtons] = useState<boolean>(false); //ここからパスワード付きの箱
   const [password, setPassword] = useState<string>('');
@@ -261,7 +262,11 @@ export default function Home({ params }: { params: { slug: string } }) {
           }
         },
         {
-          text: "ベッドの上にはもう何もない。",
+          text: "はさみを手に入れた",
+          choices: null
+        },
+        {
+          text: "ベッドの上には何もない",
           choices: null
         }
       ]
@@ -335,6 +340,10 @@ export default function Home({ params }: { params: { slug: string } }) {
       setMessageIndex(1);
     } else if (item.name === 'ドア' && isCleanDoorOpen && isDirtyDoorOpen) {
       setMessageIndex(2);
+    } else if (item.name === 'はさみ' && !acquiredScissors) {
+      setMessageIndex(0);
+    } else if (item.name === 'はさみ' && acquiredScissors) {
+      setMessageIndex(2);
     } else if (!acquiredItems.some(acquiredItem => acquiredItem.id === item.id)) {
       setMessageIndex(0);
     }
@@ -360,6 +369,10 @@ export default function Home({ params }: { params: { slug: string } }) {
     if (currentItem && currentItem.name === 'パスワード付きの箱') {
       setShowPasswordButtons(true)
       setCurrentItem(null);
+    } else if (currentItem && currentItem.name === 'はさみ') {
+      setAcquiredItems([...acquiredItems, currentItem])
+      setMessageIndex(prevIndex => prevIndex + 1);
+      setAcquiredScissors(true);
     } else if (currentItem && currentItem.name === 'ドア') {
       router.push(`/maze/dirty/${params.slug}`);
     } else if (currentItem && currentItem.name === '赤い箱' && isRedBoxBroken) {
@@ -384,10 +397,18 @@ export default function Home({ params }: { params: { slug: string } }) {
   };
 
   const handleItemSelect = (item: Item) => {
-    if (selectedItem && selectedItem.id === item.id) {
-      setSelectedItem(null); // 既に選択されているアイテムを再度クリックした場合、選択を解除
+    if (item.imagePath) {
+      if (putImageItem && putImageItem.id === item.id) {
+        setPutImageItem(null); // 既に選択されているアイテムを再度クリックした場合、選択を解除
+      } else {
+        setPutImageItem(item); // それ以外の場合、アイテムを選択
+      }
     } else {
-      setSelectedItem(item); // それ以外の場合、アイテムを選択
+      if (selectedItem && selectedItem.id === item.id) {
+        setSelectedItem(null); // 既に選択されているアイテムを再度クリックした場合、選択を解除
+      } else {
+        setSelectedItem(item); // それ以外の場合、アイテムを選択
+      }
     }
   };
 
@@ -405,8 +426,8 @@ export default function Home({ params }: { params: { slug: string } }) {
         setBackgroundImage('/dark.png');
         setCurrentItem(items[4]);
         setMessageIndex(1);
-      } else if (selectedItem && selectedItem.name === 'ナイフ') {
-        ws.send('sendKnifeFromCleanToDirty');
+      } else if (selectedItem && selectedItem.name === 'はさみ') {
+        ws.send('sendScissorFromCleanToDirty');
       }
     }
   };
@@ -430,14 +451,14 @@ export default function Home({ params }: { params: { slug: string } }) {
             setIsDirtyDoorOpen(true);
           } else if (event.data == "breakBlueBox") {
             setIsBlueBoxBroken(true)
-          } else if (event.data == "sendKnifeFromDirtyToClean") {
-            if (items[2]) {
-              setAcquiredItems([...acquiredItems, items[2]]);
+          } else if (event.data == "sendScissorFromDirtyToClean") {
+            if (items[5]) {
+              setAcquiredItems([...acquiredItems, items[5]]);
             }
-          } else if (event.data == "sendKnifeFromCleanToDirty") {
-            if (selectedItem && selectedItem.name === 'ナイフ') {
+          } else if (event.data == "sendScissorFromCleanToDirty") {
+            if (selectedItem && selectedItem.name === 'はさみ') {
               let result = acquiredItems.filter(function( item ) {
-                return item.name !== 'ナイフ';
+                return item.name !== 'はさみ';
               });
               setAcquiredItems(result);
             }
@@ -665,7 +686,7 @@ export default function Home({ params }: { params: { slug: string } }) {
           <div className="bg-gray bg-opacity-60 p-2 rounded-b-lg shadow-xl border-t border-gray-500">
             {acquiredItems.map(item => (
               <div key={item.id} 
-                   className={`p-2 rounded-b-lg shadow-xl border-t ${selectedItem && selectedItem.id === item.id ? 'bg-red-600' : 'bg-gray-800 bg-opacity-60'}`} 
+                   className={`p-2 rounded-b-lg shadow-xl border-t ${((selectedItem && selectedItem.id === item.id) || (putImageItem && putImageItem.id ===item.id)) ? 'bg-red-600' : 'bg-gray-800 bg-opacity-60'}`} 
                    onClick={() => handleItemSelect(item)}
               >
                 {item.name}
@@ -674,13 +695,13 @@ export default function Home({ params }: { params: { slug: string } }) {
           </div>
           )}
         </div>
-        {/* 選んだアイテムが画像を表示するもの（ぬいぐるみ、箱）の場合、画像を表示する */}
-        {selectedItem && selectedItem.imagePath && (
-          <Image src={selectedItem.imagePath} 
-                 alt={selectedItem.name}
+        {/* アイテムリストから選んだアイテムが画像を表示するもの（ぬいぐるみ、箱）の場合、画像を表示する */}
+        {putImageItem && putImageItem.imagePath && (
+          <Image src={putImageItem.imagePath} 
+                 alt={putImageItem.name}
                  width={1280} 
                  height={852}
-                 className="absolute top-1/2 left-1/2 translate-x-[-50%] translate-y-[-50%] w-96 h-96"
+                 className="absolute top-1/2 left-1/2 translate-x-[-50%] translate-y-[-50%] w-96 h-96 z-10 cursor-pointer"
                  priority
           />
         )}

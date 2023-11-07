@@ -66,6 +66,7 @@ export default function Home({ params }: { params: { slug: string } }) {
   const [messageIndex, setMessageIndex] = useState<number>(0); // 現在のメッセージのインデックスを管理する状態
   const [isItemListVisible, setIsItemListVisible] = useState(false); // アイテムリストの表示・非表示を管理する状態
   const [selectedItem, setSelectedItem] = useState<Item | null>(null); // アイテムリストからアイテムを選択するときに使う
+  const [putImageItem, setPutImageItem] = useState<Item | null>(null); // アイテムリストから画像付きのアイテムを置くときに使う
   const [backgroundImage, setBackgroundImage] = useState('/dirty_room.png');
   const { height, width } = GetWindowSize();
 
@@ -177,45 +178,6 @@ export default function Home({ params }: { params: { slug: string } }) {
     },
     {
       id: 5,
-      name: 'ナイフ',
-      positionClasses: `absolute top-1/2 left-1/2 translate-x-[calc(-50%-70px)] translate-y-[calc(-50%+90px)]`,
-      width: "w-44",
-      height: "h-12",
-      // コメントアウトで、クリック部分の色を消す
-      additionalStyles: { background: 'rgba(255, 255, 255, 0.1)', borderRadius: '8px' },
-      messages: [
-        {
-          text: "ナイフを取得しますか？",
-          choices: {
-            confirmText: "取得する",
-            cancelText: "取得しない"
-          }
-        }
-      ]
-    },
-    {
-      id: 6,
-      name: '壁',
-      positionClasses: "absolute top-1/2 left-1/2 translate-x-[calc(-50%-400px)] translate-y-[calc(-50%+80px)]",
-      width: "w-28",
-      height: "h-12",
-      additionalStyles: { background: 'rgba(255, 255, 255, 0.1)', borderRadius: '8px' },
-      messages: [
-        {
-          text: "壁だ",
-          choices: null
-        },
-        {
-          text: "壁を破壊しますか？",
-          choices: {
-            confirmText: "破壊する",
-            cancelText: "破壊しない"
-          }
-        }
-      ]
-    },
-    {
-      id: 7,
       name: 'ぬいぐるみ',
       imagePath: '/stuffed_bear.png',
       positionClasses: "absolute top-1/2 left-1/2 translate-x-[calc(-50%-150px)] translate-y-[calc(-50%+200px)] -skew-y-12 opacity-0",
@@ -235,7 +197,20 @@ export default function Home({ params }: { params: { slug: string } }) {
           choices: null
         }
       ]
-    }
+    },
+    {
+      id: 6,
+      name: 'はさみ',
+      positionClasses: "invisible",
+      // コメントアウトで、クリック部分の色を消す
+      additionalStyles: { background: 'rgba(255, 255, 255, 0.1)', borderRadius: '8px' },
+      messages: [
+        {
+          text: "ベッドの上にはさみがある。拾いますか？",
+          choices: null
+        }
+      ]
+    },
   ];
 
   let message: string | undefined;
@@ -252,9 +227,12 @@ export default function Home({ params }: { params: { slug: string } }) {
     if (item.name === '青い箱' && !isBlueBoxBroken) {
       setCurrentItem(item);
       setMessageIndex(0);
-    } else if (item.name === '青い箱' && isBlueBoxBroken ) {
+    } else if (item.name === '青い箱' && isBlueBoxBroken && !acquiredBlueBox) {
       setCurrentItem(item);
       setMessageIndex(1);
+    } else if (item.name === '青い箱' && isBlueBoxBroken && acquiredBlueBox ) {
+      setCurrentItem(item);
+      setMessageIndex(3);
     } else if (item.name === 'ドア' && !isDirtyDoorOpen && !isCleanDoorOpen) {
       setCurrentItem(item);
       setMessageIndex(0);
@@ -298,10 +276,18 @@ export default function Home({ params }: { params: { slug: string } }) {
   };
 
   const handleItemSelect = (item: Item) => {
-    if (selectedItem && selectedItem.id === item.id) {
-      setSelectedItem(null); // 既に選択されているアイテムを再度クリックした場合、選択を解除
+    if (item.imagePath) {
+      if (putImageItem && putImageItem.id === item.id) {
+        setPutImageItem(null); // 既に選択されているアイテムを再度クリックした場合、選択を解除
+      } else {
+        setPutImageItem(item); // それ以外の場合、アイテムを選択
+      }
     } else {
-      setSelectedItem(item); // それ以外の場合、アイテムを選択
+      if (selectedItem && selectedItem.id === item.id) {
+        setSelectedItem(null); // 既に選択されているアイテムを再度クリックした場合、選択を解除
+      } else {
+        setSelectedItem(item); // それ以外の場合、アイテムを選択
+      }
     }
   };
 
@@ -315,8 +301,8 @@ export default function Home({ params }: { params: { slug: string } }) {
 
   const handleClickHole = () => {
     if (ws && ws.readyState === WebSocket.OPEN) {
-      if (selectedItem && selectedItem.name === 'ナイフ') {
-        ws.send('sendKnifeFromDirtyToClean');
+      if (selectedItem && selectedItem.name === 'はさみ') {
+        ws.send('sendScissorFromDirtyToClean');
       }
     }
   };
@@ -348,14 +334,14 @@ export default function Home({ params }: { params: { slug: string } }) {
             setCurrentItem(items[1]);
             setMessageIndex(4);
             setIsBlueBoxBroken(true);
-          } else if (event.data == "sendKnifeFromCleanToDirty") {
-            if (items[3]) {
-              setAcquiredItems([...acquiredItems, items[3]]);
+          } else if (event.data == "sendScissorFromCleanToDirty") {
+            if (items[5]) {
+              setAcquiredItems([...acquiredItems, items[5]]);
             }
-          } else if (event.data == "sendKnifeFromDirtyToClean") {
-            if (selectedItem && selectedItem.name === 'ナイフ') {
+          } else if (event.data == "sendScissorFromDirtyToClean") {
+            if (selectedItem && selectedItem.name === 'はさみ') {
               let result = acquiredItems.filter(function( item ) {
-                return item.name !== 'ナイフ';
+                return item.name !== 'はさみ';
               });
               setAcquiredItems(result);
             }
@@ -460,7 +446,7 @@ export default function Home({ params }: { params: { slug: string } }) {
           <div className="bg-gray bg-opacity-60 p-2 rounded-b-lg shadow-xl border-t border-gray-500">
             {acquiredItems.map(item => (
               <div key={item.id} 
-                   className={`p-2 rounded-b-lg shadow-xl border-t ${selectedItem && selectedItem.id === item.id ? 'bg-red-600' : 'bg-gray-800 bg-opacity-60'}`} 
+                   className={`p-2 rounded-b-lg shadow-xl border-t ${((selectedItem && selectedItem.id === item.id) || (putImageItem && putImageItem.id ===item.id)) ? 'bg-red-600' : 'bg-gray-800 bg-opacity-60'}`} 
                    onClick={() => handleItemSelect(item)}
               >
                 {item.name}
@@ -470,12 +456,12 @@ export default function Home({ params }: { params: { slug: string } }) {
           )}
         </div>
         {/* アイテムリストから選んだアイテムが画像を表示するもの（ぬいぐるみ、箱）の場合、画像を表示する */}
-        {selectedItem && selectedItem.imagePath && (
-          <Image src={selectedItem.imagePath} 
-                 alt={selectedItem.name}
+        {putImageItem && putImageItem.imagePath && (
+          <Image src={putImageItem.imagePath} 
+                 alt={putImageItem.name}
                  width={1280} 
                  height={852}
-                 className="absolute top-1/2 left-1/2 translate-x-[-50%] translate-y-[-50%] w-96 h-96"
+                 className="absolute top-1/2 left-1/2 translate-x-[-50%] translate-y-[-50%] w-96 h-96 z-10 cursor-pointer"
                  priority
           />
         )}
