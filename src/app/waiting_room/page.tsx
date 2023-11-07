@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 
+
 type Room = {
   name: string;
   password: string;
@@ -66,6 +67,7 @@ export default function Home() {
   }, []);
 
   return (
+    
     <div>
       <button onClick={createRoom}>部屋を作成する？</button>
       <ul>
@@ -73,8 +75,10 @@ export default function Home() {
           <li key={room.id}>
             {room.name} <button onClick={() => joinRoom(room.id)}>部屋に入る</button>
           </li>
+          
         ))}
       </ul>
+      
     </div>
   );
 }

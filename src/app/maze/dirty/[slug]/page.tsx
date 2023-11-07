@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation';
 import Image from "next/image";
 import localImage from "../../../../../public/horror_image.png";
 import Link from 'next/link';
+import { GetWindowSize } from "../../../../hooks/GetWindowSize";
 
 type pointerPosition = {
   x: number;
@@ -15,10 +16,10 @@ export default function Dealer({ params }: { params: { slug: string } }) {
   const doorImage = "/door.png";
   const brickImage = "/brick.png";
   const keyImage = "/keyImage.png";
-  const keyPositions: number[][] = [[],[18,5],[6,3],[3,24]];  //[[空の配列],[key1縦,key1横],[key2縦,key2横],[key3縦,key3横]]
-  const doorPositions: number[][] = [[],[8,1],[10,13],[2,23]]; //[[空の配列],[door1縦,door1横],[door2縦,door2横],[door3縦,door3横]]
-  const [windowSize, setWindowSize] = useState({ width: window.innerWidth, height: window.innerHeight });
-  const cellSize = Math.min(windowSize.width, windowSize.height) / elements;
+  const keyPositions: number[][] = [[],[18,5],[6,3],[3,24],[14,25]];  //[[空の配列],[key1縦,key1横],[key2縦,key2横],[key3縦,key3横]]
+  const doorPositions: number[][] = [[],[8,1],[10,13],[2,23],[4,28]]; //[[空の配列],[door1縦,door1横],[door2縦,door2横],[door3縦,door3横]]
+  const { height, width } = GetWindowSize();
+  const cellSize = Math.min(width, height) / elements;
   const [ws, setWs] = useState<WebSocket | null>(null);
   const router = useRouter();
   const [playerPosition, setPlayerPosition] = useState<pointerPosition>({ x: 0, y: 0 });
@@ -31,16 +32,25 @@ export default function Dealer({ params }: { params: { slug: string } }) {
   // const [wallPositions, setWallPositions] = useState<number[][]>([[16, 13]]);
   // 壁の表示/非表示を管理するstateを追加
   const [showWall, setShowWall] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [timeLeft, setTimeLeft] = useState(5); // 残り10秒からスタート
+  const [isTimeAttackStarted, setIsTimeAttackStarted] = useState(false); // タイムアタックが開始されたかどうかを追跡
+  const timeAttackPositions: number[][] = [[],[5,9],] // タイムアタック開始のppsition
+  // リセットボタンの呼び出し関数
+  const resetButtonTimer: any = () => {
+    setTimeout(() => {
+      setResetButton(true);
+    }, 3000);
+  }
 
   useEffect(() => {
-    const handleResize = () => {
-      setWindowSize({ width: window.innerWidth, height: window.innerHeight });
-    };
-    window.addEventListener('resize', handleResize);
-    return () => {
-      window.removeEventListener('resize', handleResize);
-    };
+    setIsModalOpen(true);
   }, []);
+
+  // モーダルを閉じる関数
+  const closeModal = () => {
+    setIsModalOpen(false);
+  };
 
   useEffect(() => {
     const startPosition = document.querySelector('[data-start]');
@@ -69,10 +79,10 @@ export default function Dealer({ params }: { params: { slug: string } }) {
           if (event.data == "gameover") {
             setIsGameOver(true);
             //playGameOverSound();
-            const timer = setTimeout(() => {
-              setResetButton(true);
-            }, 3000);
-            return () => clearTimeout(timer);
+            resetButtonTimer();
+            return () => clearTimeout(resetButtonTimer);
+          } else if (event.data == "timeAttack") {
+            setIsTimeAttackStarted(true);
           } else if (event.data == "getkey1") {
             setKeys(prev => ({ ...prev, key1: true }));
             maze[doorPositions[1][0]][doorPositions[1][1]] = ' ';
@@ -104,6 +114,7 @@ export default function Dealer({ params }: { params: { slug: string } }) {
     setResetButton(false);
     setIsGameStarted(false);
     setShowWall(false);
+    setTimeLeft(5);
     setKeys({
       key1: false,
       key2: false,
@@ -112,14 +123,42 @@ export default function Dealer({ params }: { params: { slug: string } }) {
     // 他に初期化するべきステートや変数があればこちらに追加
   };
 
-    // 壁を2秒間隔で出現・消失
+    useEffect(() => {
+      if (isGameClear) {
+        setIsTimeAttackStarted(false);
+      }
+    }, [isGameClear]);
+
+    useEffect(() => {
+      if (isGameOver) {
+        setIsTimeAttackStarted(false);
+      }
+    }, [isGameOver]);
+    
+  // 壁を2秒間隔で出現・消失
     useEffect(() => {
       const interval = setInterval(() => {
         setShowWall(prev => !prev); 
       }, 2000);
-    
+
       return () => clearInterval(interval);
     }, []);
+
+  // タイムアタックのタイマーを実装
+  useEffect(() => {
+    let interval: any;
+    if (isTimeAttackStarted && timeLeft > 0) {
+      interval = setInterval(() => {
+        setTimeLeft((prevTime) => prevTime - 1);
+      }, 1000); // 1秒ごとに減らす
+    } else if (timeLeft === 0) {
+      // タイムアタック失敗
+      setIsGameOver(true);
+      setIsTimeAttackStarted(false); // タイマー停止
+      resetButtonTimer();
+    }
+    return () => clearInterval(interval); // コンポーネントのアンマウント時にインターバルをクリア
+  }, [isTimeAttackStarted, timeLeft]);
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     const rect = e.currentTarget.getBoundingClientRect();
@@ -134,6 +173,8 @@ export default function Dealer({ params }: { params: { slug: string } }) {
         ws.send('gameover');
       } else if (maze[y][x] === 'G') {
         setIsGameClear(true);
+      } else if (y === timeAttackPositions[1][0] && x === timeAttackPositions[1][1] && maze[y][x] === 'E'){
+        ws.send('timeAttack');
       } else if (y === keyPositions[1][0] && x === keyPositions[1][1] && maze[y][x] === 'K') {
         ws.send('getkey1');
       } else if (y === keyPositions[2][0] && x === keyPositions[2][1] && maze[y][x] === 'K') {
@@ -145,28 +186,28 @@ export default function Dealer({ params }: { params: { slug: string } }) {
       }
     }
   };
-
   const maze = [
-    ['#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#'],
-    ['#', '#', '#', ' ', ' ', ' ', '#', '#', '#', '#', '#', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '#', 'G', '#'],
-    ['#', '#', '#', ' ', '#', ' ', '#', '#', '#', '#', '#', ' ', '#', '#', '#', '#', '#', '#', '#', '#', '#', ' ', '#', '*', '#'],
-    ['#', ' ', ' ', ' ', '#', ' ', '#', '#', '#', ' ', ' ', ' ', '#', '#', ' ', ' ', ' ', ' ', '#', ' ', ' ', ' ', '#', ' ', '#'],
-    ['#', ' ', '#', '#', '#', ' ', ' ', '#', '#', ' ', '#', '#', '#', '#', ' ', '#', '#', ' ', '#', ' ', '#', '#', '#', ' ', '#'],
-    ['#', ' ', '#', '#', '#', '#', ' ', '#', '#', ' ', '#', '#', ' ', ' ', ' ', '#', '#', ' ', ' ', ' ', '#', ' ', ' ', ' ', '#'],
-    ['#', ' ', '#', 'K', ' ', ' ', ' ', ' ', ' ', ' ', '#', '#', ' ', '#', '#', '#', '#', '#', '#', '#', '#', ' ', '#', '#', '#'],
-    ['#', ' ', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', ' ', '#', '#', '#', '#', ' ', ' ', ' ', ' ', ' ', '#', '#', '#'],
-    ['#', '*', '#', '#', '#', '#', '#', '#', '#', ' ', ' ', ' ', ' ', '#', '#', '#', '#', ' ', '#', '#', '#', '#', '#', '#', '#'],
-    ['#', ' ', '#', ' ', ' ', ' ', '#', '#', '#', ' ', '#', '#', '#', '#', '#', '#', '#', ' ', ' ', ' ', ' ', ' ', '#', '#', '#'],
-    ['#', ' ', '#', ' ', '#', ' ', '#', '#', '#', ' ', ' ', ' ', ' ', '*', ' ', ' ', '#', '#', '#', '#', '#', ' ', '#', '#', '#'],
-    ['#', ' ', '#', ' ', '#', ' ', '#', '#', '#', '#', '#', '#', '#', '#', '#', ' ', '#', ' ', ' ', ' ', ' ', ' ', '#', '#', '#'],
-    ['#', ' ', '#', ' ', '#', ' ', ' ', ' ', '#', '#', ' ', ' ', ' ', ' ', '#', ' ', '#', ' ', '#', '#', '#', '#', '#', '#', '#'],
-    ['#', ' ', ' ', ' ', '#', '#', '#', ' ', '#', '#', ' ', '#', '#', ' ', '#', ' ', '#', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '#'],
-    ['#', ' ', '#', '#', '#', '#', '#', ' ', '#', ' ', ' ', '#', '#', ' ', '#', ' ', '#', '#', '#', '#', '#', '#', '#', ' ', '#'],
-    ['#', ' ', '#', '#', '#', '#', '#', ' ', '#', ' ', '#', '#', '#', ' ', '#', ' ', ' ', ' ', '#', '#', '#', '#', '#', ' ', '#'],
-    ['#', ' ', '#', '#', '#', '#', '#', ' ', ' ', ' ', '#', '#', '#', ' ', '#', '#', '#', ' ', '#', '#', '#', '#', '#', ' ', '#'],
-    ['#', ' ', '#', '#', '#', '#', '#', '#', '#', '#', '#', 'S', 'S', 'S', 'S', 'S', '#', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '#'],
-    ['#', ' ', ' ', ' ', ' ', '#', '#', '#', '#', '#', '#', 'S', 'S', 'S', 'S', 'S', '#', '#', '#', '#', '#', '#', '#', '#', '#'],
-    ['#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#'],
+//    0    1    2    3    4    5    6    7    8    9   10   11   12   13   14   15   16   17   18   19   20   21   22   23   24   25   26   27   28   29   30   31   32   33
+    ['#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#'],
+    ['#', '#', '#', ' ', ' ', ' ', '#', '#', '#', '#', '#', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '#', '#', '#', '#', '#', '#', 'G', '#'],
+    ['#', '#', '#', ' ', '#', ' ', '#', '#', '#', '#', '#', ' ', '#', '#', '#', '#', '#', '#', '#', '#', '#', ' ', '#', '*', ' ', ' ', '#', '#', ' ', '#'],
+    ['#', ' ', ' ', ' ', '#', ' ', '#', '#', '#', ' ', ' ', ' ', '#', '#', ' ', ' ', ' ', ' ', '#', ' ', ' ', ' ', '#', ' ', 'K', ' ', '#', '#', ' ', '#'],
+    ['#', ' ', '#', '#', '#', ' ', ' ', '#', '#', ' ', '#', '#', '#', '#', ' ', '#', '#', ' ', '#', ' ', '#', '#', '#', ' ', '#', ' ', ' ', '#', '*', '#'],
+    ['#', ' ', '#', '#', '#', '#', ' ', '#', '#', 'E', '#', '#', ' ', ' ', ' ', '#', '#', ' ', 'K', ' ', '#', ' ', ' ', ' ', '#', '#', ' ', '#', ' ', '#'],
+    ['#', ' ', '#', 'K', ' ', ' ', ' ', ' ', ' ', ' ', '#', '#', ' ', '#', '#', '#', '#', '#', '#', '#', '#', ' ', '#', ' ', '#', '#', ' ', '#', ' ', '#'],
+    ['#', ' ', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', ' ', '#', '#', '#', '#', ' ', ' ', ' ', ' ', ' ', '#', ' ', '#', '#', ' ', '#', ' ', '#'],
+    ['#', '*', '#', '#', '#', '#', '#', '#', '#', ' ', ' ', ' ', ' ', '#', '#', '#', '#', ' ', '#', '#', '#', '#', '#', ' ', ' ', '#', ' ', '#', ' ', '#'],
+    ['#', ' ', '#', ' ', ' ', ' ', '#', '#', '#', ' ', '#', '#', '#', '#', '#', '#', '#', ' ', ' ', ' ', ' ', ' ', '#', '#', ' ', '#', ' ', ' ', ' ', '#'],
+    ['#', ' ', '#', ' ', '#', ' ', '#', '#', '#', ' ', ' ', ' ', ' ', '*', ' ', ' ', '#', '#', '#', '#', '#', ' ', '#', '#', ' ', '#', '#', '#', '#', '#'],
+    ['#', ' ', '#', ' ', '#', ' ', '#', '#', '#', '#', '#', '#', '#', '#', '#', ' ', '#', ' ', ' ', ' ', ' ', ' ', '#', '#', ' ', ' ', '#', '#', '#', '#'],
+    ['#', ' ', '#', ' ', '#', ' ', ' ', ' ', '#', '#', ' ', ' ', ' ', ' ', '#', ' ', '#', ' ', '#', '#', '#', '#', '#', '#', '#', ' ', ' ', ' ', '#', '#'],
+    ['#', ' ', ' ', ' ', '#', '#', '#', ' ', '#', '#', ' ', '#', '#', ' ', '#', ' ', '#', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '#', '#', '#', ' ', '#', '#'],
+    ['#', ' ', '#', '#', '#', '#', '#', ' ', '#', ' ', ' ', '#', '#', ' ', '#', ' ', '#', '#', '#', '#', '#', '#', '#', ' ', '#', 'K', '#', ' ', ' ', '#'],
+    ['#', ' ', '#', '#', '#', '#', '#', ' ', '#', ' ', '#', '#', '#', ' ', '#', ' ', ' ', ' ', '#', '#', '#', '#', '#', ' ', '#', ' ', '#', '#', ' ', '#'],
+    ['#', ' ', '#', '#', '#', '#', '#', ' ', ' ', ' ', '#', '#', '#', ' ', '#', '#', '#', ' ', '#', '#', '#', '#', '#', ' ', '#', ' ', '#', '#', ' ', '#'],
+    ['#', ' ', '#', '#', '#', '#', '#', '#', '#', '#', '#', 'S', 'S', 'S', 'S', 'S', '#', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '#', ' ', ' ', ' ', ' ', '#'],
+    ['#', ' ', ' ', ' ', ' ', 'K', '#', '#', '#', '#', '#', 'S', 'S', 'S', 'S', 'S', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#'],
+    ['#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#'],
   ];
 
   wallPositions.forEach(([x, y]) => {
@@ -179,9 +220,29 @@ export default function Dealer({ params }: { params: { slug: string } }) {
 
   return (
     <main>
+      <div>
+        height:{height} width:{width}
+        <div>
+      {isModalOpen && (
+        <div className="modal modal-open">
+          <div className="modal-box">
+            <p>閉ざされた屋敷の扉を押し開けると、そこはもはやただの屋敷ではなかった。<br/>
+              廊下は歪み、部屋は迷路と化し、二人の冒険者を待ち受ける。<br/>
+              挑戦を開始するには、一歩を踏み出し、赤いゴールを目指し、壁に触れぬよう慎重に進まねばならない。<br/>
+              しかし、一人の力では脱出の望みは薄い。絆と信頼を武器に、二人で協力し合ってこの屋敷からの脱出を目指そう。<br/>
+              その先には、予想もしない真実が二人を待っているかもしれない。</p>
+          <div className="text-right">
+          <button className="btn" onClick={closeModal}>閉じる</button>
+        </div>
+      </div>
+    </div>
+      )}
+    </div>
+      </div>
       {!isGameStarted ? (
         // ゲームが開始されていない場合、スタートボタンを表示
         <button onClick={() => setIsGameStarted(true)}
+        className="btn btn-error"
         style={{
           position: 'absolute',
           top: 18 * cellSize + 'px',
@@ -224,6 +285,8 @@ export default function Dealer({ params }: { params: { slug: string } }) {
           {maze.map((row, rowIndex) =>
             row.map((cell, cellIndex) => (
               <div
+              // タイムアタック処理の関数を呼び出す
+                // onMouseOver={() => handleMouseOver(rowIndex, cellIndex)}
                 key={`${rowIndex}-${cellIndex}`}
                 data-start={cell === 'S' ? 'true' : undefined}
                 style={{
@@ -234,27 +297,36 @@ export default function Dealer({ params }: { params: { slug: string } }) {
                         cell === '#' ? 'black' :
                         cell === 'S' ? 'green' :
                         cell === 'G' ? 'red' :
+                        cell === 'E' ? 'black' :
                         cell === 'W' ? (showWall ? 'pink' : 'white') :
                         'white',
                     cursor: `url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="5" height="5" viewBox="0 0 2 2"><circle cx="1" cy="1" r="1" fill="black" /></svg>') 1 1, auto`,
                     backgroundSize: 'cover',
-                    backgroundImage: 
+                    backgroundImage:
                         cell === '#' ? `url(${brickImage})` :
                         cell === 'K' ? (
                           rowIndex === keyPositions[1][0] && cellIndex === keyPositions[1][1] && !keys.key1 ? `url(${keyImage})` :
                           rowIndex === keyPositions[2][0] && cellIndex === keyPositions[2][1] && !keys.key2 ? `url(${keyImage})` :
-                          rowIndex === keyPositions[3][0] && cellIndex === keyPositions[3][1] && !keys.key3 ? `url(${keyImage})` : undefined
+                          rowIndex === keyPositions[3][0] && cellIndex === keyPositions[3][1] && !keys.key3 ? `url(${keyImage})` :
+                          rowIndex === keyPositions[4][0] && cellIndex === keyPositions[4][1] && !keys.key3 ? `url(${keyImage})` : undefined
                         ) :
                         cell === '*' ? (
                           rowIndex === doorPositions[1][0] && cellIndex === doorPositions[1][1] && !keys.key1 ? `url(${doorImage})` :
                           rowIndex === doorPositions[2][0] && cellIndex === doorPositions[2][1] && !keys.key2 ? `url(${doorImage})` :
-                          rowIndex === doorPositions[3][0] && cellIndex === doorPositions[3][1] && !keys.key3 ? `url(${doorImage})` : undefined
-                        ) : 
-                        undefined,                          
+                          rowIndex === doorPositions[3][0] && cellIndex === doorPositions[3][1] && !keys.key3 ? `url(${doorImage})` :
+                          rowIndex === doorPositions[4][0] && cellIndex === doorPositions[4][1] && !keys.key3 ? `url(${doorImage})` : undefined
+                        ) :
+                        undefined,
                 }}
               ></div>
             ))
           )}
+          <div className="fixed top-4 right-4">
+          <div className="bg-pink-500 text-white py-2 px-4 rounded shadow-lg">
+          
+          {!isGameOver && isTimeAttackStarted && <div>残り時間：{timeLeft}秒</div>}
+          </div>
+          </div>
         </div>
       )}
     </main>

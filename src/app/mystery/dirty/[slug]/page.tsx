@@ -1,11 +1,14 @@
 'use client';
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import Image from "next/image";
+import { GetWindowSize } from "../../../../hooks/GetWindowSize";
 
 // アイテム型定義
 type Item = {
   id: number;
   name: string;
+  imagePath?: string;
   positionClasses: string;
   width?: string; // 例: "w-32"
   height?: string; // 例: "h-32"
@@ -15,7 +18,7 @@ type Item = {
     choices: {
       confirmText: string;
       cancelText: string;
-    };
+    }| null;
   }[];
 };
 
@@ -28,8 +31,8 @@ const Message = ({text}: {text: string}) => {
 
 // 選択肢コンポーネント  
 const Choices = ({onConfirm, onCancel, options}: any) => {
-  const confirmText = options?.confirmText || '取得する';
-  const cancelText = options?.cancelText || '取得しない';
+  const confirmText = options?.confirmText;
+  const cancelText = options?.cancelText || "戻る";
 
   return (
     <div className="flex flex-col space-y-4">
@@ -56,34 +59,38 @@ export default function Home({ params }: { params: { slug: string } }) {
   const router = useRouter();
   const [isCleanDoorOpen, setIsCleanDoorOpen] = useState(false);
   const [isDirtyDoorOpen, setIsDirtyDoorOpen] = useState(false);
+  const [isBlueBoxBroken, setIsBlueBoxBroken] = useState(false);
+  const [acquiredBlueBox, setAcquiredBlueBox] = useState(false);
+  const [isBearCutted, setIsBearCutted] = useState(false);
   const [acquiredItems, setAcquiredItems] = useState<Item[]>([]); // 取得済みのアイテムを管理する状態
   const [currentItem, setCurrentItem] = useState<Item | null>(null); // 現在選択されているアイテムを管理する状態 毎回nullにリセット
   const [messageIndex, setMessageIndex] = useState<number>(0); // 現在のメッセージのインデックスを管理する状態
   const [isItemListVisible, setIsItemListVisible] = useState(false); // アイテムリストの表示・非表示を管理する状態
-  const [backgroundImage, setBackgroundImage] = useState('/dirty_house.png');
-  let message: string | undefined;
-  let choicesOptions = {};
+  const [selectedItem, setSelectedItem] = useState<Item | null>(null); // アイテムリストからアイテムを選択するときに使う
+  const [putImageItem, setPutImageItem] = useState<Item | null>(null); // アイテムリストから画像付きのアイテムを置くときに使う
+  const [backgroundImage, setBackgroundImage] = useState('/dirty_room.png');
+  const { height, width } = GetWindowSize();
 
   // 配列にて、アイテム、メッセージ、選択肢等をオブジェクトの形で管理。
   const items: Item[] = [
     {
       id: 1,
-      name: '本',
-      positionClasses: "absolute top-1/2 left-1/2 translate-x-[calc(-50%+360px)] translate-y-[calc(-50%+350px)]",
+      name: '日記',
+      positionClasses: "invisible absolute top-1/2 left-1/2 translate-x-[calc(-50%+360px)] translate-y-[calc(-50%+350px)]",
       width: "w-64",
       height: "h-20",
       // コメントアウトで、クリック部分の色を消す
       additionalStyles: { background: 'rgba(255, 255, 255, 0.1)', borderRadius: '8px' },
       messages: [
         {
-          text: "本を開きますか？",
+          text: "日記を開きますか？",
           choices: {
             confirmText: "開く",
             cancelText: "開かない"
           }
         },
         {
-          text: "本の内容を読みますか？",
+          text: "日記の内容を読みますか？",
           choices: {
             confirmText: "読む",
             cancelText: "読まない"
@@ -93,59 +100,142 @@ export default function Home({ params }: { params: { slug: string } }) {
     },
     {
       id: 2,
-      name: '鍵',
-      positionClasses: "absolute top-1/2 left-1/2 translate-x-[calc(-50%+480px)] translate-y-[calc(-50%+120px)]",
-      width: "w-80",
-      height: "h-16",
-      // コメントアウトで、クリック部分の色を消す
-      additionalStyles: { background: 'rgba(255, 255, 255, 0.1)', borderRadius: '8px' },
-      messages: [
-        {
-          text: "鍵を取得しますか？",
-          choices: {
-            confirmText: "取得する",
-            cancelText: "取得しない"
-          }
-        }
-      ]
-    },
-    {
-      id: 3,
-      name: '地図',
-      positionClasses: "absolute top-1/2 left-1/2 translate-x-[calc(-50%+50px)] translate-y-[calc(-50%-120px)]",
+      name: '青い箱',
+      imagePath: '/box_blue.png',
+      positionClasses: "absolute top-1/2 left-1/2 translate-x-[calc(-50%+90px)] translate-y-[calc(-50%+130px)]",
       width: "w-20",
       height: "h-12",
       // コメントアウトで、クリック部分の色を消す
       additionalStyles: { background: 'rgba(255, 255, 255, 0.1)', borderRadius: '8px' },
       messages: [
         {
-          text: "地図を取得しますか？",
+          text: "ボロボロの鍵がかかっている...衝撃を加えれば壊れそうだ。",
+          choices: null
+        },
+        {
+          text: "鍵が壊れている...開けますか？",
           choices: {
-            confirmText: "取得する",
-            cancelText: "取得しない"
+            confirmText: "開ける",
+            cancelText: "開けない"
+          }
+        },
+        {
+          text: "青い箱を手に入れた",
+          choices: null
+        },
+        {
+          text: "引き出しの中は空っぽだ。",
+          choices: null
+        },
+        {
+          text: "何かが砕け散る音がした。",
+          choices: null
+        },
+      ]
+    },
+    {
+      id: 3,
+      name: 'ドア',
+      positionClasses: "absolute top-1/2 left-2/3 translate-x-[calc(-50%+120px)] translate-y-[calc(-50%)] w-36 h-96 opacity-0 text-white",
+      width: "w-24",
+      height: "h-12",
+      // コメントアウトで、クリック部分の色を消す
+      additionalStyles: { background: 'rgba(255, 255, 255, 0.1)', borderRadius: '8px' },
+      messages: [
+        {
+          text: "ドアは不思議な力で固く閉ざされている",
+          choices: null
+        },
+        {
+          text: "ドアが開いているが、もう一人を置いていくわけにはいかない...",
+          choices: null
+        },
+        {
+          text: "ドアが開いている。ここから抜け出せそうだ",
+          choices: {
+            confirmText: "出る",
+            cancelText: "やめておく"
           }
         }
       ]
     },
     {
       id: 4,
-      name: 'ナイフ',
-      positionClasses: "absolute top-1/2 left-1/2 translate-x-[calc(-50%+40px)] translate-y-[calc(-50%+80px)]",
-      width: "w-44",
+      name: 'オルゴール',
+      positionClasses: `absolute top-1/2 left-1/2 translate-x-[calc(-50%+90px)] translate-y-[calc(-50%+30px)]`,
+      width: "w-24",
       height: "h-12",
       // コメントアウトで、クリック部分の色を消す
       additionalStyles: { background: 'rgba(255, 255, 255, 0.1)', borderRadius: '8px' },
       messages: [
         {
-          text: "ナイフを取得しますか？",
+          text: "引き出しを開けた。オルゴールがある。鳴らしてみますか？",
           choices: {
-            confirmText: "取得する",
-            cancelText: "取得しない"
+            confirmText: "鳴らす",
+            cancelText: "やめておく"
           }
         }
       ]
     },
+    {
+      id: 5,
+      name: 'ぬいぐるみ',
+      imagePath: '/stuffed_bear.png',
+      positionClasses: "absolute top-1/2 left-1/2 translate-x-[calc(-50%-150px)] translate-y-[calc(-50%+200px)] -skew-y-12 opacity-0",
+      width: "w-64",
+      height: "h-12",
+      additionalStyles: { background: 'rgba(255, 255, 255, 0.1)', borderRadius: '8px' },
+      messages: [
+        {
+          text: "ベッドの下に何かある...手を伸ばして取りますか？",
+          choices: {
+            confirmText: "手を伸ばす",
+            cancelText: "やめておく"
+          }
+        },
+        {
+          text: "ぬいぐるみを手に入れた",
+          choices: null
+        },
+        {
+          text: "ぬいぐるみをハサミで切った。中からカギが2本出てきた",
+          choices: null
+        }
+      ]
+    },
+    {
+      id: 6,
+      name: 'はさみ',
+      positionClasses: "invisible",
+      // コメントアウトで、クリック部分の色を消す
+      additionalStyles: { background: 'rgba(255, 255, 255, 0.1)', borderRadius: '8px' },
+      messages: [
+        {
+          text: "ベッドの上にはさみがある。拾いますか？",
+          choices: null
+        }
+      ]
+    },
+    {
+      id: 7,
+      name: '青いカギ',
+      positionClasses: "invisible",
+      // コメントアウトで、クリック部分の色を消す
+      messages: [
+      ]
+    },
+    {
+      id: 8,
+      name: '赤いカギ',
+      positionClasses: "invisible",
+      // コメントアウトで、クリック部分の色を消す
+      messages: [
+      ]
+    },
   ];
+
+  let message: string | undefined;
+  let choicesOptions: { confirmText: string; cancelText: string } | null = null;
 
   // 現在選択されているアイテムがある場合、そのアイテムの特定のメッセージと選択肢を取得
   if (currentItem) {
@@ -155,16 +245,44 @@ export default function Home({ params }: { params: { slug: string } }) {
 
   // アイテムがクリックされた時の処理
   const handleClick = (item: Item) => {
-    if (!acquiredItems.some(acquiredItem => acquiredItem.id === item.id)) {
+    if (item.name === '青い箱' && !isBlueBoxBroken) {
       setCurrentItem(item);
-      setMessageIndex(0); // Reset message index when new item is clicked
+      setMessageIndex(0);
+    } else if (item.name === '青い箱' && isBlueBoxBroken && !acquiredBlueBox) {
+      setCurrentItem(item);
+      setMessageIndex(1);
+    } else if (item.name === '青い箱' && isBlueBoxBroken && acquiredBlueBox ) {
+      setCurrentItem(item);
+      setMessageIndex(3);
+    } else if (item.name === 'ドア' && !isDirtyDoorOpen && !isCleanDoorOpen) {
+      setCurrentItem(item);
+      setMessageIndex(0);
+    } else if (item.name === 'ドア' && isDirtyDoorOpen && !isCleanDoorOpen) {
+      setCurrentItem(item);
+      setMessageIndex(1);
+    } else if (item.name === 'ドア' && isDirtyDoorOpen && isCleanDoorOpen) {
+      setCurrentItem(item);
+      setMessageIndex(2);
+    } else if (!acquiredItems.some(acquiredItem => acquiredItem.id === item.id)) {
+      setCurrentItem(item);
+      setMessageIndex(0); 
     }
   };
 
   // 選択肢の処理
   const handleConfirm = () => {
-    if (currentItem && messageIndex < currentItem.messages.length - 1) {
+    if (currentItem && currentItem.name === 'ぬいぐるみ') {
+      setAcquiredItems([...acquiredItems, currentItem])
       setMessageIndex(prevIndex => prevIndex + 1);
+    } else if (currentItem && currentItem.name === '青い箱' && isBlueBoxBroken) {
+      setAcquiredItems([...acquiredItems, currentItem]);
+      setAcquiredBlueBox(true);
+      setMessageIndex(prevIndex => prevIndex + 1);
+    } else if (currentItem && currentItem.name === 'オルゴール') {
+      playMusic('/misery.m4a')
+      setCurrentItem(null);
+    } else if (currentItem && currentItem.name === 'ドア') {
+      router.push(`/maze/dirty/${params.slug}`);
     } else {
       if (currentItem) {
         setAcquiredItems([...acquiredItems, currentItem]);
@@ -178,12 +296,56 @@ export default function Home({ params }: { params: { slug: string } }) {
     setCurrentItem(null);
   };
 
+  const handleItemSelect = (item: Item) => {
+    if (item.imagePath) {
+      if (putImageItem && putImageItem.id === item.id) {
+        setPutImageItem(null); // 既に選択されているアイテムを再度クリックした場合、選択を解除
+      } else {
+        setPutImageItem(item); // それ以外の場合、アイテムを選択
+      }
+    } else {
+      if (selectedItem && selectedItem.id === item.id) {
+        setSelectedItem(null); // 既に選択されているアイテムを再度クリックした場合、選択を解除
+      } else {
+        setSelectedItem(item); // それ以外の場合、アイテムを選択
+      }
+    }
+  };
+
   const switchBackgroundImage = (direction: any) => {
     if (direction === 'left') {
-      setBackgroundImage('/dirty_house.png');
+      setBackgroundImage('/dirty_room.png');
     } else {
       setBackgroundImage('/wall.png');
     }
+  };
+
+  const handleClickHole = () => {
+    if (ws && ws.readyState === WebSocket.OPEN) {
+      if (selectedItem && selectedItem.name === 'はさみ') {
+        ws.send('sendScissorFromDirty');
+      } else if (selectedItem && selectedItem.name === '青いカギ') {
+        ws.send('sendBlueKeyFromDirty');
+      } else if (selectedItem && selectedItem.name === '赤いカギ') {
+        ws.send('sendRedKeyFromDirty');
+      }
+    }
+    setSelectedItem(null);
+  };
+
+  const handleClickItemImage = () => {
+    if (putImageItem && putImageItem.name === "ぬいぐるみ" && selectedItem && selectedItem.name === "はさみ" && !isBearCutted) {
+      setCurrentItem(items[4]);
+      setMessageIndex(2);
+      setAcquiredItems([...acquiredItems, items[6], items[7]]);
+      setPutImageItem(null);
+      setIsBearCutted(true);
+    } 
+  };
+
+  const playMusic = (file: string) => {
+    const audio = new Audio(file);
+    audio.play();
   };
 
   useEffect(() => {
@@ -203,6 +365,38 @@ export default function Home({ params }: { params: { slug: string } }) {
             setIsCleanDoorOpen(true);
           } else if (event.data == "openDirtyDoor") {
             setIsDirtyDoorOpen(true);
+          } else if (event.data == "breakBlueBox") {
+            playGunSound();
+            setCurrentItem(items[1]);
+            setMessageIndex(4);
+            setIsBlueBoxBroken(true);
+          } else if (event.data == "sendScissorFromClean") {
+            setAcquiredItems([...acquiredItems, items[5]]);
+          } else if (event.data == "sendBlueKeyFromClean") {
+            setAcquiredItems([...acquiredItems, items[6]]);
+          } else if (event.data == "sendRedKeyFromClean") {
+            setAcquiredItems([...acquiredItems, items[7]]);
+          } else if (event.data == "sendScissorFromDirty") {
+            if (selectedItem && selectedItem.name === 'はさみ') {
+              let result = acquiredItems.filter(function( item ) {
+                return item.name !== 'はさみ';
+              });
+              setAcquiredItems(result);
+            }
+          } else if (event.data == "sendBlueKeyFromDirty") {
+            if (selectedItem && selectedItem.name === '青いカギ') {
+              let result = acquiredItems.filter(function( item ) {
+                return item.name !== '青いカギ';
+              });
+              setAcquiredItems(result);
+            }
+          } else if (event.data == "sendRedKeyFromDirty") {
+            if (selectedItem && selectedItem.name === '赤いカギ') {
+              let result = acquiredItems.filter(function( item ) {
+                return item.name !== '赤いカギ';
+              });
+              setAcquiredItems(result);
+            }
           }
         };
 
@@ -213,7 +407,7 @@ export default function Home({ params }: { params: { slug: string } }) {
     }
 
     checkRoomExists();
-  }, [params.slug]);
+  }, [params.slug, selectedItem]);
 
   async function openCleanDoor() {
     if (ws && ws.readyState === WebSocket.OPEN) {
@@ -221,102 +415,116 @@ export default function Home({ params }: { params: { slug: string } }) {
     }
   }
 
-  async function goMazeDirty() {
-    if (isCleanDoorOpen) {
-      router.push(`/maze/dirty/${params.slug}`);
-    } else {
-      alert("相方を置いていくわけにはいかない！");
-    }
-  }
+  //音
+  const playGunSound = () => {
+    const sound = new Audio("/se_gun_fire10.wav");
+    sound.play();
+  };
 
   return (
-    <div
-      // 背景画像
-      className="h-screen w-full bg-contain bg-center bg-no-repeat"
-      style={{ backgroundImage: `url(${backgroundImage})` }}
-    >
-      
-      {/* 条件に基づいて左の三角形ボタンを表示 */}
-      {backgroundImage === '/wall.png' && (
-        <>
-          <TriangleButton direction="left" handleClickTriangle={() => switchBackgroundImage('left')} />
-        </>
-      )}
-
-      {/* 条件に基づいて右の三角形ボタンを表示 */}
-      {backgroundImage === '/dirty_house.png' && (
-        <>
-          {/* アイテム配置 */}
-          {items.map(item => (
-            <div
-              key={item.id} 
-              onClick={() => handleClick(item)}
-              className={`text-white ${item.positionClasses} cursor-pointer ${item.width} ${item.height} flex justify-center items-center`}
-              style={item.additionalStyles}
+    <div className="relative h-screen w-screen">
+      <div
+        // 背景画像
+        className="bg-contain bg-center bg-no-repeat bg-black absolute top-1/2 left-1/2 translate-x-[-50%] translate-y-[-50%]"
+        style={{ backgroundImage: `url(${backgroundImage})`,
+                 width: `1400px`,
+                 height: `750px`}}
+      >
+        {/* 条件に基づいて左の三角形ボタンを表示 */}
+        {backgroundImage === '/wall.png' && (
+          <>
+            <button onClick={handleClickHole}
+                    className="text-white absolute top-1/2 left-1/2 translate-x-[calc(-50%+10px)] translate-y-[calc(-50%)] w-36 h-36"
             >
-              {item.name}
-            </div>
-          ))}
-          {/* ドア */}
-          <button onClick={goMazeDirty}
-                  className="text-white absolute top-1/2 left-0 translate-x-[calc(-50%+40px)] translate-y-[calc(-50%+80px)]"
-          >
-            ドア
-          </button>
-          {/* currentItemに値がある場合、以降のメッセージと選択を描画する */}
-          {currentItem && (
-            <>
-              <div className="fixed justify-center items-end bottom-4 left-0 right-0 flex">
-                <div className="mb-20 w-3/5 p-20 relative">
-                  <div className="absolute top-0 left-0 w-full h-full border-4 border-gray-600 bg-gray-800 bg-opacity-50">
-                  {message && <Message text={message} />}
-                </div>
+              壁の穴
+            </button>
+            <TriangleButton direction="left" handleClickTriangle={() => switchBackgroundImage('left')} />
+          </>
+        )}
+
+        {/* 条件に基づいて右の三角形ボタンを表示 */}
+        {backgroundImage === '/dirty_room.png' && (
+          <>
+            {/* アイテム配置 */}
+            {items.map(item => (
+              <div
+                key={item.id} 
+                onClick={() => handleClick(item)}
+                className={`text-white ${item.positionClasses} cursor-pointer ${item.width} ${item.height} flex justify-center items-center`}
+                style={item.additionalStyles}
+              >
+                {item.name}
               </div>
-              </div>
-    
-              <div className="fixed top-0 left-0 right-0 bottom-0 flex items-center justify-center">
-                <div className="relative w-1/5 p-14">
-                  <div className="absolute top-0 left-0 w-full h-full border-4 border-gray-600 bg-gray-800 bg-opacity-50 flex flex-col items-center justify-center">
-                    <Choices
-                      onConfirm={handleConfirm}
-                      onCancel={handleCancel}  
-                      options={choicesOptions} 
-                    />
+            ))}
+            {/* currentItemに値がある場合、以降のメッセージと選択を描画する */}
+            {currentItem && (
+              <>
+                <div className="fixed justify-center items-end bottom-4 left-0 right-0 flex">
+                  <div className="mb-20 w-3/5 p-20 relative">
+                    <div className="absolute top-0 left-0 w-full h-full border-4 border-gray-600 bg-gray-800 bg-opacity-50">
+                    {message && <Message text={message} />}
                   </div>
                 </div>
-              </div>
-            </>
-          )}
-          <TriangleButton direction="right" handleClickTriangle={() => switchBackgroundImage('right')} />
-        </>
-      )}
-      
-      {/* 取得済みアイテム */}
-      <div className="absolute top-2/5 right-0 text-white">
-        <div className="bg-gray-800 bg-opacity-60 p-2 rounded-t-lg cursor-pointer hover:bg-opacity-70" onClick={() => setIsItemListVisible(!isItemListVisible)}>
-          <span>
-            アイテム一覧
-            <span className="ml-2">
-              {isItemListVisible ? '▲' : '▼'}
-            </span>
-          </span>
-        </div>
-        {isItemListVisible && (
-        <div className="bg-gray bg-opacity-60 p-2 rounded-b-lg shadow-xl border-t border-gray-500">
-          {acquiredItems.map(item => (
-            <div key={item.id} className="border-b border-gray-600 p-1 hover:bg-gray-700 text-shadow-md">
-              {item.name}
-            </div>
-          ))}
-        </div>
+                </div>
+  
+                <div className="fixed top-0 left-0 right-0 bottom-0 flex items-center justify-center">
+                  <div className="relative w-1/5 p-14">
+                    <div className="absolute top-0 left-0 w-full h-full border-4 border-gray-600 bg-gray-800 bg-opacity-50 flex flex-col items-center justify-center">
+                      <Choices
+                        onConfirm={handleConfirm}
+                        onCancel={handleCancel}  
+                        options={choicesOptions} 
+                      />
+                    </div>
+                  </div>
+                </div>
+              </>
+            )}
+            <TriangleButton direction="right" handleClickTriangle={() => switchBackgroundImage('right')} />
+          </>
         )}
+        
+        {/* 取得済みアイテム */}
+        <div className="absolute top-0 right-0 text-white">
+          <div className="bg-gray-800 bg-opacity-60 p-2 rounded-t-lg cursor-pointer hover:bg-opacity-70" onClick={() => setIsItemListVisible(!isItemListVisible)}>
+            <span>
+              アイテム一覧
+              <span className="ml-2">
+                {isItemListVisible ? '▲' : '▼'}
+              </span>
+            </span>
+          </div>
+          {isItemListVisible && (
+          <div className="bg-gray bg-opacity-60 p-2 rounded-b-lg shadow-xl border-t border-gray-500">
+            {acquiredItems.map(item => (
+              <div key={item.id} 
+                   className={`p-2 rounded-b-lg shadow-xl border-t ${((selectedItem && selectedItem.id === item.id) || (putImageItem && putImageItem.id ===item.id)) ? 'bg-red-600' : 'bg-gray-800 bg-opacity-60'}`} 
+                   onClick={() => handleItemSelect(item)}
+              >
+                {item.name}
+              </div>
+            ))}
+          </div>
+          )}
+        </div>
+        {/* アイテムリストから選んだアイテムが画像を表示するもの（ぬいぐるみ、箱）の場合、画像を表示する */}
+        {putImageItem && putImageItem.imagePath && (
+          <Image src={putImageItem.imagePath} 
+                 alt={putImageItem.name}
+                 width={1280} 
+                 height={852}
+                 className="absolute top-1/2 left-1/2 translate-x-[-50%] translate-y-[-50%] w-96 h-96 z-10 cursor-pointer"
+                 priority
+                 onClick={handleClickItemImage}
+          />
+        )}
+        {!isCleanDoorOpen &&
+          <button onClick={openCleanDoor}
+                  className="absolute top-1/4 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-red-600 p-5 rounded-lg shadow-lg">
+            相手のドアの鍵を開ける
+          </button>
+        }
       </div>
-      {!isCleanDoorOpen &&
-        <button onClick={openCleanDoor}
-                className="absolute top-1/4 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-red-600 p-5 rounded-lg shadow-lg">
-          相手のドアの鍵を開ける
-        </button>
-      }
     </div>
   );
 }

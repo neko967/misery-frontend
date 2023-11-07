@@ -1,6 +1,35 @@
 'use client';
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import GlitchEffect from '../../components/GlitchEffect';
+import TextEffect from '../../components/TextEffect';
+import styles from '../../components/WaitingRoomButton.module.css';
+import DirtyButtonStyles from '../../components/WaitingRoomDirtyButton.module.css';
+
+function WaitingRoomButton() {
+  return (
+      <main className={styles.container}>
+          <div className={styles.section}>
+              <div className={styles.text}>
+                  <div className={styles.character}>綺麗な</div>
+                  <div className={styles.character}>部屋に入る？</div>
+              </div>
+          </div>
+      </main>
+  );
+}
+function WaitingRoomDirtyButton() {
+  return (
+      <main className={DirtyButtonStyles.container}>
+          <div className={DirtyButtonStyles.section}>
+              <div className={DirtyButtonStyles.text}>
+                  <div className={DirtyButtonStyles.character}>寂れた</div>
+                  <div className={DirtyButtonStyles.character}>部屋に入る？</div>
+              </div>
+          </div>
+      </main>
+  );
+}
 
 type RoomState = 'clean' | 'dirty';
 
@@ -9,6 +38,19 @@ export default function Home({ params }: { params: { slug: string } }) {
   const router = useRouter();
   const [hostWhichRoom, setHostWhichRoom] = useState<RoomState>();
   const [guestWhichRoom, setGuestWhichRoom] = useState<RoomState>();
+  const [currentTextIndex, setCurrentTextIndex] = useState(0);
+
+  const storyTexts = [
+    '二人の探検者は手分けして探索することを決めた。一方が綺麗な部屋へ、もう一方は寂れた部屋へと足を進める。',
+    '綺麗な部屋には時間が止まったかのような静寂が漂い、寂れた部屋は過去の栄華を色濃く残す荒廃が存在した。',
+    '二つの部屋は異なる物語と未解の謎を秘め、探検者たちはそれぞれの扉を静かに開ける。',
+    '綺麗な部屋へ進んだ探検者は整然と保たれた空間で手がかりを求め、寂れた部屋に入った者は壁に投げかけられた自分の影と風の唸りに耳を傾けた。',
+    'やがて、彼らが再会する時、それぞれの経験は一つの大きな物語を紡ぎ、洋館の謎を解き明かす鍵となるだろう。二人の旅は、このとき始まりを告げる。',
+  ];
+
+  const nextText = () => {
+    setCurrentTextIndex((prevIndex) => prevIndex + 1);
+  };
 
   useEffect(() => {
     async function checkRoomExists() {
@@ -24,11 +66,9 @@ export default function Home({ params }: { params: { slug: string } }) {
 
         websocket.onmessage = (event) => {
           if (event.data == "goMystery") {
-            if (guestWhichRoom == 'clean') {
-              router.push(`/mystery/clean/${params.slug}`);
-            } else if (guestWhichRoom == 'dirty') {
-              router.push(`/mystery/dirty/${params.slug}`);
-            }
+            if ( hostWhichRoom && guestWhichRoom && hostWhichRoom !== guestWhichRoom) {
+              router.push(`/mystery/${guestWhichRoom}/${params.slug}`);
+            } 
           } else if (event.data == "hostMysteryClean") {
             setHostWhichRoom('clean');
           } else if (event.data == "hostMysteryDirty") {
@@ -63,31 +103,71 @@ export default function Home({ params }: { params: { slug: string } }) {
 
   return (
     <div
-      className="h-screen w-full bg-cover"
-      style={{ backgroundImage: "url('/background.png')" }}
+      className="h-screen w-full bg-cover flex justify-center items-center"
+      style={{ backgroundImage: "url('/prologue.png')" }}
     >
-      <button onClick={clickMysteryClean}
-              className="indicator absolute top-1/4 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-red-600 p-5 rounded-lg shadow-lg">
-        <div>綺麗な部屋に入る</div>
-        {hostWhichRoom == 'clean' &&
-          <span className="indicator-item indicator-start badge badge-secondary"></span>
-        }
-        {guestWhichRoom == 'clean' &&
-          <span className="indicator-item badge badge-primary"></span>
-        }
-      </button>
-      <button onClick={clickMysteryDirty}
-              className="indicator absolute top-2/4 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-red-600 p-5 rounded-lg shadow-lg">
-        <div>さびれた部屋に入る</div>
-        {hostWhichRoom == 'dirty' &&
-          <span className="indicator-item indicator-start badge badge-secondary"></span>
-        }
-        {guestWhichRoom == 'dirty' &&
-          <span className="indicator-item badge badge-primary"></span>
-        }
-      </button>
+      <GlitchEffect />
+
+      {/* Story Texts */}
+      {currentTextIndex < storyTexts.length && (
+        <div
+          style={{
+            position: 'absolute', // This might be changed if needed
+            backgroundColor: 'rgba(0, 0, 0, 0.56)',
+            color: 'white',
+            padding: '20px',
+            borderRadius: '10px',
+            textAlign: 'center',
+            width: '1000px',
+            maxHeight: '80vh',
+            overflowY: 'auto',
+            zIndex: 1000,
+          }}
+        >
+          <p style={{ margin: '10px', height: '20px' }}>{storyTexts[currentTextIndex]}</p>
+          <div
+            style={{
+              position: 'absolute',
+              right: '10px',
+              bottom: '10px',
+              cursor: 'pointer',
+              fontSize: '24px',
+              animation: 'bounce 1s infinite'
+            }}
+            onClick={nextText}
+          >
+            ▼
+          </div>
+        </div>
+      )}
+
+      {/* Buttons */}
+      {currentTextIndex >= storyTexts.length && (
+        <div
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            zIndex: 1000,
+            
+          }}
+          
+        >
+          <button className="clean-my-button" onClick={clickMysteryClean} type="button">
+            <WaitingRoomButton />
+            {hostWhichRoom === 'clean' && <span className="indicator-item indicator-start badge badge-secondary"></span>}
+            {guestWhichRoom === 'clean' && <span className="indicator-item badge badge-primary"></span>}
+          </button>
+          
+
+          <button className="dirty-my-button" onClick={clickMysteryDirty} type="button">
+            <WaitingRoomDirtyButton />
+            {hostWhichRoom === 'dirty' && <span className="indicator-item indicator-start badge badge-secondary"></span>}
+            {guestWhichRoom === 'dirty' && <span className="indicator-item badge badge-primary"></span>}
+          </button>
+          
+        </div>
+      )}
     </div>
   );
 }
-
-

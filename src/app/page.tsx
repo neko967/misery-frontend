@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link'
+import { GetWindowSize } from "../hooks/GetWindowSize";
 
 type Room = {
   name: string;
@@ -11,6 +12,7 @@ type Room = {
 export default function Home() {
   const [rooms, setRooms] = useState<Room[]>([]);
   const router = useRouter();
+  const { height, width } = GetWindowSize();
 
   async function createRoom() {
     var S="ABCDEFGHIJKLMNOPQRSTUVWXYZ"
@@ -41,10 +43,10 @@ export default function Home() {
     if (response.ok) {
       const data = await response.json();
       const roomName = data.name;
-      alert("Successfully joined the room");
+      alert("部屋に入れました!");
       router.push(`/waiting_room/guest/${roomName}`);
     } else {
-      alert("Failed to join the room");
+      alert("部屋が見つかりませんでした...");
     }
   }
 
@@ -66,6 +68,7 @@ export default function Home() {
         JOIN ROOM
         </button>
       </div>
+      
     </div>
   );
 }
