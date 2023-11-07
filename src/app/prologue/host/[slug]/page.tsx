@@ -67,11 +67,9 @@ export default function Home({ params }: { params: { slug: string } }) {
 
         websocket.onmessage = (event) => {
           if (event.data == "goMystery") {
-            if (hostWhichRoom == 'clean') {
-              router.push(`/mystery/clean/${params.slug}`);
-            } else if (hostWhichRoom == 'dirty') {
-              router.push(`/mystery/dirty/${params.slug}`);
-            }
+            if ( hostWhichRoom && guestWhichRoom && hostWhichRoom !== guestWhichRoom) {
+              router.push(`/mystery/${hostWhichRoom}/${params.slug}`);
+            } 
           } else if (event.data == "hostMysteryClean") {
             setHostWhichRoom('clean');
           } else if (event.data == "hostMysteryDirty") {
