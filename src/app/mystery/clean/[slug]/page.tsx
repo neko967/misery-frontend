@@ -98,10 +98,11 @@ export default function Home({ params }: { params: { slug: string } }) {
   const [isCleanDoorOpen, setIsCleanDoorOpen] = useState(false);
   const [isDirtyDoorOpen, setIsDirtyDoorOpen] = useState(false);
   const [isRedBoxBroken, setIsRedBoxBroken] = useState(false);
-  const [acquiredRedBox, setAcquiredRedBox] = useState(false);
   const [isBlueBoxBroken, setIsBlueBoxBroken] = useState(false);
   const [isPasswordBoxOpen, setIsPasswordBoxOpen] = useState(false);
   const [acquiredItems, setAcquiredItems] = useState<Item[]>([]); // 取得済みのアイテムを管理する状態
+  const [acquiredRedBox, setAcquiredRedBox] = useState(false);
+  const [acquiredScissors, setAcquiredScissors] = useState(false);
   const [currentItem, setCurrentItem] = useState<Item | null>(null); // 現在選択されているアイテムを管理する状態 毎回nullにリセット
   const [messageIndex, setMessageIndex] = useState<number>(0); // 現在のメッセージのインデックスを管理する状態
   const [isItemListVisible, setIsItemListVisible] = useState(false); // アイテムリストの表示・非表示を管理する状態
@@ -239,6 +240,28 @@ export default function Home({ params }: { params: { slug: string } }) {
         },
         {
           text: "壁の穴に銃口を当てた。向こうの部屋の様子はよくわからない。",
+          choices: null
+        }
+      ]
+    },
+    {
+      id: 6,
+      name: 'はさみ',
+      positionClasses: "absolute top-1/2 left-2/3 translate-x-[calc(-50%-25px)] translate-y-[calc(-50%+160px)] opacity-0",
+      width: "w-36",
+      height: "h-16",
+      // コメントアウトで、クリック部分の色を消す
+      additionalStyles: { background: 'rgba(255, 255, 255, 0.1)', borderRadius: '8px' },
+      messages: [
+        {
+          text: "ベッドの上にはさみがある。拾いますか？",
+          choices: {
+            confirmText: "拾う",
+            cancelText: "拾わない"
+          }
+        },
+        {
+          text: "ベッドの上にはもう何もない。",
           choices: null
         }
       ]
