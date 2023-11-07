@@ -40,7 +40,7 @@ export default function Home({ params }: { params: { slug: string } }) {
       {/* Twitterリンク */}
       <button className="absolute top-2/4 left-1/2 transform -translate-x1/2 -translate-y-1/2 bg-red-600 p-5 rounded-lg shadow-lg"
         onClick={() => {
-        const tweetText = "脱出成功したよ。遊んでくれてありがとう👻"
+        const tweetText = "Thankyou!!脱出成功したよ！遊んでくれてありがとう👻みんなもチャレンジしてみてね！#Misery"
         const url = window.location.origin;
             window.open(
               `https://twitter.com/intent/tweet?text=${tweetText}%0A%0A${url}`,

@@ -127,13 +127,13 @@ export default function Home({ params }: { params: { slug: string } }) {
             padding: '20px',
             borderRadius: '10px',
             textAlign: 'center',
-            width: '800px',
+            width: '1000px',
             maxHeight: '80vh',
             overflowY: 'auto',
             zIndex: 1000,
           }}
         >
-          <p style={{ marginBottom: '20px', height: '40px' }}>{storyTexts[currentTextIndex]}</p>
+          <p style={{ margin: '10px', height: '20px' }}>{storyTexts[currentTextIndex]}</p>
           <div
             style={{
               position: 'absolute',
@@ -141,6 +141,7 @@ export default function Home({ params }: { params: { slug: string } }) {
               bottom: '10px',
               cursor: 'pointer',
               fontSize: '24px',
+              animation: 'bounce 1s infinite'
             }}
             onClick={nextText}
           >
