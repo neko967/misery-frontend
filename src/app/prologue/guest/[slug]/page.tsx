@@ -120,13 +120,13 @@ export default function Home({ params }: { params: { slug: string } }) {
             padding: '20px',
             borderRadius: '10px',
             textAlign: 'center',
-            width: '800px',
+            width: '1000px',
             maxHeight: '80vh',
             overflowY: 'auto',
             zIndex: 1000,
           }}
         >
-          <p style={{ marginBottom: '20px', height: '40px' }}>{storyTexts[currentTextIndex]}</p>
+          <p style={{ margin: '10px', height: '20px' }}>{storyTexts[currentTextIndex]}</p>
           <div
             style={{
               position: 'absolute',
@@ -134,6 +134,7 @@ export default function Home({ params }: { params: { slug: string } }) {
               bottom: '10px',
               cursor: 'pointer',
               fontSize: '24px',
+              animation: 'bounce 1s infinite'
             }}
             onClick={nextText}
           >
@@ -150,19 +151,23 @@ export default function Home({ params }: { params: { slug: string } }) {
             flexDirection: 'column',
             alignItems: 'center',
             zIndex: 1000,
+            
           }}
+          
         >
           <button className="clean-my-button" onClick={clickMysteryClean} type="button">
             <WaitingRoomButton />
             {hostWhichRoom === 'clean' && <span className="indicator-item indicator-start badge badge-secondary"></span>}
             {guestWhichRoom === 'clean' && <span className="indicator-item badge badge-primary"></span>}
           </button>
+          
 
           <button className="dirty-my-button" onClick={clickMysteryDirty} type="button">
             <WaitingRoomDirtyButton />
             {hostWhichRoom === 'dirty' && <span className="indicator-item indicator-start badge badge-secondary"></span>}
             {guestWhichRoom === 'dirty' && <span className="indicator-item badge badge-primary"></span>}
           </button>
+          
         </div>
       )}
     </div>

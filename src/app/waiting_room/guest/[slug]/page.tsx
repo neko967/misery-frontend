@@ -9,7 +9,8 @@ function WaitingRoomButton() {
       <main className={styles.container}>
           <div className={styles.section}>
               <div className={styles.text}>
-                  <div className={styles.character}>⚠️本アプリにはショックの強い表現が含まれています。</div>
+                  <div className={styles.character}>
+                  <span style={{color: 'yellow'}}>⚠️</span> 本アプリにはショックの強い表現が含まれています。</div>
                   <div className={styles.character}>苦手な方や心臓の弱い方はご注意ください。</div>
               </div>
           </div>
@@ -21,7 +22,7 @@ export default function Home({ params }: { params: { slug: string } }) {
   const router = useRouter();
   const [readyToPrologue, setReadyToPrologue] = useState(false);
   const [currentTextIndex, setCurrentTextIndex] = useState(0);
-
+  
   const storyTexts = [
     'かつて華やかな宴が開かれたという洋館は、今や廃墟と化し、暗い影を村に落としていた。',
     '「ここには幽霊が出る」と囁かれ、人々の恐怖を煽る存在となって久しい。',
@@ -94,20 +95,23 @@ export default function Home({ params }: { params: { slug: string } }) {
           padding: '20px',
           borderRadius: '10px',
           textAlign: 'center',
-          width: '800px',
+          width: '1000px',
           maxHeight: '80vh', // 画面の高さの80%を最大に
           overflowY: 'auto', // 縦方向にスクロール可能に
           zIndex: 1000
         }}
       >
-        <p style={{ marginBottom: '20px', height: '40px' }}>{storyTexts[currentTextIndex]}</p>
+        <p style={{ margin: '10px', height: '20px' }}>{storyTexts[currentTextIndex]}</p>
         <div
           style={{
             position: 'absolute',
             right: '10px',
             bottom: '10px',
             cursor: 'pointer',
-            fontSize: '24px'
+            fontSize: '24px',
+            padding: '10px',
+            textAlign: 'center',
+            animation: 'bounce 1s infinite'
           }}
           onClick={nextText}
         >
@@ -115,7 +119,7 @@ export default function Home({ params }: { params: { slug: string } }) {
         </div>
       </div>
     )}
-
+   
     {currentTextIndex === storyTexts.length && (
       <div
         style={{
@@ -128,13 +132,14 @@ export default function Home({ params }: { params: { slug: string } }) {
         }}
       >
         <WaitingRoomButton />
+        <button onClick={clickReady} className="game-start">
+        準備OK?
+      </button>
       </div>
     )}
 
-      <button onClick={clickReady} className="game-start">
-        準備OK?
-      </button>
-      <p className="code">CODE: {params.slug}</p>
+      
+     
     </div>
   );
 }

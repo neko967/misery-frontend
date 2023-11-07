@@ -26,6 +26,7 @@ export default function Home({ params }: { params: { slug: string } }) {
   const router = useRouter();
   const [readyToPrologue, setReadyToPrologue] = useState(false);
   const [currentTextIndex, setCurrentTextIndex] = useState(0);
+  const [copied, setCopied] = useState(false);
 
   const storyTexts = [
     'かつて華やかな宴が開かれたという洋館は、今や廃墟と化し、暗い影を村に落としていた。',
@@ -100,20 +101,21 @@ export default function Home({ params }: { params: { slug: string } }) {
           padding: '20px',
           borderRadius: '10px',
           textAlign: 'center',
-          width: '800px',
+          width: '1000px',
           maxHeight: '80vh', // 画面の高さの80%を最大に
           overflowY: 'auto', // 縦方向にスクロール可能に
           zIndex: 1000
         }}
       >
-        <p style={{ marginBottom: '20px', height: '40px' }}>{storyTexts[currentTextIndex]}</p>
+        <p style={{ margin: '10px', height: '20px' }}>{storyTexts[currentTextIndex]}</p>
         <div
           style={{
             position: 'absolute',
             right: '10px',
             bottom: '10px',
             cursor: 'pointer',
-            fontSize: '24px'
+            fontSize: '24px',
+            animation: 'bounce 1s infinite'
           }}
           onClick={nextText}
         >
@@ -134,6 +136,14 @@ export default function Home({ params }: { params: { slug: string } }) {
         }}
       >
         <WaitingRoomButton />
+        <p className="invite-text">この部屋の招待コード</p>
+        <p className="invite-code" onClick={() => {
+          navigator.clipboard.writeText(params.slug);
+        setCopied(true);
+        }}>
+        {params.slug}
+        </p>
+        {copied && <p className="copy-message">コピーしました!</p>}
       </div>
     )}
    
@@ -141,11 +151,11 @@ export default function Home({ params }: { params: { slug: string } }) {
 
       {readyToPrologue &&
         <button onClick={goPrologue}
-                className="game-start">
+                className="game-start-host">
           GAME START
         </button>
       }
-      <p className="code">招待コードを友達に教えてください▷{params.slug}</p>
+      
     </div>
   );
 }

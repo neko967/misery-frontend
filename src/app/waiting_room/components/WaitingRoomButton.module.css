@@ -1,15 +1,38 @@
 .text {
+	padding: 20px;
   font-size: 20px;
-  background-color: #ee0909;
+  font-weight: bold; 
   line-height: 1.6;
   margin-bottom: 20px;
   position: relative;
   top: -80px;
   text-align: center; /* テキストを中央寄せにする */
+  border-radius: 10px;
 
-  /* ホラー要素のスタイル */
-  color: #ede7e7; /* 赤い文字色 */
-  text-shadow: 1px 1px #000; /* 微妙に影を付ける */
-  font-family: "CreepyFont", cursive; /* ホラーフォント */
+	/* 光るネオングラデーション */
+	background: linear-gradient(to right, #f40909, #ff0000, #f40909);
+	animation: gradient 1s infinite;
   
+	/* グリッチエフェクト */
+	text-shadow: 
+	  1px 1px 1px #f40909,
+	  2px 2px 1px #000;
+	animation: glitch 1s infinite;  
+  
+  }
+  
+  /* グラデーションアニメーション */
+  @keyframes gradient {
+	0% {background-position: 0% 50%;}
+	50% {background-position: 100% 50%;}
+	100% {background-position: 0% 50%;}
+  }
+  
+  /* グリッチアニメーション */  
+  @keyframes glitch {
+	0% {text-shadow: none;}
+	20% {text-shadow: 
+	  1px 1px 1px #f40909,
+	  2px 2px 1px #000;}
+	100% {text-shadow: none;}
   }
