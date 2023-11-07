@@ -120,7 +120,7 @@ export default function Home({ params }: { params: { slug: string } }) {
     {
       id: 1,
       name: '日記',
-      positionClasses: "absolute top-1/2 left-1/2 translate-x-[calc(-50%+360px)] translate-y-[calc(-50%+350px)]",
+      positionClasses: "invisible absolute top-1/2 left-1/2 translate-x-[calc(-50%+360px)] translate-y-[calc(-50%+350px)]",
       width: "w-64",
       height: "h-20",
       // コメントアウトで、クリック部分の色を消す
@@ -271,6 +271,22 @@ export default function Home({ params }: { params: { slug: string } }) {
         }
       ]
     },
+    {
+      id: 7,
+      name: '青いカギ',
+      positionClasses: "invisible",
+      // コメントアウトで、クリック部分の色を消す
+      messages: [
+      ]
+    },
+    {
+      id: 8,
+      name: '赤いカギ',
+      positionClasses: "invisible",
+      // コメントアウトで、クリック部分の色を消す
+      messages: [
+      ]
+    },
   ];
   
   // 配列にて、アイテム、メッセージ、選択肢等をオブジェクトの形で管理。
@@ -374,7 +390,7 @@ export default function Home({ params }: { params: { slug: string } }) {
       setMessageIndex(prevIndex => prevIndex + 1);
       setAcquiredScissors(true);
     } else if (currentItem && currentItem.name === 'ドア') {
-      router.push(`/maze/dirty/${params.slug}`);
+      router.push(`/maze/clean/${params.slug}`);
     } else if (currentItem && currentItem.name === '赤い箱' && isRedBoxBroken) {
       if (currentItem) {
         setAcquiredItems([...acquiredItems, currentItem]);
@@ -427,7 +443,11 @@ export default function Home({ params }: { params: { slug: string } }) {
         setCurrentItem(items[4]);
         setMessageIndex(1);
       } else if (selectedItem && selectedItem.name === 'はさみ') {
-        ws.send('sendScissorFromCleanToDirty');
+        ws.send('sendScissorFromClean');
+      } else if (selectedItem && selectedItem.name === '青いカギ') {
+        ws.send('sendBlueKeyFromClean');
+      } else if (selectedItem && selectedItem.name === '赤いカギ') {
+        ws.send('sendRedKeyFromClean');
       }
     }
   };
@@ -451,14 +471,30 @@ export default function Home({ params }: { params: { slug: string } }) {
             setIsDirtyDoorOpen(true);
           } else if (event.data == "breakBlueBox") {
             setIsBlueBoxBroken(true)
-          } else if (event.data == "sendScissorFromDirtyToClean") {
-            if (items[5]) {
-              setAcquiredItems([...acquiredItems, items[5]]);
-            }
-          } else if (event.data == "sendScissorFromCleanToDirty") {
+          } else if (event.data == "sendScissorFromDirty") {
+            setAcquiredItems([...acquiredItems, items[5]]);
+          } else if (event.data == "sendBlueKeyFromDirty") {
+            setAcquiredItems([...acquiredItems, items[6]]);
+          } else if (event.data == "sendRedKeyFromDirty") {
+            setAcquiredItems([...acquiredItems, items[7]]);
+          } else if (event.data == "sendScissorFromClean") {
             if (selectedItem && selectedItem.name === 'はさみ') {
               let result = acquiredItems.filter(function( item ) {
                 return item.name !== 'はさみ';
+              });
+              setAcquiredItems(result);
+            }
+          } else if (event.data == "sendBlueKeyFromClean") {
+            if (selectedItem && selectedItem.name === '青いカギ') {
+              let result = acquiredItems.filter(function( item ) {
+                return item.name !== '青いカギ';
+              });
+              setAcquiredItems(result);
+            }
+          } else if (event.data == "sendRedKeyFromClean") {
+            if (selectedItem && selectedItem.name === '赤いカギ') {
+              let result = acquiredItems.filter(function( item ) {
+                return item.name !== '赤いカギ';
               });
               setAcquiredItems(result);
             }
@@ -673,7 +709,7 @@ export default function Home({ params }: { params: { slug: string } }) {
         </>
         )}
         {/* 取得済みアイテム */}
-        <div className="absolute top-2/5 right-0 text-white">
+        <div className="absolute top-0 right-0 text-white">
           <div className="bg-gray-800 bg-opacity-60 p-2 rounded-t-lg cursor-pointer hover:bg-opacity-70" onClick={() => setIsItemListVisible(!isItemListVisible)}>
             <span>
               アイテム一覧
