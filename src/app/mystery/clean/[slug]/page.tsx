@@ -689,7 +689,6 @@ export default function Home({ params }: { params: { slug: string } }) {
             <button onClick={handleClickHole}
                     className="text-white absolute top-1/2 left-1/2 translate-x-[calc(-50%+10px)] translate-y-[calc(-50%)] w-36 h-36"
             >
-              壁の穴
             </button>
             {/* currentItemに値がある場合、以降のメッセージと選択を描画する */}
             {currentItem && (
