@@ -440,6 +440,7 @@ export default function Home({ params }: { params: { slug: string } }) {
         ws.send('cleanIsReadyToAcceptItem');
       }
     }
+    setShowPasswordButtons(false)
     setCurrentItem(null);
   };
 
@@ -688,6 +689,11 @@ export default function Home({ params }: { params: { slug: string } }) {
                           確認
                         </button>
                       )}
+                      <button
+                        className="btn btn-warning border-none cursor-pointer text-center text-xl ml-4"
+                        onClick={handleCancel}>
+                        やめる
+                      </button>
                       <ErrorMessage showError={showError} />
                     </div>
                   </div>
