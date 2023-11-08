@@ -148,7 +148,7 @@ export default function Home({ params }: { params: { slug: string } }) {
       id: 2,
       name: '赤い箱',
       imagePath: '/box_red.png',
-      positionClasses: "absolute top-2/3 left-1/4 translate-x-[calc(-50%+110px)] translate-y-[calc(-50%+10px)]",
+      positionClasses: "absolute top-2/3 left-1/4 translate-x-[calc(-50%+110px)] translate-y-[calc(-50%+10px)] opacity-0",
       width: "w-12",
       height: "h-12",
       // コメントアウトで、クリック部分の色を消す

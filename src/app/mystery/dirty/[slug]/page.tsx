@@ -103,7 +103,7 @@ export default function Home({ params }: { params: { slug: string } }) {
       id: 2,
       name: '青い箱',
       imagePath: '/box_blue.png',
-      positionClasses: "absolute top-1/2 left-1/2 translate-x-[calc(-50%+90px)] translate-y-[calc(-50%+130px)]",
+      positionClasses: "absolute top-1/2 left-1/2 translate-x-[calc(-50%+90px)] translate-y-[calc(-50%+130px)] opacity-0",
       width: "w-20",
       height: "h-12",
       // コメントアウトで、クリック部分の色を消す
@@ -167,7 +167,7 @@ export default function Home({ params }: { params: { slug: string } }) {
     {
       id: 4,
       name: 'オルゴール',
-      positionClasses: `absolute top-1/2 left-1/2 translate-x-[calc(-50%+90px)] translate-y-[calc(-50%+30px)]`,
+      positionClasses: `absolute top-1/2 left-1/2 translate-x-[calc(-50%+90px)] translate-y-[calc(-50%+30px)] opacity-0`,
       width: "w-24",
       height: "h-12",
       // コメントアウトで、クリック部分の色を消す
