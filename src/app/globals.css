@@ -567,7 +567,7 @@ opacity: 1; /* ホバー時に不透明度を戻す */
               0 0 15px rgba(0,0,0,0.6);
               
               background-color: #1b471b; /* ダークグレーのボタン背景 */
-              color: #e8dcdc;
+              color: #ffffff;
               border: none;
               padding: 10px 20px;
               text-transform: uppercase;
@@ -585,40 +585,10 @@ opacity: 1; /* ホバー時に不透明度を戻す */
    background: linear-gradient(to right, #000000, #000000, #000000);
    animation: gradient 5s infinite;
    
-   /* グリッチエフェクト */
-   text-shadow: 
-     1px 1px 1px #00ff1a,
-     2px 2px 1px #000;
-   animation: glitch 2s infinite; 
+ 
 
 }
 
-@keyframes creepy-font {
-  0% {font-size: 24px;}
-  50% {font-size: 30px;}
-  100% {font-size: 24px;}
-  text-shadow: 
-	  1px 1px 1px #f40909,
-	  2px 2px 1px #000;
-	animation: glitch 2s infinite;  
-  
-  }
-  
-  /* グラデーションアニメーション */
-  @keyframes gradient {
-	0% {background-position: 0% 50%;}
-	50% {background-position: 100% 50%;}
-	100% {background-position: 0% 50%;}
-  }
-  
-  /* グリッチアニメーション */  
-  @keyframes glitch {
-	0% {text-shadow: none;}
-	20% {text-shadow: 
-	  1px 1px 1px #00fe19,
-	  2px 2px 1px #000;}
-	100% {text-shadow: none;}
-  }
 
 
 .game-start-host-door:active {
