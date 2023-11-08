@@ -132,6 +132,10 @@ export default function Home({ params }: { params: { slug: string } }) {
           text: "何かが砕け散る音がした。",
           choices: null
         },
+        {
+          text: "どこかでカギの開く音がした...",
+          choices: null
+        },
       ]
     },
     {
@@ -385,8 +389,16 @@ export default function Home({ params }: { params: { slug: string } }) {
       setMessageIndex(2);
       setAcquiredItems([...acquiredItems, items[6], items[7]]);
       setPutImageItem(null);
-      setIsBearCutted(true);
       setSelectedItem(null);
+      setIsBearCutted(true);
+    } else if (putImageItem && putImageItem.name === "青い箱" && selectedItem && selectedItem.name === "青いカギ" && !isCleanDoorOpen) {
+      setCurrentItem(items[1]);
+      setMessageIndex(5);
+      setPutImageItem(null);
+      setSelectedItem(null);
+      if (ws && ws.readyState === WebSocket.OPEN) {
+        ws.send('openCleanDoor');
+      }
     }
   };
 
@@ -441,12 +453,6 @@ export default function Home({ params }: { params: { slug: string } }) {
 
     checkRoomExists();
   }, [params.slug, selectedItem]);
-
-  async function openCleanDoor() {
-    if (ws && ws.readyState === WebSocket.OPEN) {
-      ws.send('openCleanDoor');
-    }
-  }
 
   //音
   const playGunSound = () => {
@@ -575,12 +581,6 @@ export default function Home({ params }: { params: { slug: string } }) {
                  onClick={handleClickItemImage}
           />
         )}
-        {!isCleanDoorOpen &&
-          <button onClick={openCleanDoor}
-                  className="absolute top-1/4 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-red-600 p-5 rounded-lg shadow-lg">
-            相手のドアの鍵を開ける
-          </button>
-        }
       </div>
     </div>
   );
