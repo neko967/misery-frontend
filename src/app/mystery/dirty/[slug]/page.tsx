@@ -71,6 +71,18 @@ export default function Home({ params }: { params: { slug: string } }) {
   const [backgroundImage, setBackgroundImage] = useState('/dirty_room.png');
   const [cleanIsReadyToAcceptItem, setCleanIsReadyToAcceptItem] = useState(false);
   const [dirtyIsReadyToAcceptItem, setDirtyIsReadyToAcceptItem] = useState(false);
+  const [currentTextIndex, setCurrentTextIndex] = useState(0);
+
+  const storyTexts = [
+    '部屋に入ると、ドアが勢いよく閉じた。',
+    'ドアは不思議な力で固く閉じられ、もはや以前のように容易に開くことはない。',
+    'そして、どこからともなく微かな笑い声が響く。それは、恐怖を誘う微笑か、それとも何かを示唆する手がかりか。',
+    '探検者たちは急いで部屋の中を見渡し、脱出への糸口を探し始める。明白な道標はなく、ただ直感と推理のみが頼りだった。',
+  ];
+
+  const nextText = () => {
+    setCurrentTextIndex((prevIndex) => prevIndex + 1);
+  };
 
   // 配列にて、アイテム、メッセージ、選択肢等をオブジェクトの形で管理。
   const items: Item[] = [
@@ -581,9 +593,54 @@ export default function Home({ params }: { params: { slug: string } }) {
                  onClick={handleClickItemImage}
           />
         )}
+        {/* Story Texts */}
+        {currentTextIndex < storyTexts.length && (
+          <div
+            style={{
+              position: 'absolute', // Keep this as absolute
+              top: '50%', // Align top edge of element to the center of the screen vertically
+              left: '50%', // Align left edge of element to the center of the screen horizontally
+              transform: 'translate(-50%, -50%)', // Shift element to the left and up by 50% of its own width and height
+              backgroundColor: 'rgba(0, 0, 0, 0.56)',
+              color: 'white',
+              padding: '20px',
+              borderRadius: '10px',
+              textAlign: 'center',
+              width: '1000px', // You might want to ensure this width is responsive
+              maxHeight: '80vh',
+              overflowY: 'auto',
+              zIndex: 1000,
+            }}
+          >
+            <p style={{ margin: '10px', height: '20px' }}>{storyTexts[currentTextIndex]}</p>
+            <div
+              style={{
+                position: 'absolute',
+                right: '10px',
+                bottom: '10px',
+                cursor: 'pointer',
+                fontSize: '24px',
+                animation: 'bounce 1s infinite'
+              }}
+              onClick={nextText}
+            >
+              ▼
+            </div>
+          </div>
+        )}
+        {/* Buttons */}
+        {currentTextIndex >= storyTexts.length && (
+          <div
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              zIndex: 1000,
+            }}
+          >
+          </div>
+        )}
       </div>
     </div>
-  );
+  )
 }
-
-
