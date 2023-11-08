@@ -16,6 +16,7 @@ export default function Dealer({ params }: { params: { slug: string } }) {
   const doorImage = "/door.png";
   const brickImage = "/brick.png";
   const keyImage = "/keyImage.png";
+  const countDownImage = "/countDownImage.png";
   const keyPositions: number[][] = [[],[1,29],[0,0],[14,1],[0,0],[6,19],[0,0],[1,11],[0,0]];  //[[空の配列],[key1縦,key1横],[key2縦,key2横],[key3縦,key3横]],[key4縦,key4横]]
   const doorPositions: number[][] = [[],[0,0],[15,6],[0,0],[9,16],[0,0],[4,13],[0,0],[5,4]]; //[[空の配列],[door1縦,door1横],[door2縦,door2横],[door3縦,door3横]],[door4縦,door4横]]
   const { height, width } = GetWindowSize();
@@ -33,9 +34,9 @@ export default function Dealer({ params }: { params: { slug: string } }) {
   // 壁の表示/非表示を管理するstateを追加
   const [showWall, setShowWall] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [timeLeft, setTimeLeft] = useState(5); // 残り10秒からスタート
+  const [timeLeft, setTimeLeft] = useState(40); // 残り10秒からスタート
   const [isTimeAttackStarted, setIsTimeAttackStarted] = useState(false); // タイムアタックが開始されたかどうかを追跡
-  const timeAttackPositions: number[][] = [[],[5,9]] // タイムアタック開始のppsition
+  const timeAttackPositions: number[][] = [[],[0,0]] // タイムアタック開始のppsition
   // リセットボタンの呼び出し関数
   const resetButtonTimer: any = () => {
     setTimeout(() => {
@@ -129,7 +130,7 @@ export default function Dealer({ params }: { params: { slug: string } }) {
     setResetButton(false);
     setIsGameStarted(false);
     setShowWall(false);
-    setTimeLeft(20);
+    setTimeLeft(40);
     setKeys({
       key1: false,
       key2: false,
@@ -340,13 +341,16 @@ export default function Dealer({ params }: { params: { slug: string } }) {
                         cell === '#' ? 'black' :
                         cell === 'S' ? 'green' :
                         cell === 'G' ? 'red' :
-                        cell === 'E' ? 'black' :
+                        cell === 'E' ? 'white' :
                         cell === 'W' ? (showWall ? 'pink' : 'white') :
                         'white',
                     cursor: `url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="5" height="5" viewBox="0 0 2 2"><circle cx="1" cy="1" r="1" fill="black" /></svg>') 1 1, auto`,
                     backgroundSize: 'cover',
                     backgroundImage:
                         cell === '#' ? `url(${brickImage})` :
+                        cell === 'E' ? (
+                          rowIndex === timeAttackPositions[1][0] && cellIndex === timeAttackPositions[1][1] && !isTimeAttackStarted ? `url(${countDownImage})` : undefined
+                        ) :
                         cell === 'K' ? (
                           rowIndex === keyPositions[1][0] && cellIndex === keyPositions[1][1] && !keys.key1 ? `url(${keyImage})` :
                           rowIndex === keyPositions[2][0] && cellIndex === keyPositions[2][1] && !keys.key2 ? `url(${keyImage})` :
