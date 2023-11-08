@@ -171,8 +171,8 @@ export default function Home({ params }: { params: { slug: string } }) {
           </button>
 
           {hostWhichRoom && guestWhichRoom && (hostWhichRoom !== guestWhichRoom) && (
-            <button onClick={goMystery} className="game-start" type="button">
-              ゲームスタート
+            <button onClick={goMystery} className="game-start-host-door" type="button">
+              ドアを開ける..
             </button>
           )}
         </div>
