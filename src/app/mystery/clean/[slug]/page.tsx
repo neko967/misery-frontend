@@ -324,21 +324,6 @@ export default function Home({ params }: { params: { slug: string } }) {
         }
       ]
     },
-    {
-      id: 2,
-      name: 'ドア',
-      positionClasses: "absolute top-1/2 left-2/3 translate-x-[calc(-50%+120px)] translate-y-[calc(-50%)] w-36 h-96 opacity-0 text-white",
-      width: "w-24",
-      height: "h-12",
-      // コメントアウトで、クリック部分の色を消す
-      additionalStyles: { background: 'rgba(255, 255, 255, 0.1)', borderRadius: '8px' },
-      messages: [
-        {
-          text: "ドアは不思議な力で固く閉ざされている",
-          choices: null
-        }
-      ]
-    },
   ];
 
   let message: string | undefined;
