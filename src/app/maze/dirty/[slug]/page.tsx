@@ -80,7 +80,7 @@ export default function Dealer({ params }: { params: { slug: string } }) {
         websocket.onmessage = (event) => {
           if (event.data == "gameover") {
             setIsGameOver(true);
-            //playGameOverSound();
+            playGameOverSound();
             resetButtonTimer();
             return () => clearTimeout(resetButtonTimer);
           } else if (event.data == "timeAttack") {
