@@ -69,7 +69,20 @@ export default function Home({ params }: { params: { slug: string } }) {
   const [selectedItem, setSelectedItem] = useState<Item | null>(null); // アイテムリストからアイテムを選択するときに使う
   const [putImageItem, setPutImageItem] = useState<Item | null>(null); // アイテムリストから画像付きのアイテムを置くときに使う
   const [backgroundImage, setBackgroundImage] = useState('/dirty_room.png');
-  const { height, width } = GetWindowSize();
+  const [cleanIsReadyToAcceptItem, setCleanIsReadyToAcceptItem] = useState(false);
+  const [dirtyIsReadyToAcceptItem, setDirtyIsReadyToAcceptItem] = useState(false);
+  const [currentTextIndex, setCurrentTextIndex] = useState(0);
+
+  const storyTexts = [
+    '部屋に入ると、ドアが勢いよく閉じた。',
+    'ドアは不思議な力で固く閉じられ、もはや以前のように容易に開くことはない。',
+    'そして、どこからともなく微かな笑い声が響く。それは、恐怖を誘う微笑か、それとも何かを示唆する手がかりか。',
+    '探検者たちは急いで部屋の中を見渡し、脱出への糸口を探し始める。明白な道標はなく、ただ直感と推理のみが頼りだった。',
+  ];
+
+  const nextText = () => {
+    setCurrentTextIndex((prevIndex) => prevIndex + 1);
+  };
 
   // 配列にて、アイテム、メッセージ、選択肢等をオブジェクトの形で管理。
   const items: Item[] = [
@@ -102,7 +115,7 @@ export default function Home({ params }: { params: { slug: string } }) {
       id: 2,
       name: '青い箱',
       imagePath: '/box_blue.png',
-      positionClasses: "absolute top-1/2 left-1/2 translate-x-[calc(-50%+90px)] translate-y-[calc(-50%+130px)]",
+      positionClasses: "absolute top-1/2 left-1/2 translate-x-[calc(-50%+90px)] translate-y-[calc(-50%+130px)] opacity-0",
       width: "w-20",
       height: "h-12",
       // コメントアウトで、クリック部分の色を消す
@@ -129,6 +142,10 @@ export default function Home({ params }: { params: { slug: string } }) {
         },
         {
           text: "何かが砕け散る音がした。",
+          choices: null
+        },
+        {
+          text: "どこかでカギの開く音がした...",
           choices: null
         },
       ]
@@ -162,7 +179,7 @@ export default function Home({ params }: { params: { slug: string } }) {
     {
       id: 4,
       name: 'オルゴール',
-      positionClasses: `absolute top-1/2 left-1/2 translate-x-[calc(-50%+90px)] translate-y-[calc(-50%+30px)]`,
+      positionClasses: `absolute top-1/2 left-1/2 translate-x-[calc(-50%+90px)] translate-y-[calc(-50%+30px)] opacity-0`,
       width: "w-24",
       height: "h-12",
       // コメントアウトで、クリック部分の色を消す
@@ -211,7 +228,7 @@ export default function Home({ params }: { params: { slug: string } }) {
       additionalStyles: { background: 'rgba(255, 255, 255, 0.1)', borderRadius: '8px' },
       messages: [
         {
-          text: "ベッドの上にはさみがある。拾いますか？",
+          text: "はさみを受け取った",
           choices: null
         }
       ]
@@ -222,6 +239,10 @@ export default function Home({ params }: { params: { slug: string } }) {
       positionClasses: "invisible",
       // コメントアウトで、クリック部分の色を消す
       messages: [
+        {
+          text: "青いカギを受け取った",
+          choices: null,
+        },
       ]
     },
     {
@@ -230,6 +251,10 @@ export default function Home({ params }: { params: { slug: string } }) {
       positionClasses: "invisible",
       // コメントアウトで、クリック部分の色を消す
       messages: [
+        {
+          text: "赤いカギを受け取った",
+          choices: null,
+        },
       ]
     },
   ];
@@ -272,7 +297,7 @@ export default function Home({ params }: { params: { slug: string } }) {
   // 選択肢の処理
   const handleConfirm = () => {
     if (currentItem && currentItem.name === 'ぬいぐるみ') {
-      setAcquiredItems([...acquiredItems, currentItem])
+      setAcquiredItems([...acquiredItems, items[4]])
       setMessageIndex(prevIndex => prevIndex + 1);
     } else if (currentItem && currentItem.name === '青い箱' && isBlueBoxBroken) {
       setAcquiredItems([...acquiredItems, currentItem]);
@@ -293,6 +318,22 @@ export default function Home({ params }: { params: { slug: string } }) {
 
   // 選択肢拒否時の処理
   const handleCancel = () => {
+    if (currentItem && currentItem.name === "はさみ" && messageIndex === 0) {
+      setAcquiredItems([...acquiredItems, items[5]]);
+      if (ws && ws.readyState === WebSocket.OPEN) {
+        ws.send('dirtyIsReadyToAcceptItem');
+      }
+    } else if (currentItem && currentItem.name === "青いカギ" && messageIndex === 0) {
+      setAcquiredItems([...acquiredItems, items[6]]);
+      if (ws && ws.readyState === WebSocket.OPEN) {
+        ws.send('dirtyIsReadyToAcceptItem');
+      }
+    } else if (currentItem && currentItem.name === "赤いカギ" && messageIndex === 0) {
+      setAcquiredItems([...acquiredItems, items[7]]);
+      if (ws && ws.readyState === WebSocket.OPEN) {
+        ws.send('dirtyIsReadyToAcceptItem');
+      }
+    }
     setCurrentItem(null);
   };
 
@@ -315,19 +356,40 @@ export default function Home({ params }: { params: { slug: string } }) {
   const switchBackgroundImage = (direction: any) => {
     if (direction === 'left') {
       setBackgroundImage('/dirty_room.png');
+      if (ws && ws.readyState === WebSocket.OPEN) {
+        ws.send('dirtyIsNotReadyToAcceptItem');
+      }
     } else {
       setBackgroundImage('/wall.png');
+      if (ws && ws.readyState === WebSocket.OPEN) {
+        ws.send('dirtyIsReadyToAcceptItem');
+      }
     }
   };
 
   const handleClickHole = () => {
     if (ws && ws.readyState === WebSocket.OPEN) {
-      if (selectedItem && selectedItem.name === 'はさみ') {
+      if (selectedItem && selectedItem.name === 'はさみ' && cleanIsReadyToAcceptItem) {
         ws.send('sendScissorFromDirty');
-      } else if (selectedItem && selectedItem.name === '青いカギ') {
+        let result = acquiredItems.filter(function( item ) {
+          return item.name !== 'はさみ';
+        });
+        setAcquiredItems(result);
+        setCleanIsReadyToAcceptItem(false);
+      } else if (selectedItem && selectedItem.name === '青いカギ' && cleanIsReadyToAcceptItem) {
         ws.send('sendBlueKeyFromDirty');
-      } else if (selectedItem && selectedItem.name === '赤いカギ') {
+        let result = acquiredItems.filter(function( item ) {
+          return item.name !== '青いカギ';
+        });
+        setAcquiredItems(result);
+        setCleanIsReadyToAcceptItem(false);
+      } else if (selectedItem && selectedItem.name === '赤いカギ' && cleanIsReadyToAcceptItem) {
         ws.send('sendRedKeyFromDirty');
+        let result = acquiredItems.filter(function( item ) {
+          return item.name !== '赤いカギ';
+        });
+        setAcquiredItems(result);
+        setCleanIsReadyToAcceptItem(false);
       }
     }
     setSelectedItem(null);
@@ -339,8 +401,17 @@ export default function Home({ params }: { params: { slug: string } }) {
       setMessageIndex(2);
       setAcquiredItems([...acquiredItems, items[6], items[7]]);
       setPutImageItem(null);
+      setSelectedItem(null);
       setIsBearCutted(true);
-    } 
+    } else if (putImageItem && putImageItem.name === "青い箱" && selectedItem && selectedItem.name === "青いカギ" && !isCleanDoorOpen) {
+      setCurrentItem(items[1]);
+      setMessageIndex(5);
+      setPutImageItem(null);
+      setSelectedItem(null);
+      if (ws && ws.readyState === WebSocket.OPEN) {
+        ws.send('openCleanDoor');
+      }
+    }
   };
 
   const playMusic = (file: string) => {
@@ -371,32 +442,18 @@ export default function Home({ params }: { params: { slug: string } }) {
             setMessageIndex(4);
             setIsBlueBoxBroken(true);
           } else if (event.data == "sendScissorFromClean") {
-            setAcquiredItems([...acquiredItems, items[5]]);
+            setCurrentItem(items[5]);
+            setMessageIndex(0);
           } else if (event.data == "sendBlueKeyFromClean") {
-            setAcquiredItems([...acquiredItems, items[6]]);
+            setCurrentItem(items[6]);
+            setMessageIndex(0);
           } else if (event.data == "sendRedKeyFromClean") {
-            setAcquiredItems([...acquiredItems, items[7]]);
-          } else if (event.data == "sendScissorFromDirty") {
-            if (selectedItem && selectedItem.name === 'はさみ') {
-              let result = acquiredItems.filter(function( item ) {
-                return item.name !== 'はさみ';
-              });
-              setAcquiredItems(result);
-            }
-          } else if (event.data == "sendBlueKeyFromDirty") {
-            if (selectedItem && selectedItem.name === '青いカギ') {
-              let result = acquiredItems.filter(function( item ) {
-                return item.name !== '青いカギ';
-              });
-              setAcquiredItems(result);
-            }
-          } else if (event.data == "sendRedKeyFromDirty") {
-            if (selectedItem && selectedItem.name === '赤いカギ') {
-              let result = acquiredItems.filter(function( item ) {
-                return item.name !== '赤いカギ';
-              });
-              setAcquiredItems(result);
-            }
+            setCurrentItem(items[7]);
+            setMessageIndex(0);
+          } else if (event.data == "cleanIsReadyToAcceptItem") {
+            setCleanIsReadyToAcceptItem(true);
+          } else if (event.data == "cleanIsNotReadyToAcceptItem") {
+            setCleanIsReadyToAcceptItem(false);
           }
         };
 
@@ -408,12 +465,6 @@ export default function Home({ params }: { params: { slug: string } }) {
 
     checkRoomExists();
   }, [params.slug, selectedItem]);
-
-  async function openCleanDoor() {
-    if (ws && ws.readyState === WebSocket.OPEN) {
-      ws.send('openCleanDoor');
-    }
-  }
 
   //音
   const playGunSound = () => {
@@ -436,8 +487,32 @@ export default function Home({ params }: { params: { slug: string } }) {
             <button onClick={handleClickHole}
                     className="text-white absolute top-1/2 left-1/2 translate-x-[calc(-50%+10px)] translate-y-[calc(-50%)] w-36 h-36"
             >
-              壁の穴
+
             </button>
+            {/* currentItemに値がある場合、以降のメッセージと選択を描画する */}
+            {currentItem && (
+              <>
+                <div className="fixed justify-center items-end bottom-4 left-0 right-0 flex">
+                  <div className="mb-20 w-3/5 p-20 relative">
+                    <div className="absolute top-0 left-0 w-full h-full border-4 border-gray-600 bg-gray-800 bg-opacity-50">
+                    {message && <Message text={message} />}
+                  </div>
+                </div>
+                </div>
+  
+                <div className="fixed top-0 left-0 right-0 bottom-0 flex items-center justify-center">
+                  <div className="relative w-1/5 p-14">
+                    <div className="absolute top-0 left-0 w-full h-full border-4 border-gray-600 bg-gray-800 bg-opacity-50 flex flex-col items-center justify-center">
+                      <Choices
+                        onConfirm={handleConfirm}
+                        onCancel={handleCancel}  
+                        options={choicesOptions} 
+                      />
+                    </div>
+                  </div>
+                </div>
+              </>
+            )}
             <TriangleButton direction="left" handleClickTriangle={() => switchBackgroundImage('left')} />
           </>
         )}
@@ -518,15 +593,54 @@ export default function Home({ params }: { params: { slug: string } }) {
                  onClick={handleClickItemImage}
           />
         )}
-        {!isCleanDoorOpen &&
-          <button onClick={openCleanDoor}
-                  className="absolute top-1/4 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-red-600 p-5 rounded-lg shadow-lg">
-            相手のドアの鍵を開ける
-          </button>
-        }
+        {/* Story Texts */}
+        {currentTextIndex < storyTexts.length && (
+          <div
+            style={{
+              position: 'absolute', // Keep this as absolute
+              top: '50%', // Align top edge of element to the center of the screen vertically
+              left: '50%', // Align left edge of element to the center of the screen horizontally
+              transform: 'translate(-50%, -50%)', // Shift element to the left and up by 50% of its own width and height
+              backgroundColor: 'rgba(0, 0, 0, 0.56)',
+              color: 'white',
+              padding: '20px',
+              borderRadius: '10px',
+              textAlign: 'center',
+              width: '1000px', // You might want to ensure this width is responsive
+              maxHeight: '80vh',
+              overflowY: 'auto',
+              zIndex: 1000,
+            }}
+          >
+            <p style={{ margin: '10px', height: '20px' }}>{storyTexts[currentTextIndex]}</p>
+            <div
+              style={{
+                position: 'absolute',
+                right: '10px',
+                bottom: '10px',
+                cursor: 'pointer',
+                fontSize: '24px',
+                animation: 'bounce 1s infinite'
+              }}
+              onClick={nextText}
+            >
+              ▼
+            </div>
+          </div>
+        )}
+        {/* Buttons */}
+        {currentTextIndex >= storyTexts.length && (
+          <div
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              zIndex: 1000,
+            }}
+          >
+          </div>
+        )}
       </div>
     </div>
-  );
+  )
 }
-
-

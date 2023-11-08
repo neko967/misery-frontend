@@ -81,8 +81,8 @@ export default function Home({ params }: { params: { slug: string } }) {
 
       {/* トップページへのリンク */}
       <Link href="/"
-        className="absolute top-3/4 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-red-600 p-5 rounded-lg shadow-lg">
-        TOP PAGE
+        className="end-button">
+        トップページに戻る
       </Link>
     </div>
   );

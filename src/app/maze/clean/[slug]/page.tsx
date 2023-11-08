@@ -16,8 +16,9 @@ export default function Dealer({ params }: { params: { slug: string } }) {
   const doorImage = "/door.png";
   const brickImage = "/brick.png";
   const keyImage = "/keyImage.png";
-  const keyPositions: number[][] = [[],[8,14],[9,7],[18,5],[1,25]];  //[[空の配列],[key1縦,key1横],[key2縦,key2横],[key3縦,key3横]]
-  const doorPositions: number[][] = [[],[4,23],[5,12],[2,1],[6,29]]; //[[空の配列],[door1縦,door1横],[door2縦,door2横],[door3縦,door3横]]
+  const countDownImage = "/countDownImage.png";
+  const keyPositions: number[][] = [[],[1,29],[0,0],[14,1],[0,0],[6,19],[0,0],[1,11],[0,0]];  //[[空の配列],[key1縦,key1横],[key2縦,key2横],[key3縦,key3横]],[key4縦,key4横]]
+  const doorPositions: number[][] = [[],[0,0],[15,6],[0,0],[9,16],[0,0],[4,13],[0,0],[5,4]]; //[[空の配列],[door1縦,door1横],[door2縦,door2横],[door3縦,door3横]],[door4縦,door4横]]
   const { height, width } = GetWindowSize();
   const cellSize = Math.min(width, height) / elements;
   const [ws, setWs] = useState<WebSocket | null>(null);
@@ -27,15 +28,15 @@ export default function Dealer({ params }: { params: { slug: string } }) {
   const [resetButton, setResetButton] = useState(false);
   const [isGameClear, setIsGameClear] = useState(false);
   const [isGameStarted, setIsGameStarted] = useState(false);
-  const [keys, setKeys] = useState({ key1: false, key2: false, key3: false });
-  const wallPositions: number[][] = [[1,11],[1,12],[1,13],[1,14]]; // 出現・消失する壁
+  const [keys, setKeys] = useState({ key1: false, key2: false, key3: false, key4: false, key5: false, key6: false, key7: false, key8: false });
+  const wallPositions: number[][] = [[5,19],[7,19],[6,20],[6,18],[8,29],[9,1],[18,10],[2,14],[4,8]]; // 出現・消失する壁
   // const [wallPositions, setWallPositions] = useState<number[][]>([[16, 13]]);
   // 壁の表示/非表示を管理するstateを追加
   const [showWall, setShowWall] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [timeLeft, setTimeLeft] = useState(5); // 残り10秒からスタート
+  const [timeLeft, setTimeLeft] = useState(40); // 残り10秒からスタート
   const [isTimeAttackStarted, setIsTimeAttackStarted] = useState(false); // タイムアタックが開始されたかどうかを追跡
-  const timeAttackPositions: number[][] = [[],[5,9],] // タイムアタック開始のppsition
+  const timeAttackPositions: number[][] = [[],[0,0]] // タイムアタック開始のppsition
   // リセットボタンの呼び出し関数
   const resetButtonTimer: any = () => {
     setTimeout(() => {
@@ -92,6 +93,21 @@ export default function Dealer({ params }: { params: { slug: string } }) {
           } else if (event.data == "getkey3") {
             setKeys(prev => ({ ...prev, key3: true }));
             maze[doorPositions[3][0]][doorPositions[3][1]] = ' ';
+          } else if (event.data == "getkey4") {
+            setKeys(prev => ({ ...prev, key4: true }));
+            maze[doorPositions[4][0]][doorPositions[4][1]] = ' ';
+          } else if (event.data == "getkey5") {
+            setKeys(prev => ({ ...prev, key5: true }));
+            maze[doorPositions[5][0]][doorPositions[5][1]] = ' ';
+          } else if (event.data == "getkey6") {
+            setKeys(prev => ({ ...prev, key6: true }));
+            maze[doorPositions[6][0]][doorPositions[6][1]] = ' ';
+          } else if (event.data == "getkey7") {
+            setKeys(prev => ({ ...prev, key7: true }));
+            maze[doorPositions[7][0]][doorPositions[7][1]] = ' ';
+          } else if (event.data == "getkey8") {
+            setKeys(prev => ({ ...prev, key8: true }));
+            maze[doorPositions[8][0]][doorPositions[8][1]] = ' ';
           }
         };
 
@@ -105,7 +121,7 @@ export default function Dealer({ params }: { params: { slug: string } }) {
   }, [params.slug]);
 
   const playGameOverSound = () => {
-    const sound = new Audio("/horror_sound.wav");
+    //const sound = new Audio("/horror_sound.wav");
     sound.play();
   };
 
@@ -114,11 +130,16 @@ export default function Dealer({ params }: { params: { slug: string } }) {
     setResetButton(false);
     setIsGameStarted(false);
     setShowWall(false);
-    setTimeLeft(5);
+    setTimeLeft(40);
     setKeys({
       key1: false,
       key2: false,
-      key3: false
+      key3: false,
+      key4: false,
+      key5: false,
+      key6: false,
+      key7: false,
+      key8: false,
     });
     // 他に初期化するべきステートや変数があればこちらに追加
   };
@@ -169,6 +190,11 @@ export default function Dealer({ params }: { params: { slug: string } }) {
       if (maze[y][x] === '#' || (y == doorPositions[1][0] && x == doorPositions[1][1] && !keys.key1)
                              || (y == doorPositions[2][0] && x == doorPositions[2][1] && !keys.key2)
                              || (y == doorPositions[3][0] && x == doorPositions[3][1] && !keys.key3)
+                             || (y == doorPositions[4][0] && x == doorPositions[4][1] && !keys.key4)
+                             || (y == doorPositions[5][0] && x == doorPositions[5][1] && !keys.key5)
+                             || (y == doorPositions[6][0] && x == doorPositions[6][1] && !keys.key6)
+                             || (y == doorPositions[7][0] && x == doorPositions[7][1] && !keys.key7)
+                             || (y == doorPositions[8][0] && x == doorPositions[8][1] && !keys.key8)
                              || (maze[y][x] === 'W' && showWall)) {
         ws.send('gameover');
       } else if (maze[y][x] === 'G') {
@@ -181,33 +207,43 @@ export default function Dealer({ params }: { params: { slug: string } }) {
         ws.send('getkey2');
       } else if (y === keyPositions[3][0] && x === keyPositions[3][1] && maze[y][x] === 'K') {
         ws.send('getkey3');
+      } else if (y === keyPositions[4][0] && x === keyPositions[4][1] && maze[y][x] === 'K') {
+        ws.send('getkey4');
+      } else if (y === keyPositions[5][0] && x === keyPositions[5][1] && maze[y][x] === 'K') {
+        ws.send('getkey5');
+      } else if (y === keyPositions[6][0] && x === keyPositions[6][1] && maze[y][x] === 'K') {
+        ws.send('getkey6');
+      } else if (y === keyPositions[7][0] && x === keyPositions[7][1] && maze[y][x] === 'K') {
+        ws.send('getkey7');
+      } else if (y === keyPositions[8][0] && x === keyPositions[8][1] && maze[y][x] === 'K') {
+        ws.send('getkey8');
       } else {
         setPlayerPosition({ x, y });
       }
     }
   };
   const maze = [
-//    0    1    2    3    4    5    6    7    8    9   10   11   12   13   14   15   16   17   18   19   20   21   22   23   24   25   26   27   28   29   30   31   32   33
-    ['#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#'],
-    ['#', 'G', '#', '#', '#', '#', '#', '#', '#', '#', '#', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '#', '#', '#', 'K', '#', ' ', '#', '#', '#', '#', '#', '#'],
-    ['#', '*', '#', '#', '#', '#', '#', '#', '#', '#', '#', ' ', '#', '#', '#', '#', '#', ' ', '#', '#', '#', ' ', '#', '#', '#', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '#'],
-    ['#', ' ', '#', '#', '#', '#', '#', '#', '#', ' ', ' ', ' ', '#', '#', ' ', ' ', ' ', ' ', '#', '#', '#', ' ', ' ', ' ', '#', '#', '#', '#', '#', '#', ' ', '#', '#', '#'],
-    ['#', ' ', ' ', ' ', ' ', ' ', '#', '#', '#', ' ', '#', '#', '#', '#', ' ', '#', '#', '#', '#', ' ', '#', '#', '#', '*', '#', '#', '#', '#', '#', '#', ' ', ' ', '#', '#'],
-    ['#', '#', '#', '#', '#', ' ', '#', '#', '#', 'E', '#', '#', '*', ' ', ' ', '#', '#', '#', '#', ' ', ' ', ' ', '#', ' ', '#', '#', '#', '#', '#', '#', '#', ' ', '#', '#'],
-    ['#', ' ', ' ', ' ', ' ', ' ', '#', ' ', ' ', ' ', '#', '#', ' ', '#', '#', '#', '#', '#', '#', '#', '#', ' ', '#', ' ', ' ', ' ', '#', ' ', ' ', '*', ' ', ' ', '#', '#'],
-    ['#', ' ', '#', '#', '#', '#', '#', ' ', '#', '#', '#', '#', ' ', '#', '#', '#', '#', ' ', ' ', ' ', ' ', ' ', '#', ' ', '#', ' ', '#', ' ', '#', ' ', '#', '#', '#', '#'],
-    ['#', ' ', '#', '#', '#', '#', '#', ' ', '#', ' ', ' ', ' ', ' ', '#', 'K', '#', '#', ' ', '#', '#', '#', '#', '#', ' ', '#', ' ', '#', ' ', '#', ' ', ' ', ' ', '#', '#'],
-    ['#', ' ', '#', ' ', ' ', 'E', '#', 'K', '#', ' ', '#', '#', '#', '#', ' ', '#', '#', ' ', ' ', ' ', ' ', ' ', '#', ' ', '#', ' ', ' ', ' ', '#', '#', '#', ' ', '#', '#'],
-    ['#', ' ', '#', ' ', '#', ' ', '#', '#', '#', ' ', ' ', ' ', ' ', '#', ' ', '#', '#', '#', '#', '#', '#', ' ', '#', ' ', '#', '#', '#', '#', '#', '#', '#', ' ', '#', '#'],
-    ['#', ' ', '#', ' ', '#', ' ', '#', '#', '#', '#', '#', '#', ' ', '#', ' ', '#', '#', ' ', ' ', ' ', ' ', ' ', '#', ' ', ' ', ' ', '#', '#', ' ', ' ', ' ', ' ', '#', '#'],
-    ['#', ' ', '#', ' ', '#', ' ', ' ', ' ', '#', '#', ' ', ' ', ' ', '#', ' ', ' ', '#', ' ', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', ' ', '#', '#', '#', '#', '#'],
-    ['#', ' ', ' ', ' ', '#', '#', '#', ' ', '#', '#', ' ', '#', '#', '#', '#', ' ', '#', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '#', '#', '#', '#', ' ', ' ', ' ', ' ', ' ', '#'],
-    ['#', ' ', '#', '#', '#', '#', '#', ' ', '#', ' ', ' ', '#', '#', '#', '#', ' ', '#', '#', '#', '#', '#', '#', '#', ' ', '#', '#', '#', '#', '#', '#', '#', '#', ' ', '#'],
-    ['#', ' ', '#', '#', '#', '#', '#', ' ', '#', ' ', '#', '#', '#', ' ', ' ', ' ', ' ', ' ', '#', '#', '#', '#', '#', ' ', '#', '#', '#', '#', '#', '#', '#', '#', ' ', '#'],
-    ['#', ' ', '#', '#', '#', '#', '#', ' ', ' ', ' ', '#', '#', '#', ' ', '#', '#', '#', ' ', '#', '#', '#', '#', '#', ' ', '#', '#', '#', '#', ' ', ' ', ' ', '#', ' ', '#'],
-    ['#', ' ', '#', '#', '#', '#', '#', '#', '#', '#', '#', 'S', 'S', 'S', 'S', 'S', '#', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '#', '#', ' ', '#', ' ', '#', ' ', '#'],
-    ['#', ' ', ' ', ' ', ' ', 'K', '#', '#', '#', '#', '#', 'S', 'S', 'S', 'S', 'S', '#', '#', '#', '#', '#', '#', '#', '#', '#', ' ', ' ', ' ', ' ', '#', ' ', ' ', ' ', '#'],
-    ['#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#'],
+//    0    1    2    3    4    5    6    7    8    9   10   11   12   13   14   15   16   17   18   19   20   21   22   23   24   25   26   27   28   29   30
+    ['#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#'],
+    ['#', 'G', '#', '#', '#', '#', '#', '#', '#', '#', ' ', 'K', ' ', ' ', ' ', '#', '#', '#', ' ', '#', ' ', ' ', ' ', '#', '#', '#', '#', ' ', ' ', 'K', '#'],
+    ['#', ' ', ' ', ' ', ' ', '#', ' ', ' ', ' ', '#', ' ', '#', '#', '#', ' ', '#', ' ', ' ', ' ', '#', ' ', '#', ' ', '#', '#', '#', '#', ' ', '#', '#', '#'],
+    ['#', '#', '#', '#', ' ', '#', ' ', '#', ' ', '#', ' ', ' ', ' ', ' ', ' ', '#', ' ', '#', '#', '#', ' ', '#', ' ', ' ', '#', ' ', ' ', ' ', '#', '#', '#'],
+    ['#', '#', '#', '#', ' ', '#', ' ', '#', ' ', '#', '#', '#', '#', '*', '#', '#', ' ', '#', '#', '#', ' ', '#', '#', ' ', '#', ' ', '#', '#', '#', '#', '#'],
+    ['#', '#', '#', ' ', '*', ' ', ' ', '#', ' ', ' ', '#', '#', '#', ' ', ' ', ' ', ' ', '#', ' ', ' ', ' ', '#', '#', ' ', '#', ' ', '#', '#', '#', '#', '#'],
+    ['#', '#', '#', ' ', '#', '#', '#', '#', '#', ' ', '#', '#', '#', '#', '#', '#', ' ', '#', ' ', 'K', ' ', '#', '#', ' ', '#', ' ', '#', ' ', ' ', ' ', '#'],
+    ['#', ' ', ' ', ' ', '#', '#', '#', '#', '#', ' ', ' ', ' ', ' ', ' ', ' ', '#', ' ', '#', ' ', ' ', ' ', '#', '#', ' ', '#', ' ', ' ', ' ', '#', ' ', '#'],
+    ['#', ' ', '#', '#', '#', '#', '#', '#', '#', ' ', '#', '#', '#', '#', '#', '#', ' ', '#', '#', '#', '#', '#', '#', ' ', '#', '#', '#', '#', '#', ' ', '#'],
+    ['#', ' ', '#', '#', '#', '#', ' ', ' ', ' ', ' ', '#', '#', '#', ' ', ' ', ' ', '*', ' ', '#', '#', '#', '#', '#', ' ', '#', ' ', '#', '#', '#', ' ', '#'],
+    ['#', ' ', '#', '#', ' ', ' ', ' ', '#', '#', '#', '#', '#', '#', ' ', '#', '#', '#', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '#', ' ', '#', ' ', ' ', ' ', '#'],
+    ['#', ' ', '#', '#', ' ', '#', '#', '#', '#', '#', '#', '#', '#', ' ', '#', '#', '#', ' ', '#', '#', '#', '#', '#', '#', '#', ' ', '#', ' ', '#', '#', '#'],
+    ['#', ' ', ' ', ' ', ' ', ' ', ' ', '#', '#', ' ', ' ', ' ', ' ', ' ', ' ', '#', ' ', ' ', '#', ' ', ' ', ' ', ' ', ' ', '#', '#', '#', ' ', '#', 'K', '#'],
+    ['#', '#', '#', ' ', '#', '#', ' ', '#', '#', '#', '#', '#', '#', '#', ' ', '#', ' ', '#', '#', ' ', '#', '#', '#', ' ', '#', '#', '#', ' ', '#', ' ', '#'],
+    ['#', 'K', '#', ' ', '#', '#', ' ', '#', '#', '#', '#', '#', '#', '#', ' ', '#', '#', '#', '#', ' ', '#', '#', '#', ' ', ' ', ' ', ' ', ' ', '#', ' ', '#'],
+    ['#', ' ', '#', '#', '#', '#', '*', ' ', ' ', ' ', '#', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '#', '#', '#', '#', '#', '#', '#', '#', ' ', '#'],
+    ['#', ' ', '#', ' ', ' ', ' ', ' ', '#', '#', ' ', '#', ' ', '#', '#', '#', ' ', '#', '#', '#', '#', ' ', '#', '#', ' ', ' ', ' ', ' ', '#', '#', ' ', '#'],
+    ['#', ' ', ' ', ' ', '#', '#', ' ', ' ', '#', ' ', '#', ' ', '#', 'S', 'S', 'S', 'S', 'S', '#', '#', ' ', '#', '#', ' ', '#', '#', ' ', '#', '#', ' ', '#'],
+    ['#', '#', '#', '#', '#', '#', '#', '#', '#', ' ', ' ', ' ', '#', 'S', 'S', 'S', 'S', 'S', '#', '#', ' ', ' ', ' ', ' ', '#', '#', ' ', ' ', ' ', ' ', '#'],
+    ['#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#'],
   ];
 
   wallPositions.forEach(([x, y]) => {
@@ -219,16 +255,24 @@ export default function Dealer({ params }: { params: { slug: string } }) {
   }
 
   return (
+    <div
+    className="h-screen w-full bg-cover flex justify-center items-center"
+    style={{
+      backgroundImage: isGameClear ? "url('/Gameclear.png')" : "url('/maze.png')" ,
+      backgroundSize: 'cover',
+      backgroundPosition: 'center',
+    }}
+  >
     <main>
       <div>
-        height:{height} width:{width}
+        
         <div>
       {isModalOpen && (
         <div className="modal modal-open">
           <div className="modal-box">
             <p>閉ざされた屋敷の扉を押し開けると、そこはもはやただの屋敷ではなかった。<br/>
               廊下は歪み、部屋は迷路と化し、二人の冒険者を待ち受ける。<br/>
-              挑戦を開始するには、一歩を踏み出し、赤いゴールを目指し、壁に触れぬよう慎重に進まねばならない。<br/>
+              挑戦を開始するには、一歩を踏み出し、<span className="red-text">赤いゴールを目指し、壁に触れぬよう慎重に進まねばならない。</span><br/>
               しかし、一人の力では脱出の望みは薄い。絆と信頼を武器に、二人で協力し合ってこの屋敷からの脱出を目指そう。<br/>
               その先には、予想もしない真実が二人を待っているかもしれない。</p>
             <div className="text-right">
@@ -246,25 +290,25 @@ export default function Dealer({ params }: { params: { slug: string } }) {
         style={{
           position: 'absolute',
           top: 18 * cellSize + 'px',
-          left: 13 * cellSize + 'px',
+          left: 14.5 * cellSize + 'px',
         }}
-        >スタート
+        >迷路を進む
           </button>
       ) :isGameOver ? (
         <div>
           <Image src={localImage} alt="ホラー" />
           {resetButton &&
-            <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white p-5 rounded-lg shadow-lg">
-              <button onClick={restartGame} className="bg-blue-500 text-white px-4 py-2 rounded">やり直し</button>
+            <div className="reset">
+              <button onClick={restartGame} className="reset-button">再挑戦する</button>
             </div>
           }
         </div>
       ) : isGameClear ? (
         <>
-          <div style={{ fontSize: '24px', color: 'green' }}>ゲームクリア</div>
+          <div className="congratulation">congratulation!!</div>
           <button onClick={goEndingClean}
-                  className="absolute top-1/4 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-red-600 p-5 rounded-lg shadow-lg">
-            エンディングへ
+                  className="exit">
+            屋敷を出る
           </button>
         </>
       ) : (
@@ -297,24 +341,35 @@ export default function Dealer({ params }: { params: { slug: string } }) {
                         cell === '#' ? 'black' :
                         cell === 'S' ? 'green' :
                         cell === 'G' ? 'red' :
-                        cell === 'E' ? 'black' :
+                        cell === 'E' ? 'white' :
                         cell === 'W' ? (showWall ? 'pink' : 'white') :
                         'white',
                     cursor: `url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="5" height="5" viewBox="0 0 2 2"><circle cx="1" cy="1" r="1" fill="black" /></svg>') 1 1, auto`,
                     backgroundSize: 'cover',
                     backgroundImage:
                         cell === '#' ? `url(${brickImage})` :
+                        cell === 'E' ? (
+                          rowIndex === timeAttackPositions[1][0] && cellIndex === timeAttackPositions[1][1] && !isTimeAttackStarted ? `url(${countDownImage})` : undefined
+                        ) :
                         cell === 'K' ? (
                           rowIndex === keyPositions[1][0] && cellIndex === keyPositions[1][1] && !keys.key1 ? `url(${keyImage})` :
                           rowIndex === keyPositions[2][0] && cellIndex === keyPositions[2][1] && !keys.key2 ? `url(${keyImage})` :
-                          rowIndex === keyPositions[3][0] && cellIndex === keyPositions[3][1] && !keys.key3 ? `url(${keyImage})` : 
-                          rowIndex === keyPositions[4][0] && cellIndex === keyPositions[4][1] && !keys.key3 ? `url(${keyImage})` : undefined
+                          rowIndex === keyPositions[3][0] && cellIndex === keyPositions[3][1] && !keys.key3 ? `url(${keyImage})` :
+                          rowIndex === keyPositions[4][0] && cellIndex === keyPositions[4][1] && !keys.key4 ? `url(${keyImage})` :
+                          rowIndex === keyPositions[5][0] && cellIndex === keyPositions[5][1] && !keys.key5 ? `url(${keyImage})` :
+                          rowIndex === keyPositions[6][0] && cellIndex === keyPositions[6][1] && !keys.key6 ? `url(${keyImage})` :
+                          rowIndex === keyPositions[7][0] && cellIndex === keyPositions[7][1] && !keys.key7 ? `url(${keyImage})` :
+                          rowIndex === keyPositions[8][0] && cellIndex === keyPositions[8][1] && !keys.key8 ? `url(${keyImage})` : undefined
                         ) :
                         cell === '*' ? (
                           rowIndex === doorPositions[1][0] && cellIndex === doorPositions[1][1] && !keys.key1 ? `url(${doorImage})` :
                           rowIndex === doorPositions[2][0] && cellIndex === doorPositions[2][1] && !keys.key2 ? `url(${doorImage})` :
                           rowIndex === doorPositions[3][0] && cellIndex === doorPositions[3][1] && !keys.key3 ? `url(${doorImage})` :
-                          rowIndex === doorPositions[4][0] && cellIndex === doorPositions[4][1] && !keys.key3 ? `url(${doorImage})` : undefined
+                          rowIndex === doorPositions[4][0] && cellIndex === doorPositions[4][1] && !keys.key4 ? `url(${doorImage})` :
+                          rowIndex === doorPositions[5][0] && cellIndex === doorPositions[5][1] && !keys.key5 ? `url(${doorImage})` :
+                          rowIndex === doorPositions[6][0] && cellIndex === doorPositions[6][1] && !keys.key6 ? `url(${doorImage})` :
+                          rowIndex === doorPositions[7][0] && cellIndex === doorPositions[7][1] && !keys.key7 ? `url(${doorImage})` :
+                          rowIndex === doorPositions[8][0] && cellIndex === doorPositions[8][1] && !keys.key8 ? `url(${doorImage})` : undefined
                         ) :
                         undefined,
                 }}
@@ -330,5 +385,6 @@ export default function Dealer({ params }: { params: { slug: string } }) {
         </div>
       )}
     </main>
+    </div>
   );
 }

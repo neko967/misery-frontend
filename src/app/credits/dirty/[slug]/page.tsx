@@ -37,23 +37,38 @@ export default function Home({ params }: { params: { slug: string } }) {
       className="h-screen w-full bg-cover"
       style={{ backgroundImage: "url('/credits.png')" }}
     >
+      <div 
+  className="thanks-message"
+>
+  Thank You For Playing!!
+</div>
       {/* Twitterリンク */}
-      <button className="absolute top-2/4 left-1/2 transform -translate-x1/2 -translate-y-1/2 bg-red-600 p-5 rounded-lg shadow-lg"
+      {/* Twitterリンク */}
+      <button className="icon"
+      
         onClick={() => {
-        const tweetText = "Thankyou!!脱出成功したよ！遊んでくれてありがとう👻みんなもチャレンジしてみてね！#Misery"
-        const url = window.location.origin;
-            window.open(
-              `https://twitter.com/intent/tweet?text=${tweetText}%0A%0A${url}`,
-              '_blank'
-            );
-          }}
-        >
-          <TwitterIcon />
+          const tweetText = "脱出成功したよ。遊んでくれてありがと👻 #Misery";
+    
+          // サイトのURL
+          const url = window.location.origin;
+      
+          // ツイートに含める画像のURL
+          const imageUrl = `${url}/img/tweet-image.png`; 
+      
+          // Twitter Intentで画像とテキストを含めてツイート
+          window.open(
+            `https://twitter.com/intent/tweet?text=${tweetText}&url=${url}&hashtags=Misery&media=${imageUrl}`,
+             '_blank' 
+           );
+      
+        }}
+      >
+          <TwitterIcon />  
       </button>
 
       {/* トップページへのリンク */}
       <Link href="/"
-        className="absolute top-3/4 left-1/2 transform -translate-x1/2 -translate-y-1/2 bg-red-600 p-5 rounded-lg shadow-lg">
+        className="end-button">
         トップページに戻る
       </Link>
     </div>
