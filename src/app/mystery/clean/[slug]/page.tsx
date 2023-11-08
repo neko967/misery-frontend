@@ -180,7 +180,11 @@ export default function Home({ params }: { params: { slug: string } }) {
         {
           text: "鍵はすでに壊れている。",
           choices: null
-        }
+        },
+        {
+          text: "どこかでカギの開く音がした...",
+          choices: null
+        },
       ]
     },
     {
@@ -504,6 +508,18 @@ export default function Home({ params }: { params: { slug: string } }) {
     setSelectedItem(null);
   };
 
+  const handleClickItemImage = () => {
+    if (putImageItem && putImageItem.name === "赤い箱" && selectedItem && selectedItem.name === "赤いカギ" && !isDirtyDoorOpen) {
+      setCurrentItem(items[1]);
+      setMessageIndex(6);
+      setPutImageItem(null);
+      setSelectedItem(null);
+      if (ws && ws.readyState === WebSocket.OPEN) {
+        ws.send('openDirtyDoor');
+      }
+    }
+  };
+
   useEffect(() => {
     async function checkRoomExists() {
       const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_HTTP_URL}/api/room-exists/${params.slug}`);
@@ -547,12 +563,6 @@ export default function Home({ params }: { params: { slug: string } }) {
 
     checkRoomExists();
   }, [params.slug, selectedItem]);
-
-  async function openDirtyDoor() {
-    if (ws && ws.readyState === WebSocket.OPEN) {
-      ws.send('openDirtyDoor');
-    }
-  }
 
   ///ここからパスワード付きの箱の挙動
   useEffect(() => {
@@ -801,14 +811,9 @@ export default function Home({ params }: { params: { slug: string } }) {
                  height={852}
                  className="absolute top-1/2 left-1/2 translate-x-[-50%] translate-y-[-50%] w-96 h-96 z-10 cursor-pointer"
                  priority
+                 onClick={handleClickItemImage}
           />
         )}
-        {!isDirtyDoorOpen &&
-          <button onClick={openDirtyDoor}
-                  className="absolute top-1/4 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-red-600 p-5 rounded-lg shadow-lg">
-            相手のドアの鍵を開ける
-          </button>
-        }
       </div>
     </div>
   );
