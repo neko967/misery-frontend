@@ -103,6 +103,23 @@ body {
   background-color: rgba(0, 0, 0, 0.5);
 }
 
+.modal {
+  width: 100%; /* modalのwidthが100% */
+  
+}
+.modal-box {
+  max-width: 900px;
+  height: 150px;
+  padding: 20px;
+}
+
+.modal p {
+  font-size: 15px;
+}
+.red-text {
+  color: red; 
+}
+
 .modal-content {
   margin: auto;
   padding: 20px;
@@ -110,6 +127,45 @@ body {
   width: 80%;
 }
 
+.btn-error {
+  color: #fff;
+  background-color: #000;
+  border: 2px solid #000;
+  
+}
+
+/* ホバー時 */  
+.btn-error:hover {
+  color: #000;
+  background-color: #fff;
+  border: 2px solid #000;
+}
+.reset {
+
+  /* 見た目 */
+  background: #000000; 
+  color: #fff;
+  border: 1px solid #000000; 
+  border-radius: 25px;
+  box-shadow: 0 2px 2px rgba(0,0,0,0.1);
+  
+  width: 120px;
+  /* サイズ */
+  padding: 10px 20px 10px 20px;
+  font-size: 10px;
+
+  /* 位置 */  
+  position: absolute;
+  top: 500px;
+  right: 650px;
+}
+
+
+/* ホバー時 */
+.reset:hover {
+  background-color: #ffffff;
+  color: #000000;
+}
 .close {
   color: #aaaaaa;
   float: right;
@@ -223,7 +279,7 @@ body {
    text-shadow: 
      1px 1px 1px #f40909,
      2px 2px 1px #000;
-   animation: glitch 1s infinite;
+   animation: glitch 2s infinite;
 
   
 }
@@ -302,10 +358,10 @@ body {
 
 .invite-code {
      /* "この部屋の招待コード"のテキストのスタイル */
-     width: 100px;
+     width: 110px;
      position: fixed;
      left: 50%;
-     top: 150px;  
+     top: 140px;  
      transform: translateX(-50%);
    
      /* フォントと文字 */
@@ -362,8 +418,8 @@ opacity: 1; /* ホバー時に不透明度を戻す */
 
 .thanks-message {
   font-family: 'DancingScript', cursive; 
-  font-size: 120px;
-  color: #f6efef;
+  font-size: 140px;
+  color: #ffffff;
   text-shadow: 1px 1px 1px #333;
   position: absolute; /* テキストの位置を絶対位置に設定 */
   top: 30%; /* 上から50%の位置に配置 */
@@ -429,7 +485,7 @@ opacity: 1; /* ホバー時に不透明度を戻す */
    text-shadow: 
      1px 1px 1px #f40909,
      2px 2px 1px #000;
-   animation: glitch 1s infinite; 
+   animation: glitch 2s infinite; 
 
 }
 
@@ -487,6 +543,110 @@ opacity: 1; /* ホバー時に不透明度を戻す */
     transform: translateY(-10px);
   }
 }
+.game-start-host-door {
+  border-radius: 30px; 
+  padding: 10px 10px;
+  position: fixed; 
+  left: 700px;
+  bottom: 300px;
+  transform: translateX(-50%);
+  transition: transform 0.1s;
+  font-weight: bold;
+  width: 180px; /* ボタンの幅を200pxに設定 */
+  height: 60px;
+
+  font-size: 24px;
+  color: #eae4e4;
+  background: rgb(233, 224, 224); 
+  background: linear-gradient(to bottom, #ffffff, #950404);
+  border-radius: 5px;
+  padding: 10px 20px;
+
+  box-shadow: 1px 1px #000, 
+              inset 2px 2px 0 rgba(255,255,255,0.5),
+              0 0 15px rgba(0,0,0,0.6);
+              
+              background-color: #1b471b; /* ダークグレーのボタン背景 */
+              color: #e8dcdc;
+              border: none;
+              padding: 10px 20px;
+              text-transform: uppercase;
+              font-size: 18px;
+              cursor: pointer;
+              border-radius: 5px;
+              box-shadow: 0 4px 8px rgba(0, 0, 0, 0.6); /* 影をつけて立体感を出す */
+              transition: background-color 0.3s ease;
+  
+  
+  transition: 0.5s;
+  transform: skewZ(-5deg);
+  text-shadow: 1px 1px rgb(23, 16, 16);
+   animation: creepy-font 2s infinite;
+   background: linear-gradient(to right, #000000, #000000, #000000);
+   animation: gradient 5s infinite;
+   
+   /* グリッチエフェクト */
+   text-shadow: 
+     1px 1px 1px #00ff1a,
+     2px 2px 1px #000;
+   animation: glitch 2s infinite; 
+
+}
+
+@keyframes creepy-font {
+  0% {font-size: 24px;}
+  50% {font-size: 30px;}
+  100% {font-size: 24px;}
+  text-shadow: 
+	  1px 1px 1px #f40909,
+	  2px 2px 1px #000;
+	animation: glitch 2s infinite;  
+  
+  }
+  
+  /* グラデーションアニメーション */
+  @keyframes gradient {
+	0% {background-position: 0% 50%;}
+	50% {background-position: 100% 50%;}
+	100% {background-position: 0% 50%;}
+  }
+  
+  /* グリッチアニメーション */  
+  @keyframes glitch {
+	0% {text-shadow: none;}
+	20% {text-shadow: 
+	  1px 1px 1px #00fe19,
+	  2px 2px 1px #000;}
+	100% {text-shadow: none;}
+  }
+
+
+.game-start-host-door:active {
+  transform: translateX(-48%) translateY(-10%) scale(0.95);
+  opacity: 0.85;
+  transition: transform 0.1s, opacity 0.2s; 
+  box-shadow: 0 0 12px rgba(0,0,0,0.4);
+
+}
+
+.game-start-host-door:hover {
+  background: rgb(229, 225, 225);
+  background: linear-gradient(to bottom,#000000,#000000); 
+
+}
+.game-start-host-door:active::after {
+  content: "";
+  animation: click-feedback 0.3s ease;
+}
+
+@keyframes bounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
 .copy-message {
   animation: fade-out 1s ease-out forwards; 
 
@@ -507,3 +667,113 @@ opacity: 1; /* ホバー時に不透明度を戻す */
     opacity: 0;
     }
   }
+
+
+  .end-button {
+  position: absolute;
+  right: 80px;
+  bottom: 30px;
+  /* サイズ */
+  display: inline-block;
+  padding: 20px 40px; /* パディングを大きく */
+  border-radius: 4px;
+  
+  /* 色 */
+  background-color: #111010; /* 色をより鮮やかに */
+  color: white;
+  
+  /* フォント */
+  font-size: 24px; /* フォントサイズを大きく */
+  font-weight: bold;
+  text-align: center;
+  
+  /* その他 */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: background-color 0.2s, transform 0.2s; /* transformのトランジションを追加 */
+}
+
+.end-button:hover {
+  background-color: #ffffff; /* ホバー時の色を変更 */
+  transform: scale(1.05); /* ホバー時にボタンを少し大きく */
+  color: rgb(0, 0, 0);
+}
+
+.end-button:active {
+  background-color: #ffffff; /* アクティブ時の色を変更 */
+  box-shadow: none;
+  transform: translateY(2px) scale(0.9); /* アクティブ時にボタンを少し小さく */
+}
+
+.exit {
+
+  /* 中央配置 */
+  position: absolute;
+  top: 20px;
+  right: 20px;
+
+  all: unset;
+  display: flex;
+  align-items: center;
+  padding: 0.6em 2em;
+ 
+
+  /* その他スタイル */
+  all: unset;
+  display: flex;
+  align-items: center;
+  padding: 0.6em 2em;
+  border: mediumspringgreen solid 0.15em;
+  border-radius: 0.25em;
+  color: mediumspringgreen;
+  font-size: 1.5em;  
+  font-weight: 600;
+  cursor: pointer;
+  overflow: hidden;
+  transition: border 300ms, color 300ms;
+  user-select: none;
+
+}
+
+
+
+
+
+
+
+.congratulation {
+
+  /* 文字を中央上寄せ */
+  position: absolute;
+  top: 30%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+
+  /* その他のスタイル */
+  font-size: 100px;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 900;
+  color: #e1ff00;
+  text-transform: uppercase;
+  letter-spacing: 20px;
+  
+  background: linear-gradient(to right, #663dff, #da22ff);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  
+  text-shadow:
+    2px 2px 0 #ffff00,
+    -2px -2px 0 #fbff00,
+    -2px 2px 0 #fff200,
+    2px -2px 0 #eaff00;
+    
+  animation: shine 2s forwards;
+}
+
+@keyframes shine {
+  from {
+    background-position: 0;
+  }
+  to {
+    background-position: 600px;  
+  }
+}

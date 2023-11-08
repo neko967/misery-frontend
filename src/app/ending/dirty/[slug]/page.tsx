@@ -64,12 +64,12 @@ export default function Home({ params }: { params: { slug: string } }) {
             padding: '20px',
             borderRadius: '10px',
             textAlign: 'center',
-            width: '800px',
+            width: '1050px',
             maxHeight: '80vh',
             overflowY: 'auto',
           }}
         >
-          <p style={{ marginBottom: '20px', height: '40px' }}>{storyTexts[currentTextIndex]}</p>
+          <p style={{ margin: '10px', height: '20px' }}>{storyTexts[currentTextIndex]}</p>
           <div
             style={{
               position: 'absolute', // これで右下に固定する
@@ -77,6 +77,7 @@ export default function Home({ params }: { params: { slug: string } }) {
               bottom: '10px', // 下端からの距離
               cursor: 'pointer',
               fontSize: '24px',
+              animation: 'bounce 1s infinite'
             }}
             onClick={nextText}
           >
@@ -89,9 +90,9 @@ export default function Home({ params }: { params: { slug: string } }) {
       {currentTextIndex >= storyTexts.length && (
         <button
           onClick={goCreditsDirty}
-          className="bg-red-600 p-5 rounded-lg shadow-lg"
+          className="end-button"
         >
-          The End
+          The End.
         </button>
       )}
     </div>

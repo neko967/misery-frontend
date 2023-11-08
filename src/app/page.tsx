@@ -13,6 +13,7 @@ export default function Home() {
   const [rooms, setRooms] = useState<Room[]>([]);
   const router = useRouter();
   const { height, width } = GetWindowSize();
+  
 
   async function createRoom() {
     var S="ABCDEFGHIJKLMNOPQRSTUVWXYZ"
@@ -34,7 +35,7 @@ export default function Home() {
   }
 
   async function joinRoom() {
-    const name = prompt("部屋のコードを入力してください");
+    const name = prompt("招待コードを入力してください");
     const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_HTTP_URL}/api/join-room/${name}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -55,16 +56,21 @@ export default function Home() {
       className="h-screen w-full bg-cover"
       style={{ backgroundImage: "url('/background.png')" }}
     >
-      <div className="fixed top-8 flex animate-flicker-5">
-        <div className="font-horror2 ml-10 text-9xl">M</div><div className="font-horror1 text-9xl">ISE</div><div className="font-horror2 text-9xl">R</div><div className="font-horror4 text-9xl">Y</div>
+      <div className="relative ml-0">
+      <div className="fixed top-[-30px] ml-10 flex animate-flicker-5 pt-0">
+        <div className="font-horror2 ml-4  text-[min(20vw,130px)]">M</div>
+        <div className="font-horror1 text-[min(20vw,130px)]">ISE</div>
+        <div className="font-horror2 text-[min(20vw,130px)]">R</div>
+        <div className="font-horror4 text-[min(20vw,130px)]">Y</div>
       </div>
-      <div className="absolute right-10 bottom-10 gap-4 flex flex-col ">
+      </div>
+      <div className="absolute top-80 right-90 bottom-60 gap-4 flex flex-col ">
         <button onClick={createRoom}
-                className="font-horror2 ml-10 text-3xl">
+                className="font-horror2 my-5 ml-10 mr-50  text-7xl">
         NEW GAME
         </button>
         <button onClick={joinRoom}
-                className="font-horror2 ml-10 text-3xl">
+                className="font-horror2 ml-20 mr-10  text-7xl">
         JOIN ROOM
         </button>
       </div>

@@ -254,16 +254,24 @@ export default function Dealer({ params }: { params: { slug: string } }) {
   }
 
   return (
+    <div
+    className="h-screen w-full bg-cover flex justify-center items-center"
+    style={{
+      backgroundImage: isGameClear ? "url('/Gameclear.png')" : "url('/maze.png')" ,
+      backgroundSize: 'cover',
+      backgroundPosition: 'center',
+    }}
+  >
     <main>
       <div>
-        height:{height} width:{width}
+        
         <div>
       {isModalOpen && (
         <div className="modal modal-open">
           <div className="modal-box">
             <p>閉ざされた屋敷の扉を押し開けると、そこはもはやただの屋敷ではなかった。<br/>
               廊下は歪み、部屋は迷路と化し、二人の冒険者を待ち受ける。<br/>
-              挑戦を開始するには、一歩を踏み出し、赤いゴールを目指し、壁に触れぬよう慎重に進まねばならない。<br/>
+              挑戦を開始するには、一歩を踏み出し、<span className="red-text">赤いゴールを目指し、壁に触れぬよう慎重に進まねばならない。</span><br/>
               しかし、一人の力では脱出の望みは薄い。絆と信頼を武器に、二人で協力し合ってこの屋敷からの脱出を目指そう。<br/>
               その先には、予想もしない真実が二人を待っているかもしれない。</p>
             <div className="text-right">
@@ -283,23 +291,23 @@ export default function Dealer({ params }: { params: { slug: string } }) {
           top: 18 * cellSize + 'px',
           left: 14.5 * cellSize + 'px',
         }}
-        >スタート
+        >迷路を進む
           </button>
       ) :isGameOver ? (
         <div>
           <Image src={localImage} alt="ホラー" />
           {resetButton &&
-            <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white p-5 rounded-lg shadow-lg">
-              <button onClick={restartGame} className="bg-blue-500 text-white px-4 py-2 rounded">やり直し</button>
+            <div className="reset">
+              <button onClick={restartGame} className="reset-button">再挑戦する</button>
             </div>
           }
         </div>
       ) : isGameClear ? (
         <>
-          <div style={{ fontSize: '24px', color: 'green' }}>ゲームクリア</div>
+          <div className="congratulation">congratulation!!</div>
           <button onClick={goEndingClean}
-                  className="absolute top-1/4 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-red-600 p-5 rounded-lg shadow-lg">
-            エンディングへ
+                  className="exit">
+            屋敷を出る
           </button>
         </>
       ) : (
@@ -373,5 +381,6 @@ export default function Dealer({ params }: { params: { slug: string } }) {
         </div>
       )}
     </main>
+    </div>
   );
 }
