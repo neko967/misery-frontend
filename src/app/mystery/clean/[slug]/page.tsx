@@ -324,7 +324,7 @@ export default function Home({ params }: { params: { slug: string } }) {
     {
       id: 1,
       name: '青い箱',
-      positionClasses: "absolute top-1/2 left-1/2 translate-x-[calc(-50%+90px)] translate-y-[calc(-50%+130px)]",
+      positionClasses: "absolute top-1/2 left-1/2 translate-x-[calc(-50%+90px)] translate-y-[calc(-50%+130px)] opacity-0",
       width: "w-20",
       height: "h-12",
       // コメントアウトで、クリック部分の色を消す
