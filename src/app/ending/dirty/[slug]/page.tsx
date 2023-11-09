@@ -92,7 +92,7 @@ export default function Home({ params }: { params: { slug: string } }) {
           onClick={goCreditsDirty}
           className="end-button"
         >
-          >> The End.
+          ▶▶ The End.
         </button>
       )}
     </div>
