@@ -26,7 +26,8 @@ export default function Dealer({ params }: { params: { slug: string } }) {
   const [playerPosition, setPlayerPosition] = useState<pointerPosition>({ x: 0, y: 0 });
   const [isGameOver, setIsGameOver] = useState(false);
   const [resetButton, setResetButton] = useState(false);
-  const [isGameClear, setIsGameClear] = useState(false);
+  const [isDirtyGameClear, setIsDirtyGameClear] = useState(false);
+  const [isCleanGameClear, setIsCleanGameClear] = useState(false);
   const [isGameStarted, setIsGameStarted] = useState(false);
   const [keys, setKeys] = useState({ key1: false, key2: false, key3: false, key4: false,
                                      key5: false, key6: false, key7: false, key8: false });
@@ -84,6 +85,10 @@ export default function Dealer({ params }: { params: { slug: string } }) {
             playGameOverSound();
             resetButtonTimer();
             return () => clearTimeout(resetButtonTimer);
+          } else if (event.data == "isDirtyGameClear") {
+            setIsDirtyGameClear(true);
+          } else if (event.data == "isCleanGameClear") {
+            setIsCleanGameClear(true);
           } else if (event.data == "timeAttack") {
             setIsTimeAttackStarted(true);
           } else if (event.data == "getkey1") {
@@ -133,6 +138,7 @@ export default function Dealer({ params }: { params: { slug: string } }) {
     setIsGameStarted(false);
     setShowWall(false);
     setTimeLeft(30);
+    setIsDirtyGameClear(false);
     setKeys({
       key1: false,
       key2: false,
@@ -147,10 +153,10 @@ export default function Dealer({ params }: { params: { slug: string } }) {
   };
 
     useEffect(() => {
-      if (isGameClear) {
+      if (isDirtyGameClear) {
         setIsTimeAttackStarted(false);
       }
-    }, [isGameClear]);
+    }, [isDirtyGameClear]);
 
     useEffect(() => {
       if (isGameOver) {
@@ -233,7 +239,9 @@ export default function Dealer({ params }: { params: { slug: string } }) {
                              {
         ws.send('gameover');
       } else if (maze[y][x] === 'G') {
-        setIsGameClear(true);
+        if (ws && ws.readyState === WebSocket.OPEN) {
+          ws.send('isDirtyGameClear');
+        }
       } else if (y === timeAttackPositions[1][0] && x === timeAttackPositions[1][1] && maze[y][x] === 'E'){
         ws.send('timeAttack');
       } else if (y === keyPositions[1][0] && x === keyPositions[1][1] && maze[y][x] === 'K') {
@@ -293,7 +301,7 @@ export default function Dealer({ params }: { params: { slug: string } }) {
     <div
     className="h-screen w-full bg-cover flex justify-center items-center"
     style={{
-      backgroundImage: isGameClear ? "url('/Gameclear.png')" : "url('/maze.png')" ,
+      backgroundImage: isDirtyGameClear ? "url('/Gameclear.png')" : "url('/maze.png')" ,
       backgroundSize: 'cover',
       backgroundPosition: 'center',
     }}
@@ -338,13 +346,15 @@ export default function Dealer({ params }: { params: { slug: string } }) {
             </div>
           }
         </div>
-      ) : isGameClear ? (
+      ) : isDirtyGameClear ? (
         <>
           <div className="congratulation">congratulation!!</div>
-          <button onClick={goEndingDirty}
-                  className="exit">
-            屋敷を出る
-          </button>
+          {isDirtyGameClear && isCleanGameClear &&
+            <button onClick={goEndingDirty}
+                    className="exit">
+              屋敷を出る
+            </button>
+          }
         </>
       ) : (
         <div
