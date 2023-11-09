@@ -83,6 +83,7 @@ export default function Dealer({ params }: { params: { slug: string } }) {
             setIsGameOver(true);
             playGameOverSound();
             resetButtonTimer();
+            setIsGameClear(false);
             return () => clearTimeout(resetButtonTimer);
           } else if (event.data == "timeAttack") {
             setIsTimeAttackStarted(true);
