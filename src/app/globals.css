@@ -339,7 +339,7 @@ body {
   /* テキストの位置 */
   position: fixed;
   left: 50%;
-  bottom: 0px;
+  bottom: 280px;
   
   transform: translateX(-50%);
   
@@ -361,7 +361,7 @@ body {
      width: 110px;
      position: fixed;
      left: 50%;
-     top: 140px;  
+     top: 500px;  
      transform: translateX(-50%);
    
      /* フォントと文字 */
@@ -446,7 +446,7 @@ opacity: 1; /* ホバー時に不透明度を戻す */
   padding: 15px 30px;
   position: fixed; 
   left: 50%;
-  bottom: 180px;
+  bottom: 130px;
   transform: translateX(-50%);
   transition: transform 0.1s;
   font-weight: bold;
@@ -621,7 +621,8 @@ opacity: 1; /* ホバー時に不透明度を戻す */
   animation: fade-out 1s ease-out forwards; 
 
   position: fixed; /* 画面に対して固定位置 */
-  left: 60%;
+  top: 500px;
+  left: 800px;
 }
 @keyframes fade-out {
     0% {
@@ -675,8 +676,9 @@ opacity: 1; /* ホバー時に不透明度を戻す */
 }
 .code-s {
   position: absolute;
-  left: 120px;
-  top: 190px;
+  left: 570px;
+  right: 100px;
+  top: 550px;
 }
 .exit {
   position: absolute;
