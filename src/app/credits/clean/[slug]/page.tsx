@@ -60,7 +60,7 @@ export default function Home({ params }: { params: { slug: string } }) {
       <button className="icon"
       
         onClick={() => {
-          const tweetText = "脱出成功したよ。遊んでくれてありがと👻 #Misery";
+          const tweetText = "congratulations!!。👻 #Misery";
     
           // サイトのURL
           const url = window.location.origin;
@@ -82,7 +82,7 @@ export default function Home({ params }: { params: { slug: string } }) {
       {/* トップページへのリンク */}
       <Link href="/"
         className="end-button">
-        トップページに戻る
+        TOPページに戻る
       </Link>
     </div>
   );

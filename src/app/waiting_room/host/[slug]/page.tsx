@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link'
 import styles from '../../components/WaitingRoomButton.module.css';
+import { KoHo } from 'next/font/google';
 
 
 
@@ -143,6 +144,7 @@ export default function Home({ params }: { params: { slug: string } }) {
         }}>
         {params.slug}
         </p>
+        <p className="code-s">上記コードをクリックして相手に伝えてください</p>
         {copied && <p className="copy-message">コピーしました!</p>}
       </div>
     )}
