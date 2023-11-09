@@ -90,6 +90,15 @@ export default function Home({ params }: { params: { slug: string } }) {
       className="h-screen w-full bg-cover"
       style={{ backgroundImage: "url('/Central.png')" }}
     >
+      <p className="invite-text">この部屋の招待コード</p>
+        <p className="invite-code" onClick={() => {
+          navigator.clipboard.writeText(params.slug);
+        setCopied(true);
+        }}>
+        {params.slug}
+        </p>
+        <p className="code-s">上記コードをクリックして相手に伝えてください</p>
+        {copied && <p className="copy-message">コピーしました!</p>}
       {currentTextIndex < storyTexts.length && (
       <div
         style={{
@@ -137,15 +146,7 @@ export default function Home({ params }: { params: { slug: string } }) {
         }}
       >
         <WaitingRoomButton />
-        <p className="invite-text">この部屋の招待コード</p>
-        <p className="invite-code" onClick={() => {
-          navigator.clipboard.writeText(params.slug);
-        setCopied(true);
-        }}>
-        {params.slug}
-        </p>
-        <p className="code-s">上記コードをクリックして相手に伝えてください</p>
-        {copied && <p className="copy-message">コピーしました!</p>}
+        
       </div>
     )}
    

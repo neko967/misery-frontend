@@ -32,6 +32,7 @@ function WaitingRoomDirtyButton() {
   );
 }
 
+
 type RoomState = 'clean' | 'dirty';
 
 export default function Home({ params }: { params: { slug: string } }) {
@@ -110,10 +111,10 @@ export default function Home({ params }: { params: { slug: string } }) {
 
   return (
     <div
-      className="h-screen w-full bg-cover flex justify-center items-center"
+      className="h-screen w-full bg-cover flex justify-center items-center position: relative"
       style={{ backgroundImage: "url('/prologue.png')" }}
-    >
-      <GlitchEffect />
+    > 
+       <GlitchEffect style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', zIndex: 100 }} />
 
       {/* Story Texts */}
       {currentTextIndex < storyTexts.length && (
