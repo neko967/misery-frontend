@@ -418,7 +418,7 @@ opacity: 1; /* ホバー時に不透明度を戻す */
 
 .thanks-message {
   font-family: 'DancingScript', cursive; 
-  font-size: 140px;
+  font-size: 130px;
   color: #ffffff;
   text-shadow: 1px 1px 1px #333;
   position: absolute; /* テキストの位置を絶対位置に設定 */
@@ -653,7 +653,7 @@ opacity: 1; /* ホバー時に不透明度を戻す */
   color: white;
   
   /* フォント */
-  font-size: 24px; /* フォントサイズを大きく */
+  font-size: 18px; /* フォントサイズを大きく */
   font-weight: bold;
   text-align: center;
   
@@ -673,35 +673,65 @@ opacity: 1; /* ホバー時に不透明度を戻す */
   box-shadow: none;
   transform: translateY(2px) scale(0.9); /* アクティブ時にボタンを少し小さく */
 }
-
-.exit {
-
-  /* 中央配置 */
+.code-s {
   position: absolute;
-  top: 20px;
-  right: 20px;
-
-  all: unset;
-  display: flex;
-  align-items: center;
-  padding: 0.6em 2em;
+  left: 120px;
+  top: 190px;
+}
+.exit {
+  position: absolute;
+  bottom: 20px;
+  left: 100%;
+  transform: translate(-50%, -50%); 
+  --green: #1BFD9C;
+  font-size: 15px;
+  padding: 0.7em 2.7em;
+  letter-spacing: 0.06em;
+  position: relative;
+  font-family: inherit;
+  border-radius: 0.6em;
+  overflow: hidden;
+  transition: all 0.3s;
+  line-height: 1.4em;
+  border: 2px solid var(--green);
+  background: linear-gradient(to right, rgba(27, 253, 156, 0.1) 1%, transparent 40%,transparent 60% , rgba(27, 253, 156, 0.1) 100%);
+  color: var(--green);
+  box-shadow: inset 0 0 10px rgba(27, 253, 156, 0.4), 0 0 9px 3px rgba(27, 253, 156, 0.1);
+  .exit:hover {
+ 
+      color: #82ffc9;
+      box-shadow: inset 0 0 10px rgba(27, 253, 156, 0.6), 0 0 9px 3px rgba(27, 253, 156, 0.2);
+  }
+  .exit:hover:before {
+    content: "";
+    position: absolute;
+    left: -4em;
+    width: 4em;
+    height: 100%;
+    top: 0;
+    transition: transform .4s ease-in-out;
+    background: linear-gradient(to right, transparent 1%, rgba(27, 253, 156, 0.1) 40%,rgba(27, 253, 156, 0.1) 60% , transparent 100%);
+  }
+  .exit:hover:before {
+    transform: translateX(15em);
+  }
+  
  
 
   /* その他スタイル */
-  all: unset;
-  display: flex;
-  align-items: center;
-  padding: 0.6em 2em;
+  
+  padding: 0.6em;
   border: mediumspringgreen solid 0.15em;
   border-radius: 0.25em;
   color: mediumspringgreen;
   font-size: 1.5em;  
-  font-weight: 600;
-  cursor: pointer;
-  overflow: hidden;
-  transition: border 300ms, color 300ms;
-  user-select: none;
+  font-weight: 700;
+  
+  
+  
+  
 
+  
 }
 
 
@@ -714,12 +744,12 @@ opacity: 1; /* ホバー時に不透明度を戻す */
 
   /* 文字を中央上寄せ */
   position: absolute;
-  top: 30%;
+  top: 25%;
   left: 50%;
   transform: translate(-50%, -50%);
 
   /* その他のスタイル */
-  font-size: 100px;
+  font-size: 95px;
   font-family: 'Montserrat', sans-serif;
   font-weight: 900;
   color: #e1ff00;
