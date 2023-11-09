@@ -47,18 +47,14 @@ export default function Home({ params }: { params: { slug: string } }) {
       className="h-screen w-full bg-cover"
       style={{ backgroundImage: "url('/credits.png')" }}
     >
-      
-      <div 
-  className="thanks-message"
->
-  Thank You For Playing!!
-</div>
-<main className="flex min-h-screen flex-col items-center justify-between p-24">
+      <div className="thanks-message">
+        Thank You For Playing!!
+      </div>
+      <main className="flex min-h-screen flex-col items-center justify-between p-24">
 				<Link href="https://twitter.com/share?url=https://misery-seven.vercel.app/">
 				  Twitter
-			    </Link>
-		</main>
-      {/* Twitterリンク */}
+			  </Link>
+		  </main>
       {/* Twitterリンク */}
       <button className="icon"
       

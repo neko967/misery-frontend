@@ -3,8 +3,6 @@ import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import TwitterIcon from '@mui/icons-material/Twitter';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome' 
-import { faTimes } from '@fortawesome/free-solid-svg-icons'
 import { randomBytes } from 'crypto';
 
 export default function Home({ params }: { params: { slug: string } }) {
@@ -50,15 +48,11 @@ export default function Home({ params }: { params: { slug: string } }) {
       className="h-screen w-full bg-cover"
       style={{ backgroundImage: "url('/credits.png')" }}
     >
-      <div 
-  className="thanks-message"
->
-  Thank You For Playing!!
-</div>
-      {/* Twitterリンク */}
+      <div  className="thanks-message">
+        Thank You For Playing!!
+      </div>
       {/* Twitterリンク */}
       <button className="icon"
-      
         onClick={() => {
           const tweetText = "congratulations!!。👻 #Misery";
     
@@ -73,10 +67,9 @@ export default function Home({ params }: { params: { slug: string } }) {
             `https://twitter.com/intent/tweet?text=${tweetText}&url=${url}&hashtags=Misery&media=${imageUrl}`,
              '_blank' 
            );
-      
         }}
       >
-          <TwitterIcon />  
+        <TwitterIcon />  
       </button>
 
       {/* トップページへのリンク */}
