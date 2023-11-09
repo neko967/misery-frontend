@@ -138,6 +138,7 @@ export default function Dealer({ params }: { params: { slug: string } }) {
     setIsGameStarted(false);
     setShowWall(false);
     setTimeLeft(30);
+    setIsCleanGameClear(false);
     setIsDirtyGameClear(false);
     setKeys({
       key1: false,
