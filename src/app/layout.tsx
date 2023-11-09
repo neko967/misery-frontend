@@ -6,7 +6,7 @@ import './globals.css'
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
-  metadataBase: new URL('https://misery-seven.vercel.app//'),
+  metadataBase: new URL('https://misery-seven.vercel.app/'),
   title: 'タイトル',
 	description: '説明',
 	openGraph: {
