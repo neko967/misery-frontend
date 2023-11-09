@@ -113,9 +113,7 @@ export default function Home({ params }: { params: { slug: string } }) {
     <div
       className="h-screen w-full bg-cover flex justify-center items-center position: relative"
       style={{ backgroundImage: "url('/prologue.png')" }}
-    > 
-       <GlitchEffect style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', zIndex: 100 }} />
-
+    >
       {/* Story Texts */}
       {currentTextIndex < storyTexts.length && (
         <div
