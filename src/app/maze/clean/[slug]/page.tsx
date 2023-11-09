@@ -28,13 +28,14 @@ export default function Dealer({ params }: { params: { slug: string } }) {
   const [resetButton, setResetButton] = useState(false);
   const [isGameClear, setIsGameClear] = useState(false);
   const [isGameStarted, setIsGameStarted] = useState(false);
-  const [keys, setKeys] = useState({ key1: false, key2: false, key3: false, key4: false, key5: false, key6: false, key7: false, key8: false });
+  const [keys, setKeys] = useState({ key1: false, key2: false, key3: false, key4: false, 
+                                     key5: false, key6: false, key7: false, key8: false });
   const wallPositions: number[][] = [[5,19],[7,19],[6,20],[6,18],[8,29],[9,1],[18,10],[2,14],[4,8]]; // 出現・消失する壁
   // const [wallPositions, setWallPositions] = useState<number[][]>([[16, 13]]);
   // 壁の表示/非表示を管理するstateを追加
   const [showWall, setShowWall] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [timeLeft, setTimeLeft] = useState(40); // 残り10秒からスタート
+  const [timeLeft, setTimeLeft] = useState(30); // 残り10秒からスタート
   const [isTimeAttackStarted, setIsTimeAttackStarted] = useState(false); // タイムアタックが開始されたかどうかを追跡
   const timeAttackPositions: number[][] = [[],[0,0]] // タイムアタック開始のppsition
   // リセットボタンの呼び出し関数
@@ -43,6 +44,7 @@ export default function Dealer({ params }: { params: { slug: string } }) {
       setResetButton(true);
     }, 3000);
   }
+  const [movingDot, setMovingDot] = useState({ x: 1, y: 12, direction: 1 }); // 移動するギミック。yを4にして、xを1から開始
 
   useEffect(() => {
     setIsModalOpen(true);
@@ -121,8 +123,8 @@ export default function Dealer({ params }: { params: { slug: string } }) {
   }, [params.slug]);
 
   const playGameOverSound = () => {
-    const sound = new Audio("/horror_sound.wav");
-    sound.play();
+    //const sound = new Audio("/horror_sound.wav");
+    //sound.play();
   };
 
   const restartGame = () => {
@@ -130,7 +132,7 @@ export default function Dealer({ params }: { params: { slug: string } }) {
     setResetButton(false);
     setIsGameStarted(false);
     setShowWall(false);
-    setTimeLeft(40);
+    setTimeLeft(30);
     setKeys({
       key1: false,
       key2: false,
@@ -180,6 +182,38 @@ export default function Dealer({ params }: { params: { slug: string } }) {
     }
     return () => clearInterval(interval); // コンポーネントのアンマウント時にインターバルをクリア
   }, [isTimeAttackStarted, timeLeft]);
+
+  // X軸に移動するギミック
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setMovingDot(prev => {
+        let newX = prev.x + prev.direction; // 現在の方向に応じてXを更新
+        let newDirection = prev.direction;
+  
+        // 点が[4][8]の右端または[4][1]の左端に達した場合、方向を反転
+        if (newX > 6 || newX < 1) { // xの範囲を1〜8に変更
+          newDirection *= -1; // 方向を反転させる
+          newX = prev.x + newDirection; // 新しい方向で位置を更新
+        }
+  
+        return { ...prev, x: newX, direction: newDirection };
+      });
+    }, 1000); // 1秒ごとに動かす
+  
+    return () => clearInterval(interval); // コンポーネントのアンマウント時にクリーンアップ
+  }, []);
+  
+  // X軸に移動するギミックの衝突判定
+  useEffect(() => {
+    if (isGameStarted && playerPosition.x === movingDot.x && playerPosition.y === movingDot.y) {
+      // ゲームオーバーのロジックをトリガーする
+      setIsGameOver(true)
+      resetButtonTimer();
+      if (ws && ws.readyState === WebSocket.OPEN) {
+        ws.send('gameover');
+      }
+    }
+  }, [playerPosition, movingDot]);
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     const rect = e.currentTarget.getBoundingClientRect();
@@ -338,6 +372,7 @@ export default function Dealer({ params }: { params: { slug: string } }) {
                     width: `${cellSize}px`,
                     height: `${cellSize}px`,
                     backgroundColor:
+                        (rowIndex === movingDot.y && cellIndex === movingDot.x) ? 'orange' : // 動く点の色
                         cell === '#' ? 'black' :
                         cell === 'S' ? 'green' :
                         cell === 'G' ? 'red' :
