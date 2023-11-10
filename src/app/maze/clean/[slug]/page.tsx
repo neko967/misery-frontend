@@ -367,10 +367,12 @@ export default function Dealer({ params }: { params: { slug: string } }) {
         ) : isCleanGameClear ? (
           <>
             <div className="congratulation">congratulations!!</div>
-            <button onClick={goEndingClean}
-                    className="exit">
-              屋敷を出る
-            </button>
+            {isDirtyGameClear && isCleanGameClear &&
+              <button onClick={goEndingClean}
+                      className="exit">
+                屋敷を出る
+              </button>
+            }
           </>
         ) : (
           <div
