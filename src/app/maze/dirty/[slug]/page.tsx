@@ -37,7 +37,6 @@ export default function Dealer({ params }: { params: { slug: string } }) {
   // const [wallPositions, setWallPositions] = useState<number[][]>([[16, 13]]);
   // 壁の表示/非表示を管理するstateを追加
   const [showWall, setShowWall] = useState(false);
-  const [isModalOpen, setIsModalOpen] = useState(false);
   const [timeLeft, setTimeLeft] = useState(30); // 残り10秒からスタート
   const [isTimeAttackStarted, setIsTimeAttackStarted] = useState(false); // タイムアタックが開始されたかどうかを追跡
   const timeAttackPositions: number[][] = [[],[1,21],] // タイムアタック開始のppsition
@@ -48,14 +47,18 @@ export default function Dealer({ params }: { params: { slug: string } }) {
     }, 3000);
   }
   const [movingDot, setMovingDot] = useState({ x: 1, y: 3, direction: 1 }); // 移動するギミック。yを4にして、xを1から開始
+  const [currentTextIndex, setCurrentTextIndex] = useState(0);
 
-  useEffect(() => {
-    setIsModalOpen(true);
-  }, []);
+  const storyTexts = [
+    '閉ざされた屋敷の扉を押し開けると、そこはもはやただの屋敷ではなかった。',
+    '廊下は歪み、部屋は迷路と化し、二人の冒険者を待ち受ける。',
+    <>挑戦を開始するには、一歩を踏み出し、<span style={{ color: 'red' }}>赤いゴールを目指し、壁に触れぬよう慎重に進まねばならない。</span></>,
+    'しかし、一人の力では脱出の望みは薄い。絆と信頼を武器に、二人で協力し合ってこの屋敷からの脱出を目指そう。',
+    'その先には、予想もしない真実が二人を待っているかもしれない。',
+  ];
 
-  // モーダルを閉じる関数
-  const closeModal = () => {
-    setIsModalOpen(false);
+  const nextText = () => {
+    setCurrentTextIndex((prevIndex) => prevIndex + 1);
   };
 
   useEffect(() => {
@@ -310,25 +313,37 @@ export default function Dealer({ params }: { params: { slug: string } }) {
     }}
   >
     <main>
-      <div>
-       
-        <div>
-      {isModalOpen && (
-        <div className="modal modal-open">
-          <div className="modal-box">
-            <p>閉ざされた屋敷の扉を押し開けると、そこはもはやただの屋敷ではなかった。<br/>
-              廊下は歪み、部屋は迷路と化し、二人の冒険者を待ち受ける。<br/>
-              挑戦を開始するには、一歩を踏み出し、<span className="red-text">赤いゴールを目指し、壁に触れぬよう慎重に進まねばならない。</span><br/>
-              しかし、一人の力では脱出の望みは薄い。絆と信頼を武器に、二人で協力し合ってこの屋敷からの脱出を目指そう。<br/>
-              その先には、予想もしない真実が二人を待っているかもしれない。</p>
-          <div className="text-right">
-          <button className="btn" onClick={closeModal}>閉じる</button>
+      {/* Story Texts */}
+      {currentTextIndex < storyTexts.length && (
+        <div
+          style={{
+            position: 'relative', // これにより、内部のabsolute要素をこのdivに対して相対的に配置できる
+            backgroundColor: 'rgba(0, 0, 0, 0.56)',
+            color: 'white',
+            padding: '20px',
+            borderRadius: '10px',
+            textAlign: 'center',
+            width: '1050px',
+            maxHeight: '80vh',
+            overflowY: 'auto',
+          }}
+        >
+          <p style={{ margin: '10px', height: '20px' }}>{storyTexts[currentTextIndex]}</p>
+          <div
+            style={{
+              position: 'absolute', // これで右下に固定する
+              right: '10px', // 右端からの距離
+              bottom: '10px', // 下端からの距離
+              cursor: 'pointer',
+              fontSize: '24px',
+              animation: 'bounce 1s infinite'
+            }}
+            onClick={nextText}
+          >
+            ▼
+          </div>
         </div>
-      </div>
-    </div>
       )}
-    </div>
-      </div>
       {!isGameStarted ? (
         // ゲームが開始されていない場合、スタートボタンを表示
         <button onClick={() => setIsGameStarted(true)}
