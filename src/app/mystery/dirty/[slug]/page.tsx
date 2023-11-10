@@ -332,7 +332,7 @@ export default function Home({ params }: { params: { slug: string } }) {
       additionalStyles: { background: 'rgba(255, 255, 255, 0.1)', borderRadius: '8px' },
       messages: [
         {
-          text: "枕だ。硬さはあまり好みじゃない。",
+          text: "椅子がある。一旦落ち着いてと。",
           choices: null
         }
       ]
@@ -485,7 +485,7 @@ export default function Home({ params }: { params: { slug: string } }) {
   const handleClickItemImage = () => {
     if (putImageItem && putImageItem.name === "ぬいぐるみ" && selectedItem && selectedItem.name === "はさみ" && !isBearCutted) {
       setCurrentItem(items[4]);
-      setMessageIndex(2);
+      setMessageIndex(3);
       setAcquiredItems([...acquiredItems, items[6], items[7]]);
       setPutImageItem(null);
       setSelectedItem(null);
