@@ -61,6 +61,7 @@ export default function Home({ params }: { params: { slug: string } }) {
   const [isDirtyDoorOpen, setIsDirtyDoorOpen] = useState(false);
   const [isBlueBoxBroken, setIsBlueBoxBroken] = useState(false);
   const [acquiredBlueBox, setAcquiredBlueBox] = useState(false);
+  const [acquiredBear, setAcquiredBear] = useState(false);
   const [isBearCutted, setIsBearCutted] = useState(false);
   const [acquiredItems, setAcquiredItems] = useState<Item[]>([]); // 取得済みのアイテムを管理する状態
   const [currentItem, setCurrentItem] = useState<Item | null>(null); // 現在選択されているアイテムを管理する状態 毎回nullにリセット
@@ -215,6 +216,10 @@ export default function Home({ params }: { params: { slug: string } }) {
           choices: null
         },
         {
+          text: "ベッドの下にはもう何もない",
+          choices: null
+        },
+        {
           text: "ぬいぐるみをハサミで切った。中からカギが2本出てきた",
           choices: null
         }
@@ -257,6 +262,81 @@ export default function Home({ params }: { params: { slug: string } }) {
         },
       ]
     },
+    {
+      id: 9,
+      name: '窓',
+      positionClasses: `absolute top-1/3 left-1/4 translate-x-[calc(-50%+90px)] translate-y-[calc(-50%+30px)] opacity-0`,
+      width: "w-36",
+      height: "h-64",
+      // コメントアウトで、クリック部分の色を消す
+      additionalStyles: { background: 'rgba(255, 255, 255, 0.1)', borderRadius: '8px' },
+      messages: [
+        {
+          text: "窓だ。月明かりに照らされている。",
+          choices: null
+        }
+      ]
+    },
+    {
+      id: 10,
+      name: '絵画',
+      positionClasses: `absolute top-1/3 left-1/2 translate-x-[calc(-50%+115px)] translate-y-[calc(-50%-35px)] opacity-0`,
+      width: "w-36",
+      height: "h-36",
+      // コメントアウトで、クリック部分の色を消す
+      additionalStyles: { background: 'rgba(255, 255, 255, 0.1)', borderRadius: '8px' },
+      messages: [
+        {
+          text: "変な絵だなぁ。",
+          choices: null
+        }
+      ]
+    },
+    {
+      id: 11,
+      name: '蜘蛛の巣',
+      positionClasses: `absolute top-1/3 left-1/3 translate-x-[calc(-50%+115px)] translate-y-[calc(-50%-35px)] opacity-0`,
+      width: "w-36",
+      height: "h-48",
+      // コメントアウトで、クリック部分の色を消す
+      additionalStyles: { background: 'rgba(255, 255, 255, 0.1)', borderRadius: '8px' },
+      messages: [
+        {
+          text: "蜘蛛の巣だ。ばっちぃ",
+          choices: null
+        }
+      ]
+    },
+    {
+      id: 12,
+      name: '枕',
+      positionClasses: `absolute top-1/2 left-1/2 translate-x-[calc(-50%-80px)] translate-y-[calc(-50%+80px)] opacity-0`,
+      width: "w-36",
+      height: "h-12",
+      // コメントアウトで、クリック部分の色を消す
+      additionalStyles: { background: 'rgba(255, 255, 255, 0.1)', borderRadius: '8px' },
+      messages: [
+        {
+          text: "枕だ。硬さはあまり好みじゃない。",
+          choices: null
+        }
+      ]
+    },
+    {
+      id: 13,
+      name: '椅子',
+      positionClasses: `absolute top-1/2 left-1/2 translate-x-[calc(-50%-80px)] translate-y-[calc(-50%+80px)]`,
+      width: "w-36",
+      height: "h-12",
+      // コメントアウトで、クリック部分の色を消す
+      additionalStyles: { background: 'rgba(255, 255, 255, 0.1)', borderRadius: '8px' },
+      messages: [
+        {
+          text: "枕だ。硬さはあまり好みじゃない。",
+          choices: null
+        }
+      ]
+    },
   ];
 
   let message: string | undefined;
@@ -288,6 +368,12 @@ export default function Home({ params }: { params: { slug: string } }) {
     } else if (item.name === 'ドア' && isDirtyDoorOpen && isCleanDoorOpen) {
       setCurrentItem(item);
       setMessageIndex(2);
+    } else if (item.name === 'ぬいぐるみ' && !acquiredBear) {
+      setCurrentItem(item);
+      setMessageIndex(0);
+    } else if (item.name === 'ぬいぐるみ' && acquiredBear) {
+      setCurrentItem(item);
+      setMessageIndex(2);
     } else if (!acquiredItems.some(acquiredItem => acquiredItem.id === item.id)) {
       setCurrentItem(item);
       setMessageIndex(0); 
@@ -296,9 +382,10 @@ export default function Home({ params }: { params: { slug: string } }) {
 
   // 選択肢の処理
   const handleConfirm = () => {
-    if (currentItem && currentItem.name === 'ぬいぐるみ') {
+    if (currentItem && currentItem.name === 'ぬいぐるみ' && !acquiredBear) {
       setAcquiredItems([...acquiredItems, items[4]])
       setMessageIndex(prevIndex => prevIndex + 1);
+      setAcquiredBear(true);
     } else if (currentItem && currentItem.name === '青い箱' && isBlueBoxBroken) {
       setAcquiredItems([...acquiredItems, currentItem]);
       setAcquiredBlueBox(true);
@@ -478,8 +565,8 @@ export default function Home({ params }: { params: { slug: string } }) {
         // 背景画像
         className="bg-contain bg-center bg-no-repeat bg-black absolute top-1/2 left-1/2 translate-x-[-50%] translate-y-[-50%]"
         style={{ backgroundImage: `url(${backgroundImage})`,
-                 width: `1400px`,
-                 height: `750px`}}
+                 width: `1300px`,
+                 height: `700px`}}
       >
         {/* 条件に基づいて左の三角形ボタンを表示 */}
         {backgroundImage === '/wall.png' && (
@@ -496,8 +583,8 @@ export default function Home({ params }: { params: { slug: string } }) {
                   <div className="mb-20 w-3/5 p-20 relative">
                     <div className="absolute top-0 left-0 w-full h-full border-4 border-gray-600 bg-gray-800 bg-opacity-50">
                     {message && <Message text={message} />}
+                    </div>
                   </div>
-                </div>
                 </div>
   
                 <div className="fixed top-0 left-0 right-0 bottom-0 flex items-center justify-center">
