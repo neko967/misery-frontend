@@ -11,8 +11,8 @@ export const metadata: Metadata = {
   title: 'Misery | Horror Cooperative Escape Game',
 	description: 'PCブラウザ専用のホラー協力型脱出ゲーム', 
 	openGraph: {
-		title: 'タイトル',
-		description: '説明',
+		title: 'Misery | Horror Cooperative Escape Game',
+		description: 'PCブラウザ専用のホラー協力型脱出ゲーム',
 	},
 	twitter: {
 		title: 'Misery | Horror Cooperative Escape Game',
