@@ -133,8 +133,8 @@ export default function Dealer({ params }: { params: { slug: string } }) {
   }, [params.slug]);
 
   const playGameOverSound = () => {
-    //const sound = new Audio("/horror_sound.wav");
-    //sound.play();
+    const sound = new Audio("/horror_sound.wav");
+    sound.play();
   };
 
   const restartGame = () => {
