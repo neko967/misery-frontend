@@ -83,6 +83,7 @@ export default function Home({ params }: { params: { slug: string } }) {
       className="h-screen w-full bg-cover"
       style={{ backgroundImage: "url('/Central.png')" }}
     >
+        <div className="warning">※このゲームは、2人プレイ専用です。音を出してお楽しみください。</div>
       {currentTextIndex < storyTexts.length && (
       <div
         style={{
