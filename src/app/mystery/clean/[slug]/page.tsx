@@ -324,14 +324,73 @@ export default function Home({ params }: { params: { slug: string } }) {
     {
       id: 1,
       name: '青い箱',
-      positionClasses: "absolute top-1/2 left-1/2 translate-x-[calc(-50%+90px)] translate-y-[calc(-50%+130px)] opacity-0",
-      width: "w-20",
-      height: "h-12",
+      positionClasses: "absolute top-1/2 left-1/2 translate-x-[calc(-50%+90px)] translate-y-[calc(-50%+130px)] ",
+      width: "w-36",
+      height: "h-16",
       // コメントアウトで、クリック部分の色を消す
       additionalStyles: { background: 'rgba(255, 255, 255, 0.1)', borderRadius: '8px' },
       messages: [
         {
           text: "何かが砕け散る音がした。",
+          choices: null
+        }
+      ]
+    },
+    {
+      id: 2,
+      name: 'ドア',
+      positionClasses: "absolute top-1/2 left-2/3 translate-x-[calc(-50%+120px)] translate-y-[calc(-50%)] w-36 h-96 opacity-0 text-white",
+      width: "w-24",
+      height: "h-12",
+      // コメントアウトで、クリック部分の色を消す
+      additionalStyles: { background: 'rgba(255, 255, 255, 0.1)', borderRadius: '8px' },
+      messages: [
+        {
+          text: "木製の何かに当たる音がした。",
+          choices: null
+        }
+      ]
+    },
+    {
+      id: 3,
+      name: 'ベッド',
+      positionClasses: "absolute top-1/2 left-1/2 translate-x-[calc(-50%-150px)] translate-y-[calc(-50%+200px)] -skew-y-12",
+      width: "w-64",
+      height: "h-24",
+      additionalStyles: { background: 'rgba(255, 255, 255, 0.1)', borderRadius: '8px' },
+      messages: [
+        {
+          text: "柔らかい何かに当たる音がした。",
+          choices: null
+        },
+      ]
+    },
+    {
+      id: 4,
+      name: '枕',
+      positionClasses: `absolute top-1/2 left-1/2 translate-x-[calc(-50%-80px)] translate-y-[calc(-50%+80px)]`,
+      width: "w-36",
+      height: "h-12",
+      // コメントアウトで、クリック部分の色を消す
+      additionalStyles: { background: 'rgba(255, 255, 255, 0.1)', borderRadius: '8px' },
+      messages: [
+        {
+          text: "ボスっという音がした。",
+          choices: null
+        }
+      ]
+    },
+    {
+      id: 5,
+      name: '窓',
+      positionClasses: `absolute top-1/3 left-1/4 translate-x-[calc(-50%+90px)] translate-y-[calc(-50%+30px)] opacity-0`,
+      width: "w-36",
+      height: "h-64",
+      // コメントアウトで、クリック部分の色を消す
+      additionalStyles: { background: 'rgba(255, 255, 255, 0.1)', borderRadius: '8px' },
+      messages: [
+        {
+          text: "ガラスの割れる音がした",
           choices: null
         }
       ]
@@ -388,8 +447,6 @@ export default function Home({ params }: { params: { slug: string } }) {
       if (ws && ws.readyState === WebSocket.OPEN) {
         ws.send('breakBlueBox');
       }
-    } else if (dirtyRoomItem.name === '青い箱' && isBlueBoxBroken) {
-      setMessageIndex(1);
     } else if (!acquiredItems.some(acquiredItem => acquiredItem.id === dirtyRoomItem.id)) {
       setMessageIndex(0);
     }
@@ -629,8 +686,8 @@ export default function Home({ params }: { params: { slug: string } }) {
                     ${selectedItem && selectedItem.name === "銃" ? 'cursor-crosshair' : undefined}`}
         style={{
           backgroundImage: `url(${backgroundImage})`,
-          width: `1400px`,
-          height: `750px`
+          width: `1300px`,
+          height: `700px`
         }}
         onClick={() => `${selectedItem && selectedItem.name === "銃" ? playGunSound() : undefined}`}
       >
