@@ -557,7 +557,7 @@ export default function Home({ params }: { params: { slug: string } }) {
           } else if (event.data == "openDirtyDoor") {
             setIsDirtyDoorOpen(true);
           } else if (event.data == "breakBlueBox") {
-            playGunSound();
+            //playGunSound();
             setCurrentItem(items[1]);
             setMessageIndex(4);
             setIsBlueBoxBroken(true);
