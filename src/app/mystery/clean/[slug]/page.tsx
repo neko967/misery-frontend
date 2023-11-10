@@ -112,7 +112,7 @@ export default function Home({ params }: { params: { slug: string } }) {
   const [showPasswordButtons, setShowPasswordButtons] = useState<boolean>(false); //ここからパスワード付きの箱
   const [password, setPassword] = useState<string>('');
   const [passwordAttempted, setPasswordAttempted] = useState<boolean>(false);
-  const correctSequence: string = '7305*7'; // 正しいパスワード
+  const correctSequence: string = '3542'; // 正しいパスワード
   const [showError, setShowError] = useState<boolean>(false); //ここまでパスワード付きの箱
   const [cleanIsReadyToAcceptItem, setCleanIsReadyToAcceptItem] = useState(false);
   const [dirtyIsReadyToAcceptItem, setDirtyIsReadyToAcceptItem] = useState(false);
@@ -581,10 +581,12 @@ export default function Home({ params }: { params: { slug: string } }) {
   };
 
   const handleButtonClick = (key: string): void => {
-    if (password.length < 6) {
-      playPasswordMusic(`/sound${key}.m4a`);
-      setPassword((prev: string) => prev + key); // パスワードに文字を追加
-    }
+    playPasswordMusic(`/sound${key}.m4a`);
+    setPassword((prev: string) => {
+      // パスワードが4文字を超える場合は、最初の文字を削除して新しいキーを追加する
+      const updatedPassword = prev.length >= 4 ? prev.substring(1) + key : prev + key;
+      return updatedPassword;
+    });
   };
 
   const checkPassword = (): void => {
@@ -609,7 +611,7 @@ export default function Home({ params }: { params: { slug: string } }) {
 
   // 箱が開いたかどうかの状態は、passwordAttempted とパスワードが正しいかで判断する
   const isUnlocked: boolean = passwordAttempted && password === correctSequence;
-  const passwordKeys = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '*', '＃'];
+  const passwordKeys = ['1', '2', '3', '4', '5', '6', '7', '8', '9'];
 
   //音
   const playGunSound = () => {
