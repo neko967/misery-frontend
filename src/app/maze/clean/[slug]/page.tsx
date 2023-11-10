@@ -14,6 +14,8 @@ type pointerPosition = {
 export default function Dealer({ params }: { params: { slug: string } }) {
   const elements = 20;
   const doorImage = "/door.png";
+  const girlImage = "/girl.png";
+  const needleImage = "/needle.png";
   const brickImage = "/brick.png";
   const keyImage = "/keyImage.png";
   const countDownImage = "/countDownImage.png";
@@ -26,7 +28,8 @@ export default function Dealer({ params }: { params: { slug: string } }) {
   const [playerPosition, setPlayerPosition] = useState<pointerPosition>({ x: 0, y: 0 });
   const [isGameOver, setIsGameOver] = useState(false);
   const [resetButton, setResetButton] = useState(false);
-  const [isGameClear, setIsGameClear] = useState(false);
+  const [isDirtyGameClear, setIsDirtyGameClear] = useState(false);
+  const [isCleanGameClear, setIsCleanGameClear] = useState(false);
   const [isGameStarted, setIsGameStarted] = useState(false);
   const [keys, setKeys] = useState({ key1: false, key2: false, key3: false, key4: false, 
                                      key5: false, key6: false, key7: false, key8: false });
@@ -84,6 +87,10 @@ export default function Dealer({ params }: { params: { slug: string } }) {
             playGameOverSound();
             resetButtonTimer();
             return () => clearTimeout(resetButtonTimer);
+          } else if (event.data == "isDirtyGameClear") {
+            setIsDirtyGameClear(true);
+          } else if (event.data == "isCleanGameClear") {
+            setIsCleanGameClear(true);
           } else if (event.data == "timeAttack") {
             setIsTimeAttackStarted(true);
           } else if (event.data == "getkey1") {
@@ -133,6 +140,8 @@ export default function Dealer({ params }: { params: { slug: string } }) {
     setIsGameStarted(false);
     setShowWall(false);
     setTimeLeft(30);
+    setIsCleanGameClear(false);
+    setIsDirtyGameClear(false);
     setKeys({
       key1: false,
       key2: false,
@@ -147,10 +156,10 @@ export default function Dealer({ params }: { params: { slug: string } }) {
   };
 
   useEffect(() => {
-    if (isGameClear) {
+    if (isCleanGameClear) {
       setIsTimeAttackStarted(false);
     }
-  }, [isGameClear]);
+  }, [isCleanGameClear]);
 
   useEffect(() => {
     if (isGameOver) {
@@ -232,7 +241,9 @@ export default function Dealer({ params }: { params: { slug: string } }) {
                              || (maze[y][x] === 'W' && showWall)) {
         ws.send('gameover');
       } else if (maze[y][x] === 'G') {
-        setIsGameClear(true);
+        if (ws && ws.readyState === WebSocket.OPEN) {
+          ws.send('isCleanGameClear');
+        }
       } else if (y === timeAttackPositions[1][0] && x === timeAttackPositions[1][1] && maze[y][x] === 'E'){
         ws.send('timeAttack');
       } else if (y === keyPositions[1][0] && x === keyPositions[1][1] && maze[y][x] === 'K') {
@@ -290,136 +301,134 @@ export default function Dealer({ params }: { params: { slug: string } }) {
 
   return (
     <div
-    className="h-screen w-full bg-cover flex justify-center items-center"
-    style={{
-      backgroundImage: isGameClear ? "url('/Gameclear.png')" : "url('/maze.png')" ,
-      backgroundSize: 'cover',
-      backgroundPosition: 'center',
-    }}
-  >
-    <main>
-      <div>
-        
+      className="h-screen w-full bg-cover flex justify-center items-center"
+      style={{
+        backgroundImage: isGameOver ? "url('/dark.png')" : isCleanGameClear ? "url('/Gameclear.png')" : "url('/maze.png')",
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+      }}
+    >
+      <main>
         <div>
-      {isModalOpen && (
-        <div className="modal modal-open">
-          <div className="modal-box">
-            <p>閉ざされた屋敷の扉を押し開けると、そこはもはやただの屋敷ではなかった。<br/>
-              廊下は歪み、部屋は迷路と化し、二人の冒険者を待ち受ける。<br/>
-              挑戦を開始するには、一歩を踏み出し、<span className="red-text">赤いゴールを目指し、壁に触れぬよう慎重に進まねばならない。</span><br/>
-              しかし、一人の力では脱出の望みは薄い。絆と信頼を武器に、二人で協力し合ってこの屋敷からの脱出を目指そう。<br/>
-              その先には、予想もしない真実が二人を待っているかもしれない。</p>
-            <div className="text-right">
-          <button className="btn" onClick={closeModal}>閉じる</button>
+          <div>
+            {isModalOpen && (
+              <div className="modal modal-open">
+                <div className="modal-box">
+                  <p>閉ざされた屋敷の扉を押し開けると、そこはもはやただの屋敷ではなかった。<br/>
+                    廊下は歪み、部屋は迷路と化し、二人の冒険者を待ち受ける。<br/>
+                    挑戦を開始するには、一歩を踏み出し、<span className="red-text">赤いゴールを目指し、壁に触れぬよう慎重に進まねばならない。</span><br/>
+                    しかし、一人の力では脱出の望みは薄い。絆と信頼を武器に、二人で協力し合ってこの屋敷からの脱出を目指そう。<br/>
+                    その先には、予想もしない真実が二人を待っているかもしれない。</p>
+                  <div className="text-right">
+                    <button className="btn" onClick={closeModal}>閉じる</button>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
         </div>
-      </div>
-    </div>
-      )}
-    </div>
-      </div>
-      {!isGameStarted ? (
-        // ゲームが開始されていない場合、スタートボタンを表示
-        <button onClick={() => setIsGameStarted(true)}
-        className="btn btn-error"
-        style={{
-          position: 'absolute',
-          top: 18 * cellSize + 'px',
-          left: 14.5 * cellSize + 'px',
-        }}
-        >迷路を進む
+        {!isGameStarted ? (
+          // ゲームが開始されていない場合、スタートボタンを表示
+          <button onClick={() => setIsGameStarted(true)}
+            className="btn btn-error"
+            style={{
+              position: 'absolute',
+              top: '90%', // 画面の中央から上方向へ
+              left: '50%', // 画面の中央から左方向へ
+              transform: 'translate(-50%, -50%)', // ボタン自体の中心を基準に位置を調整
+            }}
+          >迷路を進む
           </button>
-      ) :isGameOver ? (
-        <div>
-          <Image src={localImage} alt="ホラー" />
-          {resetButton &&
-            <div className="reset">
-              <button onClick={restartGame} className="reset-button">再挑戦する</button>
+        ) :isGameOver ? (
+          <div>
+            <Image src={localImage} alt="ホラー" />
+            {resetButton &&
+              <div className="reset">
+                <button onClick={restartGame} className="reset-button">再挑戦する</button>
+              </div>
+            }
+          </div>
+        ) : isCleanGameClear ? (
+          <>
+            <div className="congratulation">congratulations!!</div>
+            <button onClick={goEndingClean}
+                    className="exit">
+              屋敷を出る
+            </button>
+          </>
+        ) : (
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: `repeat(${maze[0].length}, ${cellSize}px)`,
+              cursor: 'none',
+              gridGap: '0px',
+              position: 'relative', /* Change from 'absolute' to 'relative' */
+              /* Remove 'top' and 'left' properties */
+            }}
+              onMouseMove={handleMouseMove}
+          >
+            {maze.map((row, rowIndex) =>
+              row.map((cell, cellIndex) => (
+                <div
+                  // タイムアタック処理の関数を呼び出す
+                  // onMouseOver={() => handleMouseOver(rowIndex, cellIndex)}
+                  key={`${rowIndex}-${cellIndex}`}
+                  data-start={cell === 'S' ? 'true' : undefined}
+                  style={{
+                      boxSizing: 'border-box',
+                      width: `${cellSize}px`,
+                      height: `${cellSize}px`,
+                      backgroundColor:
+                          (rowIndex === movingDot.y && cellIndex === movingDot.x) ? 'orange' : // 動く点の色
+                          cell === '#' ? 'black' :
+                          cell === 'S' ? 'green' :
+                          cell === 'G' ? 'red' :
+                          cell === 'E' ? 'white' :
+                          cell === 'W' ? (showWall ? 'pink' : 'white') :
+                          'white',
+                      cursor: `url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="5" height="5" viewBox="0 0 2 2"><circle cx="1" cy="1" r="1" fill="black" /></svg>') 1 1, auto`,
+                      backgroundSize: 'cover',
+                      backgroundImage:
+                      (rowIndex === movingDot.y && cellIndex === movingDot.x) ? `url(${girlImage})` :
+                      cell === 'W' ? (showWall ? `url(${needleImage})` : 'none') :
+                          cell === '#' ? `url(${brickImage})` :
+                          cell === 'E' ? (
+                            rowIndex === timeAttackPositions[1][0] && cellIndex === timeAttackPositions[1][1] && !isTimeAttackStarted ? `url(${countDownImage})` : undefined
+                          ) :
+                          cell === 'K' ? (
+                            rowIndex === keyPositions[1][0] && cellIndex === keyPositions[1][1] && !keys.key1 ? `url(${keyImage})` :
+                            rowIndex === keyPositions[2][0] && cellIndex === keyPositions[2][1] && !keys.key2 ? `url(${keyImage})` :
+                            rowIndex === keyPositions[3][0] && cellIndex === keyPositions[3][1] && !keys.key3 ? `url(${keyImage})` :
+                            rowIndex === keyPositions[4][0] && cellIndex === keyPositions[4][1] && !keys.key4 ? `url(${keyImage})` :
+                            rowIndex === keyPositions[5][0] && cellIndex === keyPositions[5][1] && !keys.key5 ? `url(${keyImage})` :
+                            rowIndex === keyPositions[6][0] && cellIndex === keyPositions[6][1] && !keys.key6 ? `url(${keyImage})` :
+                            rowIndex === keyPositions[7][0] && cellIndex === keyPositions[7][1] && !keys.key7 ? `url(${keyImage})` :
+                            rowIndex === keyPositions[8][0] && cellIndex === keyPositions[8][1] && !keys.key8 ? `url(${keyImage})` : undefined
+                          ) :
+                          cell === '*' ? (
+                            rowIndex === doorPositions[1][0] && cellIndex === doorPositions[1][1] && !keys.key1 ? `url(${doorImage})` :
+                            rowIndex === doorPositions[2][0] && cellIndex === doorPositions[2][1] && !keys.key2 ? `url(${doorImage})` :
+                            rowIndex === doorPositions[3][0] && cellIndex === doorPositions[3][1] && !keys.key3 ? `url(${doorImage})` :
+                            rowIndex === doorPositions[4][0] && cellIndex === doorPositions[4][1] && !keys.key4 ? `url(${doorImage})` :
+                            rowIndex === doorPositions[5][0] && cellIndex === doorPositions[5][1] && !keys.key5 ? `url(${doorImage})` :
+                            rowIndex === doorPositions[6][0] && cellIndex === doorPositions[6][1] && !keys.key6 ? `url(${doorImage})` :
+                            rowIndex === doorPositions[7][0] && cellIndex === doorPositions[7][1] && !keys.key7 ? `url(${doorImage})` :
+                            rowIndex === doorPositions[8][0] && cellIndex === doorPositions[8][1] && !keys.key8 ? `url(${doorImage})` : undefined
+                          ) :
+                          undefined,
+                  }}
+                ></div>
+              ))
+            )}
+            <div className="fixed top-4 right-4">
+              <div className="bg-pink-500 text-white py-2 px-4 rounded shadow-lg">
+                {!isGameOver && isTimeAttackStarted && <div>残り時間：{timeLeft}秒</div>}
+              </div>
             </div>
-          }
-        </div>
-      ) : isGameClear ? (
-        <>
-          <div className="congratulation">congratulation!!</div>
-          <button onClick={goEndingClean}
-                  className="exit">
-            屋敷を出る
-          </button>
-        </>
-      ) : (
-        <div
-          style={{
-            display: 'grid',
-            gridTemplateColumns: `repeat(${maze[0].length}, ${cellSize}px)`,
-            cursor: 'none',
-            gridGap: '0px',
-            width: '100%',
-            height: '100%',
-            position: 'absolute',
-            top: 0,
-            left: 0
-          }}
-          onMouseMove={handleMouseMove}
-        >
-          {maze.map((row, rowIndex) =>
-            row.map((cell, cellIndex) => (
-              <div
-                // タイムアタック処理の関数を呼び出す
-                // onMouseOver={() => handleMouseOver(rowIndex, cellIndex)}
-                key={`${rowIndex}-${cellIndex}`}
-                data-start={cell === 'S' ? 'true' : undefined}
-                style={{
-                    boxSizing: 'border-box',
-                    width: `${cellSize}px`,
-                    height: `${cellSize}px`,
-                    backgroundColor:
-                        (rowIndex === movingDot.y && cellIndex === movingDot.x) ? 'orange' : // 動く点の色
-                        cell === '#' ? 'black' :
-                        cell === 'S' ? 'green' :
-                        cell === 'G' ? 'red' :
-                        cell === 'E' ? 'white' :
-                        cell === 'W' ? (showWall ? 'pink' : 'white') :
-                        'white',
-                    cursor: `url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="5" height="5" viewBox="0 0 2 2"><circle cx="1" cy="1" r="1" fill="black" /></svg>') 1 1, auto`,
-                    backgroundSize: 'cover',
-                    backgroundImage:
-                        cell === '#' ? `url(${brickImage})` :
-                        cell === 'E' ? (
-                          rowIndex === timeAttackPositions[1][0] && cellIndex === timeAttackPositions[1][1] && !isTimeAttackStarted ? `url(${countDownImage})` : undefined
-                        ) :
-                        cell === 'K' ? (
-                          rowIndex === keyPositions[1][0] && cellIndex === keyPositions[1][1] && !keys.key1 ? `url(${keyImage})` :
-                          rowIndex === keyPositions[2][0] && cellIndex === keyPositions[2][1] && !keys.key2 ? `url(${keyImage})` :
-                          rowIndex === keyPositions[3][0] && cellIndex === keyPositions[3][1] && !keys.key3 ? `url(${keyImage})` :
-                          rowIndex === keyPositions[4][0] && cellIndex === keyPositions[4][1] && !keys.key4 ? `url(${keyImage})` :
-                          rowIndex === keyPositions[5][0] && cellIndex === keyPositions[5][1] && !keys.key5 ? `url(${keyImage})` :
-                          rowIndex === keyPositions[6][0] && cellIndex === keyPositions[6][1] && !keys.key6 ? `url(${keyImage})` :
-                          rowIndex === keyPositions[7][0] && cellIndex === keyPositions[7][1] && !keys.key7 ? `url(${keyImage})` :
-                          rowIndex === keyPositions[8][0] && cellIndex === keyPositions[8][1] && !keys.key8 ? `url(${keyImage})` : undefined
-                        ) :
-                        cell === '*' ? (
-                          rowIndex === doorPositions[1][0] && cellIndex === doorPositions[1][1] && !keys.key1 ? `url(${doorImage})` :
-                          rowIndex === doorPositions[2][0] && cellIndex === doorPositions[2][1] && !keys.key2 ? `url(${doorImage})` :
-                          rowIndex === doorPositions[3][0] && cellIndex === doorPositions[3][1] && !keys.key3 ? `url(${doorImage})` :
-                          rowIndex === doorPositions[4][0] && cellIndex === doorPositions[4][1] && !keys.key4 ? `url(${doorImage})` :
-                          rowIndex === doorPositions[5][0] && cellIndex === doorPositions[5][1] && !keys.key5 ? `url(${doorImage})` :
-                          rowIndex === doorPositions[6][0] && cellIndex === doorPositions[6][1] && !keys.key6 ? `url(${doorImage})` :
-                          rowIndex === doorPositions[7][0] && cellIndex === doorPositions[7][1] && !keys.key7 ? `url(${doorImage})` :
-                          rowIndex === doorPositions[8][0] && cellIndex === doorPositions[8][1] && !keys.key8 ? `url(${doorImage})` : undefined
-                        ) :
-                        undefined,
-                }}
-              ></div>
-            ))
-          )}
-          <div className="fixed top-4 right-4">
-          <div className="bg-pink-500 text-white py-2 px-4 rounded shadow-lg">
-          
-          {!isGameOver && isTimeAttackStarted && <div>残り時間：{timeLeft}秒</div>}
           </div>
-          </div>
-        </div>
-      )}
-    </main>
+        )}
+      </main>
     </div>
   );
 }

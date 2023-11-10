@@ -152,12 +152,16 @@ body {
   width: 120px;
   /* サイズ */
   padding: 10px 20px 10px 20px;
-  font-size: 10px;
+  font-size: 15px;
 
   /* 位置 */  
   position: absolute;
-  top: 500px;
-  right: 650px;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 
@@ -189,7 +193,7 @@ body {
 .clean-my-button {
   position: fixed; /* 画面に対して固定位置 */
   left: 25%;       /* 左から画面の50%の位置 */
-  bottom: 400px;    /* 画面の下から20pxの位置 */
+  bottom: 50%;    /* 画面の下から20pxの位置 */
   transform: translateX(-50%); /* X軸に沿って中央揃え */
   /* その他のスタイリング（サイズ、色、フォント等） */
 }
@@ -197,7 +201,7 @@ body {
 .dirty-my-button {
   position: fixed; /* 画面に対して固定位置 */
   left: 75%;       /* 左から画面の50%の位置 */
-  bottom: 400px;    /* 画面の下から20pxの位置 */
+  bottom: 50%;    /* 画面の下から20pxの位置 */
   transform: translateX(-50%); /* X軸に沿って中央揃え */
   /* その他のスタイリング（サイズ、色、フォント等） */
 }
@@ -676,13 +680,14 @@ opacity: 1; /* ホバー時に不透明度を戻す */
 }
 .code-s {
   position: absolute;
-  left: 570px;
-  right: 100px;
-  top: 550px;
+  left: 40%;
+  
+  top: 72%;
+  
 }
 .exit {
   position: absolute;
-  bottom: 20px;
+  bottom: 50%;
   left: 100%;
   transform: translate(-50%, -50%); 
   --green: #1BFD9C;
@@ -751,7 +756,7 @@ opacity: 1; /* ホバー時に不透明度を戻す */
   transform: translate(-50%, -50%);
 
   /* その他のスタイル */
-  font-size: 95px;
+  font-size: 90px;
   font-family: 'Montserrat', sans-serif;
   font-weight: 900;
   color: #e1ff00;
