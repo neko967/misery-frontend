@@ -28,7 +28,8 @@ export default function Dealer({ params }: { params: { slug: string } }) {
   const [playerPosition, setPlayerPosition] = useState<pointerPosition>({ x: 0, y: 0 });
   const [isGameOver, setIsGameOver] = useState(false);
   const [resetButton, setResetButton] = useState(false);
-  const [isGameClear, setIsGameClear] = useState(false);
+  const [isDirtyGameClear, setIsDirtyGameClear] = useState(false);
+  const [isCleanGameClear, setIsCleanGameClear] = useState(false);
   const [isGameStarted, setIsGameStarted] = useState(false);
   const [keys, setKeys] = useState({ key1: false, key2: false, key3: false, key4: false, 
                                      key5: false, key6: false, key7: false, key8: false });
@@ -86,6 +87,10 @@ export default function Dealer({ params }: { params: { slug: string } }) {
             playGameOverSound();
             resetButtonTimer();
             return () => clearTimeout(resetButtonTimer);
+          } else if (event.data == "isDirtyGameClear") {
+            setIsDirtyGameClear(true);
+          } else if (event.data == "isCleanGameClear") {
+            setIsCleanGameClear(true);
           } else if (event.data == "timeAttack") {
             setIsTimeAttackStarted(true);
           } else if (event.data == "getkey1") {
@@ -135,6 +140,8 @@ export default function Dealer({ params }: { params: { slug: string } }) {
     setIsGameStarted(false);
     setShowWall(false);
     setTimeLeft(30);
+    setIsCleanGameClear(false);
+    setIsDirtyGameClear(false);
     setKeys({
       key1: false,
       key2: false,
@@ -149,10 +156,10 @@ export default function Dealer({ params }: { params: { slug: string } }) {
   };
 
   useEffect(() => {
-    if (isGameClear) {
+    if (isCleanGameClear) {
       setIsTimeAttackStarted(false);
     }
-  }, [isGameClear]);
+  }, [isCleanGameClear]);
 
   useEffect(() => {
     if (isGameOver) {
@@ -234,7 +241,9 @@ export default function Dealer({ params }: { params: { slug: string } }) {
                              || (maze[y][x] === 'W' && showWall)) {
         ws.send('gameover');
       } else if (maze[y][x] === 'G') {
-        setIsGameClear(true);
+        if (ws && ws.readyState === WebSocket.OPEN) {
+          ws.send('isCleanGameClear');
+        }
       } else if (y === timeAttackPositions[1][0] && x === timeAttackPositions[1][1] && maze[y][x] === 'E'){
         ws.send('timeAttack');
       } else if (y === keyPositions[1][0] && x === keyPositions[1][1] && maze[y][x] === 'K') {
@@ -294,25 +303,28 @@ export default function Dealer({ params }: { params: { slug: string } }) {
     <div
     className="h-screen w-full bg-cover flex justify-center items-center"
     style={{
-      backgroundImage: isGameOver ? "url('/dark.png')" : isGameClear ? "url('/Gameclear.png')" : "url('/maze.png')",
+      backgroundImage: isGameOver ? "url('/dark.png')" : isCleanGameClear ? "url('/Gameclear.png')" : "url('/maze.png')",
       backgroundSize: 'cover',
       backgroundPosition: 'center',
     }}
-  >
+ 　 >
     <main>
       <div>
-        
         <div>
-      {isModalOpen && (
-        <div className="modal modal-open">
-          <div className="modal-box">
-            <p>閉ざされた屋敷の扉を押し開けると、そこはもはやただの屋敷ではなかった。<br/>
-              廊下は歪み、部屋は迷路と化し、二人の冒険者を待ち受ける。<br/>
-              挑戦を開始するには、一歩を踏み出し、<span className="red-text">赤いゴールを目指し、壁に触れぬよう慎重に進まねばならない。</span><br/>
-              しかし、一人の力では脱出の望みは薄い。絆と信頼を武器に、二人で協力し合ってこの屋敷からの脱出を目指そう。<br/>
-              その先には、予想もしない真実が二人を待っているかもしれない。</p>
-            <div className="text-right">
-          <button className="btn" onClick={closeModal}>閉じる</button>
+          {isModalOpen && (
+            <div className="modal modal-open">
+              <div className="modal-box">
+                <p>閉ざされた屋敷の扉を押し開けると、そこはもはやただの屋敷ではなかった。<br/>
+                  廊下は歪み、部屋は迷路と化し、二人の冒険者を待ち受ける。<br/>
+                  挑戦を開始するには、一歩を踏み出し、<span className="red-text">赤いゴールを目指し、壁に触れぬよう慎重に進まねばならない。</span><br/>
+                  しかし、一人の力では脱出の望みは薄い。絆と信頼を武器に、二人で協力し合ってこの屋敷からの脱出を目指そう。<br/>
+                  その先には、予想もしない真実が二人を待っているかもしれない。</p>
+                <div className="text-right">
+                  <button className="btn" onClick={closeModal}>閉じる</button>
+                </div>
+              </div>
+             </div>
+          )}
         </div>
       </div>
     </div>
@@ -340,7 +352,7 @@ export default function Dealer({ params }: { params: { slug: string } }) {
             </div>
           }
         </div>
-      ) : isGameClear ? (
+      ) : isCleanGameClear ? (
         <>
           <div className="congratulation">congratulations!!</div>
           <button onClick={goEndingClean}
@@ -414,14 +426,12 @@ export default function Dealer({ params }: { params: { slug: string } }) {
             ))
           )}
           <div className="fixed top-4 right-4">
-          <div className="bg-pink-500 text-white py-2 px-4 rounded shadow-lg">
-          
-          {!isGameOver && isTimeAttackStarted && <div>残り時間：{timeLeft}秒</div>}
+            <div className="bg-pink-500 text-white py-2 px-4 rounded shadow-lg">
+           　　 {!isGameOver && isTimeAttackStarted && <div>残り時間：{timeLeft}秒</div>}
+            </div>
           </div>
-          </div>
-        </div>
-      )}
+        )}
     </main>
-    </div>
+  </div>
   );
 }
