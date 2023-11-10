@@ -8,15 +8,15 @@ const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://misery-seven.vercel.app/'),
-  title: 'タイトル',
-	description: '説明',
+  title: 'Misery | Horror Cooperative Escape Game',
+	description: 'PCブラウザ専用のホラー協力型脱出ゲーム', 
 	openGraph: {
 		title: 'タイトル',
 		description: '説明',
 	},
 	twitter: {
-		title: 'タイトル',
-		description: '説明',
+		title: 'Misery | Horror Cooperative Escape Game',
+		description: 'PCブラウザ専用のホラー協力型脱出ゲーム',
 		card: 'summary_large_image',
 	},
 };
