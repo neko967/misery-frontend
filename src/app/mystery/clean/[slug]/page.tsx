@@ -160,14 +160,14 @@ export default function Home({ params }: { params: { slug: string } }) {
       id: 2,
       name: '赤い箱',
       imagePath: '/box_red.png',
-      positionClasses: "absolute top-2/3 left-1/4 translate-x-[calc(-50%+110px)] translate-y-[calc(-50%+10px)] opacity-0",
+      positionClasses: "absolute top-2/3 left-1/4 translate-x-[calc(-50%+110px)] translate-y-[calc(-50%+30px)] opacity-0",
       width: "w-12",
-      height: "h-12",
+      height: "h-20",
       // コメントアウトで、クリック部分の色を消す
       additionalStyles: { background: 'rgba(255, 255, 255, 0.1)', borderRadius: '8px' },
       messages: [
         {
-          text: "ボロボロの鍵がかかっている...衝撃を加えれば壊れそうだ。",
+          text: "棚にボロボロの鍵がかかっている...衝撃を加えれば壊れそうだ。",
           choices: null
         },
         {
@@ -209,7 +209,7 @@ export default function Home({ params }: { params: { slug: string } }) {
       additionalStyles: { background: 'rgba(255, 255, 255, 0.1)', borderRadius: '8px' },
       messages: [
         {
-          text: "ドアは不思議な力で固く閉ざされている",
+          text: "ドアは不思議な力で固く閉ざされている。",
           choices: null
         },
         {
@@ -291,6 +291,10 @@ export default function Home({ params }: { params: { slug: string } }) {
           text: "はさみを受け取った",
           choices: null
         },
+        {
+          text: "はさみを渡した",
+          choices: null
+        },
       ]
     },
     {
@@ -301,6 +305,10 @@ export default function Home({ params }: { params: { slug: string } }) {
       messages: [
         {
           text: "青いカギを受け取った",
+          choices: null,
+        },
+        {
+          text: "青いカギを渡した",
           choices: null,
         },
       ]
@@ -315,6 +323,85 @@ export default function Home({ params }: { params: { slug: string } }) {
           text: "赤いカギを受け取った",
           choices: null,
         },
+        {
+          text: "赤いカギを渡した",
+          choices: null,
+        },
+      ]
+    },
+    {
+      id: 9,
+      name: '窓',
+      positionClasses: "absolute top-1/2 left-1/2 translate-x-[calc(-50%-40px)] translate-y-[calc(-50%-40px)] opacity-0 text-white",
+      width: "w-36",
+      height: "h-72",
+      // コメントアウトで、クリック部分の色を消す
+      additionalStyles: { background: 'rgba(255, 255, 255, 0.1)', borderRadius: '8px' },
+      messages: [
+        {
+          text: "窓だ。月明かりに見惚れてしまう",
+          choices: null
+        },
+      ]
+    },
+    {
+      id: 10,
+      name: '絵画',
+      positionClasses: "absolute top-1/2 left-3/4 translate-x-[calc(-50%-20px)] translate-y-[calc(-50%-80px)] -skew-y-12 opacity-0",
+      width: "w-36",
+      height: "h-36",
+      // コメントアウトで、クリック部分の色を消す
+      additionalStyles: { background: 'rgba(255, 255, 255, 0.1)', borderRadius: '8px' },
+      messages: [
+        {
+          text: "大きな絵が飾られている。立派だ。",
+          choices: null
+        },
+      ]
+    },
+    {
+      id: 11,
+      name: '本',
+      positionClasses: "absolute top-3/4 left-1/3 translate-x-[calc(-50%+50px)] translate-y-[calc(-50%+80px)] opacity-0",
+      width: "w-16",
+      height: "h-12",
+      // コメントアウトで、クリック部分の色を消す
+      additionalStyles: { background: 'rgba(255, 255, 255, 0.1)', borderRadius: '8px' },
+      messages: [
+        {
+          text: "本が積み上げられている。",
+          choices: null
+        },
+      ]
+    },
+    {
+      id: 12,
+      name: '左カーテン',
+      positionClasses: "absolute top-1/2 left-1/2 translate-x-[calc(-50%-160px)] translate-y-[calc(-50%-100px)] opacity-0",
+      width: "w-24",
+      height: "h-64",
+      // コメントアウトで、クリック部分の色を消す
+      additionalStyles: { background: 'rgba(255, 255, 255, 0.1)', borderRadius: '8px' },
+      messages: [
+        {
+          text: "重厚なカーテンだ。とても重そう。",
+          choices: null
+        },
+      ]
+    },
+    {
+      id: 13,
+      name: '右カーテン',
+      positionClasses: "absolute top-1/2 left-1/2 translate-x-[calc(-50%+70px)] translate-y-[calc(-50%-100px)] opacity-0",
+      width: "w-24",
+      height: "h-64",
+      // コメントアウトで、クリック部分の色を消す
+      additionalStyles: { background: 'rgba(255, 255, 255, 0.1)', borderRadius: '8px' },
+      messages: [
+        {
+          text: "重厚なカーテンだ。とても重そう。",
+          choices: null
+        },
       ]
     },
   ];
@@ -324,7 +411,7 @@ export default function Home({ params }: { params: { slug: string } }) {
     {
       id: 1,
       name: '青い箱',
-      positionClasses: "absolute top-1/2 left-1/2 translate-x-[calc(-50%+90px)] translate-y-[calc(-50%+130px)] ",
+      positionClasses: "absolute top-1/2 left-1/2 translate-x-[calc(-50%+90px)] translate-y-[calc(-50%+130px)] opacity-0",
       width: "w-36",
       height: "h-16",
       // コメントアウトで、クリック部分の色を消す
@@ -354,7 +441,7 @@ export default function Home({ params }: { params: { slug: string } }) {
     {
       id: 3,
       name: 'ベッド',
-      positionClasses: "absolute top-1/2 left-1/2 translate-x-[calc(-50%-150px)] translate-y-[calc(-50%+200px)] -skew-y-12",
+      positionClasses: "absolute top-1/2 left-1/2 translate-x-[calc(-50%-150px)] translate-y-[calc(-50%+100px)] -skew-y-12 opacity-0",
       width: "w-64",
       height: "h-24",
       additionalStyles: { background: 'rgba(255, 255, 255, 0.1)', borderRadius: '8px' },
@@ -368,14 +455,14 @@ export default function Home({ params }: { params: { slug: string } }) {
     {
       id: 4,
       name: '枕',
-      positionClasses: `absolute top-1/2 left-1/2 translate-x-[calc(-50%-80px)] translate-y-[calc(-50%+80px)]`,
+      positionClasses: `absolute top-1/2 left-1/2 translate-x-[calc(-50%-80px)] translate-y-[calc(-50%+80px)] opacity-0`,
       width: "w-36",
       height: "h-12",
       // コメントアウトで、クリック部分の色を消す
       additionalStyles: { background: 'rgba(255, 255, 255, 0.1)', borderRadius: '8px' },
       messages: [
         {
-          text: "ボスっという音がした。",
+          text: "ボスっという音がした",
           choices: null
         }
       ]
@@ -391,6 +478,51 @@ export default function Home({ params }: { params: { slug: string } }) {
       messages: [
         {
           text: "ガラスの割れる音がした",
+          choices: null
+        }
+      ]
+    },
+    {
+      id: 6,
+      name: '椅子',
+      positionClasses: `absolute top-2/3 left-1/4 translate-x-[calc(-50%-90px)] translate-y-[calc(-50%+60px)] opacity-0`,
+      width: "w-48",
+      height: "h-24",
+      // コメントアウトで、クリック部分の色を消す
+      additionalStyles: { background: 'rgba(255, 255, 255, 0.1)', borderRadius: '8px' },
+      messages: [
+        {
+          text: "木製の何かに当たった。落ち着かない。",
+          choices: null
+        }
+      ]
+    },
+    {
+      id: 7,
+      name: '時計',
+      positionClasses: `absolute top-1/4 left-1/4 translate-x-[calc(-50%-100px)] translate-y-[calc(-50%+40px)] opacity-0`,
+      width: "w-28",
+      height: "h-36",
+      // コメントアウトで、クリック部分の色を消す
+      additionalStyles: { background: 'rgba(255, 255, 255, 0.1)', borderRadius: '8px' },
+      messages: [
+        {
+          text: "何かに当たった。時が止まった気がした。",
+          choices: null
+        }
+      ]
+    },
+    {
+      id: 8,
+      name: '絵画',
+      positionClasses: `absolute top-1/3 left-1/2 translate-x-[calc(-50%+115px)] translate-y-[calc(-50%-35px)] opacity-0`,
+      width: "w-36",
+      height: "h-36",
+      // コメントアウトで、クリック部分の色を消す
+      additionalStyles: { background: 'rgba(255, 255, 255, 0.1)', borderRadius: '8px' },
+      messages: [
+        {
+          text: "何か変なものに当たった気がする。",
           choices: null
         }
       ]
@@ -544,6 +676,8 @@ export default function Home({ params }: { params: { slug: string } }) {
         });
         setAcquiredItems(result);
         setDirtyIsReadyToAcceptItem(false);
+        setCurrentItem(items[5]);
+        setMessageIndex(4);
       } else if (selectedItem && selectedItem.name === '青いカギ' && dirtyIsReadyToAcceptItem) {
         ws.send('sendBlueKeyFromClean');
         let result = acquiredItems.filter(function (item) {
@@ -551,6 +685,8 @@ export default function Home({ params }: { params: { slug: string } }) {
         });
         setAcquiredItems(result);
         setDirtyIsReadyToAcceptItem(false);
+        setCurrentItem(items[6]);
+        setMessageIndex(1);
       } else if (selectedItem && selectedItem.name === '赤いカギ' && dirtyIsReadyToAcceptItem) {
         ws.send('sendRedKeyFromClean');
         let result = acquiredItems.filter(function (item) {
@@ -558,6 +694,8 @@ export default function Home({ params }: { params: { slug: string } }) {
         });
         setAcquiredItems(result);
         setDirtyIsReadyToAcceptItem(false);
+        setCurrentItem(items[7]);
+        setMessageIndex(1);
       }
     }
     setSelectedItem(null);

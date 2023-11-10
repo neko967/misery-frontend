@@ -235,6 +235,10 @@ export default function Home({ params }: { params: { slug: string } }) {
         {
           text: "はさみを受け取った",
           choices: null
+        },
+        {
+          text: "はさみを渡した",
+          choices: null
         }
       ]
     },
@@ -248,6 +252,10 @@ export default function Home({ params }: { params: { slug: string } }) {
           text: "青いカギを受け取った",
           choices: null,
         },
+        {
+          text: "青いカギを渡した",
+          choices: null,
+        },
       ]
     },
     {
@@ -258,6 +266,10 @@ export default function Home({ params }: { params: { slug: string } }) {
       messages: [
         {
           text: "赤いカギを受け取った",
+          choices: null,
+        },
+        {
+          text: "赤いカギを渡した",
           choices: null,
         },
       ]
@@ -325,14 +337,29 @@ export default function Home({ params }: { params: { slug: string } }) {
     {
       id: 13,
       name: '椅子',
-      positionClasses: `absolute top-1/2 left-1/2 translate-x-[calc(-50%-80px)] translate-y-[calc(-50%+80px)]`,
-      width: "w-36",
-      height: "h-12",
+      positionClasses: `absolute top-2/3 left-1/4 translate-x-[calc(-50%-90px)] translate-y-[calc(-50%+60px)] opacity-0`,
+      width: "w-48",
+      height: "h-24",
       // コメントアウトで、クリック部分の色を消す
       additionalStyles: { background: 'rgba(255, 255, 255, 0.1)', borderRadius: '8px' },
       messages: [
         {
           text: "椅子がある。一旦落ち着いてと。",
+          choices: null
+        }
+      ]
+    },
+    {
+      id: 14,
+      name: '時計',
+      positionClasses: `absolute top-1/4 left-1/4 translate-x-[calc(-50%-100px)] translate-y-[calc(-50%+40px)] opacity-0`,
+      width: "w-28",
+      height: "h-36",
+      // コメントアウトで、クリック部分の色を消す
+      additionalStyles: { background: 'rgba(255, 255, 255, 0.1)', borderRadius: '8px' },
+      messages: [
+        {
+          text: "時計がある。針は止まっているようだ。",
           choices: null
         }
       ]
@@ -463,6 +490,8 @@ export default function Home({ params }: { params: { slug: string } }) {
         });
         setAcquiredItems(result);
         setCleanIsReadyToAcceptItem(false);
+        setCurrentItem(items[5]);
+        setMessageIndex(1);
       } else if (selectedItem && selectedItem.name === '青いカギ' && cleanIsReadyToAcceptItem) {
         ws.send('sendBlueKeyFromDirty');
         let result = acquiredItems.filter(function( item ) {
@@ -470,6 +499,8 @@ export default function Home({ params }: { params: { slug: string } }) {
         });
         setAcquiredItems(result);
         setCleanIsReadyToAcceptItem(false);
+        setCurrentItem(items[6]);
+        setMessageIndex(1);
       } else if (selectedItem && selectedItem.name === '赤いカギ' && cleanIsReadyToAcceptItem) {
         ws.send('sendRedKeyFromDirty');
         let result = acquiredItems.filter(function( item ) {
@@ -477,6 +508,8 @@ export default function Home({ params }: { params: { slug: string } }) {
         });
         setAcquiredItems(result);
         setCleanIsReadyToAcceptItem(false);
+        setCurrentItem(items[7]);
+        setMessageIndex(1);
       }
     }
     setSelectedItem(null);
