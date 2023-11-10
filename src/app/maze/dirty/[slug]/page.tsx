@@ -14,6 +14,8 @@ type pointerPosition = {
 export default function Dealer({ params }: { params: { slug: string } }) {
   const elements = 20;
   const doorImage = "/door.png";
+  const girlImage = "/girl.png";
+  const needleImage = "/needle.png";
   const brickImage = "/brick.png";
   const keyImage = "/keyImage.png";
   const countDownImage = "/countDownImage.png";
@@ -302,7 +304,7 @@ export default function Dealer({ params }: { params: { slug: string } }) {
     <div
     className="h-screen w-full bg-cover flex justify-center items-center"
     style={{
-      backgroundImage: isDirtyGameClear ? "url('/Gameclear.png')" : "url('/maze.png')" ,
+      backgroundImage: isGameOver ? "url('/dark.png')" : isDirtyGameClear ? "url('/Gameclear.png')" : "url('/maze.png')",
       backgroundSize: 'cover',
       backgroundPosition: 'center',
     }}
@@ -333,13 +335,14 @@ export default function Dealer({ params }: { params: { slug: string } }) {
         className="btn btn-error"
         style={{
           position: 'absolute',
-          top: 18 * cellSize + 'px',
-          left: 13 * cellSize + 'px',
+          top: '90%', // 画面の中央から上方向へ
+          left: '50%', // 画面の中央から左方向へ
+          transform: 'translate(-50%, -50%)', // ボタン自体の中心を基準に位置を調整
         }}
         >迷路を進む
         </button>
       ) :isGameOver ? (
-        <div>
+          <div> 
           <Image src={localImage} alt="ホラー" />
           {resetButton &&
             <div className="reset">
@@ -359,17 +362,14 @@ export default function Dealer({ params }: { params: { slug: string } }) {
         </>
       ) : (
         <div
-          style={{
-            display: 'grid',
-            gridTemplateColumns: `repeat(${maze[0].length}, ${cellSize}px)`,
-            cursor: 'none',
-            gridGap: '0px',
-            width: '100%',
-            height: '100%',
-            position: 'absolute',
-            top: 0,
-            left: 0
-          }}
+        style={{
+          display: 'grid',
+          gridTemplateColumns: `repeat(${maze[0].length}, ${cellSize}px)`,
+          cursor: 'none',
+          gridGap: '0px',
+          position: 'relative', /* Change from 'absolute' to 'relative' */
+          /* Remove 'top' and 'left' properties */
+        }}
           onMouseMove={handleMouseMove}
         >
           {maze.map((row, rowIndex) =>
@@ -395,10 +395,15 @@ export default function Dealer({ params }: { params: { slug: string } }) {
                     cursor: `url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="5" height="5" viewBox="0 0 2 2"><circle cx="1" cy="1" r="1" fill="black" /></svg>') 1 1, auto`,
                     backgroundSize: 'cover',
                     backgroundImage:
+                    (rowIndex === movingDot.y && cellIndex === movingDot.x) ? `url(${girlImage})` :
+                        cell === 'W' ? (showWall ? `url(${needleImage})` : 'none') : 
+                        
+                        
                         cell === '#' ? `url(${brickImage})` :
                         cell === 'E' ? (
                           rowIndex === timeAttackPositions[1][0] && cellIndex === timeAttackPositions[1][1] && !isTimeAttackStarted ?`url(${countDownImage})` : undefined
                         ) :
+                        
                         cell === 'K' ? (
                           rowIndex === keyPositions[1][0] && cellIndex === keyPositions[1][1] && !keys.key1 ? `url(${keyImage})` :
                           rowIndex === keyPositions[2][0] && cellIndex === keyPositions[2][1] && !keys.key2 ? `url(${keyImage})` :
@@ -419,6 +424,7 @@ export default function Dealer({ params }: { params: { slug: string } }) {
                           rowIndex === doorPositions[7][0] && cellIndex === doorPositions[7][1] && !keys.key7 ? `url(${doorImage})` :
                           rowIndex === doorPositions[8][0] && cellIndex === doorPositions[8][1] && !keys.key8 ? `url(${doorImage})` : undefined
                         ) :
+                        
                         undefined,
                 }}
               ></div>
