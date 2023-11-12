@@ -258,7 +258,7 @@ export default function Home({ params }: { params: { slug: string } }) {
           choices: null
         },
         {
-          text: "壁の穴に銃口を当てた。向こうの部屋の様子はよくわからない。",
+          text: "壁の穴に銃口を当てた。向こうの部屋の様子がうっすらと見える。",
           choices: null
         }
       ]
@@ -369,7 +369,7 @@ export default function Home({ params }: { params: { slug: string } }) {
       additionalStyles: { background: 'rgba(255, 255, 255, 0.1)', borderRadius: '8px' },
       messages: [
         {
-          text: "本が積み上げられている。",
+          text: "本に何か書かれている。【3XXX】",
           choices: null
         },
       ]
