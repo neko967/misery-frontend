@@ -19,8 +19,10 @@ export default function Dealer({ params }: { params: { slug: string } }) {
   const brickImage = "/brick.png";
   const keyImage = "/keyImage.png";
   const countDownImage = "/countDownImage.png";
+  const timedVanisingDoorImage = "/timedVanisingDoor.png";
+  const newsPaperImage = "/newsPaper.png";
   const keyPositions: number[][] = [[],[1,29],[0,0],[14,1],[0,0],[6,19],[0,0],[1,11],[0,0]];  //[[空の配列],[key1縦,key1横],[key2縦,key2横],[key3縦,key3横]],[key4縦,key4横]]
-  const doorPositions: number[][] = [[],[0,0],[15,6],[0,0],[9,16],[0,0],[4,13],[0,0],[5,4]]; //[[空の配列],[door1縦,door1横],[door2縦,door2横],[door3縦,door3横]],[door4縦,door4横]]
+  const doorPositions: number[][] = [[],[0,0],[15,6],[0,0],[9,16],[0,0],[4,13],[7,10],[4,4]]; //[[空の配列],[door1縦,door1横],[door2縦,door2横],[door3縦,door3横]],[door4縦,door4横]]
   const { height, width } = GetWindowSize();
   const cellSize = Math.min(width, height) / elements;
   const [ws, setWs] = useState<WebSocket | null>(null);
@@ -46,8 +48,12 @@ export default function Dealer({ params }: { params: { slug: string } }) {
       setResetButton(true);
     }, 3000);
   }
-  const [movingDot, setMovingDot] = useState({ x: 1, y: 12, direction: 1 }); // 移動するギミック。yを4にして、xを1から開始
+  const [movingDot, setMovingDot] = useState({ x: 2, y: 5, direction: 1 }); // 移動するギミック。yを4にして、xを1から開始
   const [currentTextIndex, setCurrentTextIndex] = useState(0);
+  // カウントダウンタイマーを取得すると消失するドア
+  const timedVanisingDoor: number[][] = [[],[14,29]];
+  // 取得するとTrueEndに行ける新聞紙
+  const newsPaper: number[][] = [[],[12,29]];
 
   const storyTexts = [
     '閉ざされた屋敷の扉を押し開けると、そこはもはやただの屋敷ではなかった。',
@@ -203,7 +209,7 @@ export default function Dealer({ params }: { params: { slug: string } }) {
         let newDirection = prev.direction;
   
         // 点が[4][8]の右端または[4][1]の左端に達した場合、方向を反転
-        if (newX > 6 || newX < 1) { // xの範囲を1〜8に変更
+        if (newX > 6 || newX < 2) { // xの範囲を1〜8に変更
           newDirection *= -1; // 方向を反転させる
           newX = prev.x + newDirection; // 新しい方向で位置を更新
         }
@@ -241,7 +247,9 @@ export default function Dealer({ params }: { params: { slug: string } }) {
                              || (y == doorPositions[6][0] && x == doorPositions[6][1] && !keys.key6)
                              || (y == doorPositions[7][0] && x == doorPositions[7][1] && !keys.key7)
                              || (y == doorPositions[8][0] && x == doorPositions[8][1] && !keys.key8)
-                             || (maze[y][x] === 'W' && showWall)) {
+                             || (maze[y][x] === 'W' && showWall)
+                             || (y == timedVanisingDoor[1][0] && x == timedVanisingDoor[1][1]) && !isTimeAttackStarted)
+                             {
         ws.send('gameover');
       } else if (maze[y][x] === 'G') {
         if (ws && ws.readyState === WebSocket.OPEN) {
@@ -276,17 +284,17 @@ export default function Dealer({ params }: { params: { slug: string } }) {
     ['#', 'G', '#', '#', '#', '#', '#', '#', '#', '#', ' ', 'K', ' ', ' ', ' ', '#', '#', '#', ' ', '#', ' ', ' ', ' ', '#', '#', '#', '#', ' ', ' ', 'K', '#'],
     ['#', ' ', ' ', ' ', ' ', '#', ' ', ' ', ' ', '#', ' ', '#', '#', '#', ' ', '#', ' ', ' ', ' ', '#', ' ', '#', ' ', '#', '#', '#', '#', ' ', '#', '#', '#'],
     ['#', '#', '#', '#', ' ', '#', ' ', '#', ' ', '#', ' ', ' ', ' ', ' ', ' ', '#', ' ', '#', '#', '#', ' ', '#', ' ', ' ', '#', ' ', ' ', ' ', '#', '#', '#'],
-    ['#', '#', '#', '#', ' ', '#', ' ', '#', ' ', '#', '#', '#', '#', '*', '#', '#', ' ', '#', '#', '#', ' ', '#', '#', ' ', '#', ' ', '#', '#', '#', '#', '#'],
-    ['#', '#', '#', ' ', '*', ' ', ' ', '#', ' ', ' ', '#', '#', '#', ' ', ' ', ' ', ' ', '#', ' ', ' ', ' ', '#', '#', ' ', '#', ' ', '#', '#', '#', '#', '#'],
-    ['#', '#', '#', ' ', '#', '#', '#', '#', '#', ' ', '#', '#', '#', '#', '#', '#', ' ', '#', ' ', 'K', ' ', '#', '#', ' ', '#', ' ', '#', ' ', ' ', ' ', '#'],
-    ['#', ' ', ' ', ' ', '#', '#', '#', '#', '#', ' ', ' ', ' ', ' ', ' ', ' ', '#', ' ', '#', ' ', ' ', ' ', '#', '#', ' ', '#', ' ', ' ', ' ', '#', ' ', '#'],
+    ['#', '#', '#', '#', '*', '#', ' ', '#', ' ', '#', '#', '#', '#', '*', '#', '#', ' ', '#', '#', '#', ' ', '#', '#', ' ', '#', ' ', '#', '#', '#', '#', '#'],
+    ['#', '#', ' ', ' ', ' ', ' ', ' ', '#', ' ', ' ', '#', '#', '#', ' ', ' ', ' ', ' ', '#', ' ', ' ', ' ', '#', '#', ' ', '#', ' ', '#', '#', '#', '#', '#'],
+    ['#', ' ', '#', ' ', '#', '#', '#', '#', '#', ' ', '#', '#', '#', '#', '#', '#', ' ', '#', ' ', 'K', ' ', '#', '#', ' ', '#', ' ', '#', ' ', ' ', ' ', '#'],
+    ['#', ' ', ' ', ' ', '#', '#', '#', '#', '#', ' ', '*', ' ', ' ', ' ', ' ', ' ', ' ', '#', ' ', ' ', ' ', '#', '#', ' ', '#', ' ', ' ', ' ', '#', ' ', '#'],
     ['#', ' ', '#', '#', '#', '#', '#', '#', '#', ' ', '#', '#', '#', '#', '#', '#', ' ', '#', '#', '#', '#', '#', '#', ' ', '#', '#', '#', '#', '#', ' ', '#'],
     ['#', ' ', '#', '#', '#', '#', ' ', ' ', ' ', ' ', '#', '#', '#', ' ', ' ', ' ', '*', ' ', '#', '#', '#', '#', '#', ' ', '#', ' ', '#', '#', '#', ' ', '#'],
     ['#', ' ', '#', '#', ' ', ' ', ' ', '#', '#', '#', '#', '#', '#', ' ', '#', '#', '#', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '#', ' ', '#', ' ', ' ', ' ', '#'],
     ['#', ' ', '#', '#', ' ', '#', '#', '#', '#', '#', '#', '#', '#', ' ', '#', '#', '#', ' ', '#', '#', '#', '#', '#', '#', '#', ' ', '#', ' ', '#', '#', '#'],
-    ['#', ' ', ' ', ' ', ' ', ' ', ' ', '#', '#', ' ', ' ', ' ', ' ', ' ', ' ', '#', ' ', ' ', '#', ' ', ' ', ' ', ' ', ' ', '#', '#', '#', ' ', '#', 'K', '#'],
+    ['#', ' ', ' ', ' ', ' ', ' ', ' ', '#', '#', ' ', ' ', ' ', ' ', ' ', ' ', '#', ' ', ' ', '#', ' ', ' ', ' ', ' ', ' ', '#', '#', '#', ' ', '#', 'N', '#'],
     ['#', '#', '#', ' ', '#', '#', ' ', '#', '#', '#', '#', '#', '#', '#', ' ', '#', ' ', '#', '#', ' ', '#', '#', '#', ' ', '#', '#', '#', ' ', '#', ' ', '#'],
-    ['#', 'K', '#', ' ', '#', '#', ' ', '#', '#', '#', '#', '#', '#', '#', ' ', '#', '#', '#', '#', ' ', '#', '#', '#', ' ', ' ', ' ', ' ', ' ', '#', ' ', '#'],
+    ['#', 'K', '#', ' ', '#', '#', ' ', '#', '#', '#', '#', '#', '#', '#', ' ', '#', '#', '#', '#', ' ', '#', '#', '#', ' ', ' ', ' ', ' ', ' ', '#', 'D', '#'],
     ['#', ' ', '#', '#', '#', '#', '*', ' ', ' ', ' ', '#', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '#', '#', '#', '#', '#', '#', '#', '#', ' ', '#'],
     ['#', ' ', '#', ' ', ' ', ' ', ' ', '#', '#', ' ', '#', ' ', '#', '#', '#', ' ', '#', '#', '#', '#', ' ', '#', '#', ' ', ' ', ' ', ' ', '#', '#', ' ', '#'],
     ['#', ' ', ' ', ' ', '#', '#', ' ', ' ', '#', ' ', '#', ' ', '#', 'S', 'S', 'S', 'S', 'S', '#', '#', ' ', '#', '#', ' ', '#', '#', ' ', '#', '#', ' ', '#'],
@@ -409,8 +417,12 @@ export default function Dealer({ params }: { params: { slug: string } }) {
                       backgroundSize: 'cover',
                       backgroundImage:
                       (rowIndex === movingDot.y && cellIndex === movingDot.x) ? `url(${girlImage})` :
-                      cell === 'W' ? (showWall ? `url(${needleImage})` : 'none') :
+                          cell === 'W' ? (showWall ? `url(${needleImage})` : 'none') :
                           cell === '#' ? `url(${brickImage})` :
+                          cell === 'N' ? `url(${newsPaperImage})` :
+                          cell === 'D' ? (
+                            rowIndex === timedVanisingDoor[1][0] && cellIndex === timedVanisingDoor[1][1] && !isTimeAttackStarted ? `url(${timedVanisingDoorImage})` : undefined
+                          ) :
                           cell === 'E' ? (
                             rowIndex === timeAttackPositions[1][0] && cellIndex === timeAttackPositions[1][1] && !isTimeAttackStarted ? `url(${countDownImage})` : undefined
                           ) :
