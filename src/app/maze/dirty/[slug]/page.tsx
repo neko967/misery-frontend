@@ -19,7 +19,9 @@ export default function Dealer({ params }: { params: { slug: string } }) {
   const brickImage = "/brick.png";
   const keyImage = "/keyImage.png";
   const countDownImage = "/countDownImage.png";
-  const keyPositions: number[][] = [[],[0,0],[6,2],[0,0],[1,6],[0,0],[14,29],[0,0],[2,19]];  //[[空の配列],[key1縦,key1横],[key2縦,key2横],[key3縦,key3横]]
+  const timedVanisingDoorImage = "/timedVanisingDoor.png";
+  const newsPaperImage = "/newsPaper.png";
+  const keyPositions: number[][] = [[],[0,0],[6,2],[0,0],[1,6],[0,0],[14,29],[0,0],[5,16]];  //[[空の配列],[key1縦,key1横],[key2縦,key2横],[key3縦,key3横]]
   const doorPositions: number[][] = [[],[13,1],[0,0],[12,15],[0,0],[14,26],[0,0],[9,27],[2,29]]; //[[空の配列],[door1縦,door1横],[door2縦,door2横],[door3縦,door3横]]
   const { height, width } = GetWindowSize();
   const cellSize = Math.min(width, height) / elements;
@@ -33,7 +35,7 @@ export default function Dealer({ params }: { params: { slug: string } }) {
   const [isGameStarted, setIsGameStarted] = useState(false);
   const [keys, setKeys] = useState({ key1: false, key2: false, key3: false, key4: false,
                                      key5: false, key6: false, key7: false, key8: false });
-  const wallPositions: number[][] = [[6,1],[6,3],[7,2],[5,2],[4,6],[14,5],[3,12],[5,29],[2,26],[13,29]]; // 出現・消失する壁
+  const wallPositions: number[][] = [[6,1],[6,3],[7,2],[5,2],[4,6],[14,5],[5,29],[2,26],[13,29]]; // 出現・消失する壁
   // const [wallPositions, setWallPositions] = useState<number[][]>([[16, 13]]);
   // 壁の表示/非表示を管理するstateを追加
   const [showWall, setShowWall] = useState(false);
@@ -48,6 +50,10 @@ export default function Dealer({ params }: { params: { slug: string } }) {
   }
   const [movingDot, setMovingDot] = useState({ x: 1, y: 3, direction: 1 }); // 移動するギミック。yを4にして、xを1から開始
   const [currentTextIndex, setCurrentTextIndex] = useState(0);
+  // カウントダウンタイマーを取得すると消失するドア
+  const timedVanisingDoor: number[][] = [[],[3,12]];
+  // 取得するとTrueEndに行ける新聞紙
+  const newsPaper: number[][] = [[],[1,12]];
 
   const storyTexts = [
     '閉ざされた屋敷の扉を押し開けると、そこはもはやただの屋敷ではなかった。',
@@ -241,7 +247,8 @@ export default function Dealer({ params }: { params: { slug: string } }) {
                              || (y == doorPositions[6][0] && x == doorPositions[6][1] && !keys.key6)
                              || (y == doorPositions[7][0] && x == doorPositions[7][1] && !keys.key7)
                              || (y == doorPositions[8][0] && x == doorPositions[8][1] && !keys.key8)
-                             || (maze[y][x] === 'W' && showWall)) 
+                             || (maze[y][x] === 'W' && showWall)
+                             || (y == timedVanisingDoor[1][0] && x == timedVanisingDoor[1][1]) && !isTimeAttackStarted)
                              {
         ws.send('gameover');
       } else if (maze[y][x] === 'G') {
@@ -274,11 +281,11 @@ export default function Dealer({ params }: { params: { slug: string } }) {
   const maze = [
 //    0    1    2    3    4    5    6    7    8    9   10   11   12   13   14   15   16   17   18   19   20   21   22   23   24   25   26   27   28   29   30   31   32   33
     ['#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#'],
-    ['#', ' ', ' ', ' ', ' ', ' ', 'K', ' ', ' ', '#', '#', ' ', ' ', ' ', '#', '#', '#', '#', '#', '#', '#', 'E', ' ', ' ', '#', '#', ' ', '#', '#', 'G', '#'],
-    ['#', ' ', '#', '#', '#', '#', '#', '#', ' ', '#', '#', ' ', ' ', ' ', '#', ' ', ' ', ' ', '#', 'K', ' ', ' ', '#', ' ', ' ', ' ', ' ', '#', '#', '*', '#'],
-    ['#', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '#', '#', '#', ' ', '#', '#', ' ', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', ' ', '#', '#', ' ', '#'],
-    ['#', '#', '#', '#', '#', '#', ' ', '#', '#', '#', ' ', ' ', ' ', ' ', ' ', ' ', '#', '#', ' ', ' ', ' ', ' ', '#', '#', '#', '#', ' ', '#', '#', ' ', '#'],
-    ['#', ' ', ' ', ' ', '#', '#', ' ', '#', '#', '#', ' ', '#', '#', '#', '#', '#', '#', '#', ' ', '#', '#', ' ', ' ', '#', '#', '#', ' ', '#', ' ', ' ', '#'],
+    ['#', ' ', ' ', ' ', ' ', ' ', 'K', ' ', ' ', '#', '#', ' ', 'N', ' ', '#', ' ', ' ', '#', '#', '#', '#', 'E', ' ', ' ', '#', '#', ' ', '#', '#', 'G', '#'],
+    ['#', ' ', '#', '#', '#', '#', '#', '#', ' ', '#', '#', ' ', ' ', ' ', '#', '#', ' ', ' ', ' ', ' ', ' ', ' ', '#', ' ', ' ', ' ', ' ', '#', '#', '*', '#'],
+    ['#', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '#', '#', '#', 'D', '#', '#', '#', ' ', '#', '#', '#', '#', '#', '#', '#', '#', '#', ' ', '#', '#', ' ', '#'],
+    ['#', '#', '#', '#', '#', '#', ' ', '#', '#', '#', ' ', ' ', ' ', ' ', ' ', '#', ' ', '#', ' ', ' ', ' ', ' ', '#', '#', '#', '#', ' ', '#', '#', ' ', '#'],
+    ['#', ' ', ' ', ' ', '#', '#', ' ', '#', '#', '#', ' ', '#', '#', '#', '#', '#', 'K', '#', ' ', '#', '#', ' ', ' ', '#', '#', '#', ' ', '#', ' ', ' ', '#'],
     ['#', ' ', 'K', ' ', '#', '#', ' ', '#', '#', '#', ' ', '#', ' ', ' ', ' ', '#', '#', '#', ' ', '#', '#', '#', '#', '#', '#', '#', ' ', ' ', ' ', '#', '#'],
     ['#', ' ', ' ', ' ', '#', '#', ' ', '#', '#', '#', ' ', ' ', ' ', '#', ' ', '#', '#', '#', ' ', '#', ' ', ' ', ' ', ' ', '#', '#', '#', ' ', '#', '#', '#'],
     ['#', '#', '#', ' ', '#', '#', ' ', ' ', ' ', '#', ' ', '#', '#', '#', ' ', ' ', '#', '#', ' ', ' ', ' ', '#', '#', ' ', '#', '#', '#', ' ', '#', '#', '#'],
@@ -401,7 +408,6 @@ export default function Dealer({ params }: { params: { slug: string } }) {
                     backgroundColor:
                         (rowIndex === movingDot.y && cellIndex === movingDot.x) ? 'orange' : // 動く点の色
                         cell === '#' ? 'black' : 
-                        cell === '#' ? 'black' :
                         cell === 'S' ? 'green' :
                         cell === 'G' ? 'red' :
                         cell === 'E' ? 'white' :
@@ -412,13 +418,14 @@ export default function Dealer({ params }: { params: { slug: string } }) {
                     backgroundImage:
                     (rowIndex === movingDot.y && cellIndex === movingDot.x) ? `url(${girlImage})` :
                         cell === 'W' ? (showWall ? `url(${needleImage})` : 'none') : 
-                        
-                        
                         cell === '#' ? `url(${brickImage})` :
+                        cell === 'N' ? `url(${newsPaperImage})` :
+                        cell === 'D' ? (
+                          rowIndex === timedVanisingDoor[1][0] && cellIndex === timedVanisingDoor[1][1] && !isTimeAttackStarted ? `url(${timedVanisingDoorImage})` : undefined
+                        ) :
                         cell === 'E' ? (
                           rowIndex === timeAttackPositions[1][0] && cellIndex === timeAttackPositions[1][1] && !isTimeAttackStarted ?`url(${countDownImage})` : undefined
                         ) :
-                        
                         cell === 'K' ? (
                           rowIndex === keyPositions[1][0] && cellIndex === keyPositions[1][1] && !keys.key1 ? `url(${keyImage})` :
                           rowIndex === keyPositions[2][0] && cellIndex === keyPositions[2][1] && !keys.key2 ? `url(${keyImage})` :
@@ -439,21 +446,18 @@ export default function Dealer({ params }: { params: { slug: string } }) {
                           rowIndex === doorPositions[7][0] && cellIndex === doorPositions[7][1] && !keys.key7 ? `url(${doorImage})` :
                           rowIndex === doorPositions[8][0] && cellIndex === doorPositions[8][1] && !keys.key8 ? `url(${doorImage})` : undefined
                         ) :
-                        
                         undefined,
                 }}
               ></div>
             ))
           )}
           <div className="fixed top-4 right-4">
-          <div className="bg-pink-500 text-white py-2 px-4 rounded shadow-lg">
-          
-          {!isGameOver && isTimeAttackStarted && <div>残り時間：{timeLeft}秒</div>}
-          </div>
+            <div className="bg-pink-500 text-white py-2 px-4 rounded shadow-lg">
+              {!isGameOver && isTimeAttackStarted && <div>残り時間：{timeLeft}秒</div>}
+            </div>
           </div>
         </div>
       )}
-      
     </main>
     </div>
   );
