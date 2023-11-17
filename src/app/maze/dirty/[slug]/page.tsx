@@ -54,6 +54,12 @@ export default function Dealer({ params }: { params: { slug: string } }) {
   const timedVanisingDoor: number[][] = [[],[3,12]];
   // 取得するとTrueEndに行ける新聞紙
   const newsPaper: number[][] = [[],[1,12]];
+  // 新聞紙の表示/非表示を管理するステート trueが表示、falseが非表示
+  const [newsPaperState, setNewsPaperState] = useState(true);
+  // マウスが新聞紙のマスに当たると実行される関数
+  const hideNewspaper = () => {
+    setNewsPaperState(false);
+  };
 
   const storyTexts = [
     '閉ざされた屋敷の扉を押し開けると、そこはもはやただの屋敷ではなかった。',
@@ -139,8 +145,8 @@ export default function Dealer({ params }: { params: { slug: string } }) {
   }, [params.slug]);
 
   const playGameOverSound = () => {
-    const sound = new Audio("/horror_sound.wav");
-    sound.play();
+    //const sound = new Audio("/horror_sound.wav");
+    //sound.play();
   };
 
   const restartGame = () => {
@@ -151,6 +157,7 @@ export default function Dealer({ params }: { params: { slug: string } }) {
     setTimeLeft(30);
     setIsCleanGameClear(false);
     setIsDirtyGameClear(false);
+    setNewsPaperState(true);
     setKeys({
       key1: false,
       key2: false,
@@ -273,11 +280,14 @@ export default function Dealer({ params }: { params: { slug: string } }) {
         ws.send('getkey7');
       } else if (y === keyPositions[8][0] && x === keyPositions[8][1] && maze[y][x] === 'K') {
         ws.send('getkey8');
+      } else if (y === newsPaper[1][0] && x === newsPaper[1][1] && maze[y][x] === 'N') {
+        hideNewspaper();
       } else {
         setPlayerPosition({ x, y });
       }
     }
   };
+
   const maze = [
 //    0    1    2    3    4    5    6    7    8    9   10   11   12   13   14   15   16   17   18   19   20   21   22   23   24   25   26   27   28   29   30   31   32   33
     ['#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#'],
@@ -308,6 +318,10 @@ export default function Dealer({ params }: { params: { slug: string } }) {
 
   async function goEndingDirty() {
     router.push(`/ending/dirty/${params.slug}`);
+  }
+
+  async function goEndingTrue() {
+    router.push(`/ending/true`);
   }
 
   return (
@@ -364,7 +378,7 @@ export default function Dealer({ params }: { params: { slug: string } }) {
         >迷路を進む
         </button>
       ) :isGameOver ? (
-          <div> 
+        <div> 
           <Image src={localImage} alt="ホラー" />
           {resetButton &&
             <div className="reset">
@@ -372,6 +386,16 @@ export default function Dealer({ params }: { params: { slug: string } }) {
             </div>
           }
         </div>
+      ) : isDirtyGameClear && !newsPaperState ? (
+        <>
+          <div className="congratulation">congratulation!!</div>
+          {isDirtyGameClear && isCleanGameClear &&
+            <button onClick={goEndingTrue}
+                    className="exit">
+              屋敷を出る
+            </button>
+          }
+        </>
       ) : isDirtyGameClear ? (
         <>
           <div className="congratulation">congratulation!!</div>
@@ -419,7 +443,9 @@ export default function Dealer({ params }: { params: { slug: string } }) {
                     (rowIndex === movingDot.y && cellIndex === movingDot.x) ? `url(${girlImage})` :
                         cell === 'W' ? (showWall ? `url(${needleImage})` : 'none') : 
                         cell === '#' ? `url(${brickImage})` :
-                        cell === 'N' ? `url(${newsPaperImage})` :
+                        cell === 'N' ? (
+                          rowIndex === newsPaper[1][0] && cellIndex === newsPaper[1][1] && newsPaperState ? `url(${newsPaperImage})` : undefined
+                        ) :
                         cell === 'D' ? (
                           rowIndex === timedVanisingDoor[1][0] && cellIndex === timedVanisingDoor[1][1] && !isTimeAttackStarted ? `url(${timedVanisingDoorImage})` : undefined
                         ) :
