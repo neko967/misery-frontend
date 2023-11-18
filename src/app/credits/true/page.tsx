@@ -70,7 +70,6 @@ export default function Home() {
 
       <div className="absolute bottom-20 left-20 text-xl">
         <p>True End: 少女の正体</p>
-        <p>JOIN ROOMに"MISERY"と打ち込むと...？</p>
       </div>
       {/* トップページへのリンク */}
       <Link href="/"

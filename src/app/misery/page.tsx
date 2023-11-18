@@ -157,14 +157,14 @@ return (
      currentTextIndexBook2 === storyTextsBook2.length && currentTextIndexBook3 === storyTextsBook3.length && (
       <>
         <div
-          className="absolute left-1/4 top-3/4 h-48 w-48 bg-cover hover:rotate-6 z-10 translate-x-[calc(-50%)] translate-y-[calc(-50%)]"
-          style={{ backgroundImage: "url('/book.png')"}}
+          className="absolute left-1/4 top-3/4 h-48 w-96 bg-cover hover:rotate-6 z-10 translate-x-[calc(-50%)] translate-y-[calc(-50%)]"
+          style={{ backgroundImage: "url('/book2.png')"}}
           onClick={handleClickBook1}
         >
         </div>
         <div
-          className="absolute left-1/2 top-3/4 h-48 w-48 bg-cover hover:rotate-6 z-10 translate-x-[calc(-50%)] translate-y-[calc(-50%)]"
-          style={{ backgroundImage: "url('/book.png')"}}
+          className="absolute left-1/2 top-3/4 h-48 w-96 bg-cover hover:rotate-6 z-10 translate-x-[calc(-50%)] translate-y-[calc(-50%)]"
+          style={{ backgroundImage: "url('/book2.png')"}}
           onClick={handleClickBook2}
         >
         </div>
