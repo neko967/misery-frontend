@@ -801,3 +801,61 @@ opacity: 1; /* ホバー時に不透明度を戻す */
               0px 1px 0 #000000,  0-1px 0 #000000,
               -1px 0 0 #000000, 1px 0 0 #000000;
 }
+
+.end_title {
+  /* フォント */
+  font-family: 'メイリオ', sans-serif;
+  font-size: 32px;
+  color: #333;
+  
+  /* 文字の影 */
+  text-shadow: 
+    -1px -1px 0 #fff,
+    1px -1px 0 #fff,
+    -1px 1px 0 #fff,
+    1px 1px 0 #fff;
+
+  /* グラデーション */
+  background: linear-gradient(to right, #f00, #ff0);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  
+  /* アニメーション */
+  animation: shine 2s linear infinite;
+}
+
+@keyframes shine {
+  0% {
+    background-position: 0;
+  }
+  60% {
+    background-position: 600px;
+  }
+  100% {
+    background-position: 600px;
+  }
+}
+.true_title {
+
+  color: #fff;
+  font-size: 20px;
+  font-weight: bold;
+
+  /* 文字の縁取り */
+  text-shadow: 
+    -2px -2px 0 #000,  
+     2px -2px 0 #000,
+    -2px 2px 0 #000,
+     2px 2px 0 #000;
+
+  
+
+  /* 丸みをつける */
+ 
+  padding: 5px 20px;
+  position: absolute;
+  top: 93.5%;
+  left: 42.5%;
+  transform: translate(-50%, -50%);
+
+}
