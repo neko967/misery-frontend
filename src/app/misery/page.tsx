@@ -11,7 +11,11 @@ const [ book2, setBook2 ] = useState(false);
 const [ book3, setBook3 ] = useState(false);
 
 const storyTexts = [
-  'ミザリーの過去に招かれたという説明',
+  '突然、目の前の光景が変わり、見知らぬ部屋に立っていた。',
+  '荒れた壁がかつての栄華を色褪せた色彩でささやき、窓から差し込む柔らかな光が、床に長い影を落とし、ベッドに座る幼い少女、ミザリーの姿を温かく照らしていた。',
+  '彼女はただ窓を見つめているが、その透き通る瞳には何の焦点もなく、まるで外の世界から切り離されているかのようだった。',
+  'ここはどうやらミザリーの部屋のようだ。彼女はゆっくりと語りかけてくる。',
+  '「」',
 ];
 
 const storyTextsBook1 = [
@@ -157,20 +161,20 @@ return (
      currentTextIndexBook2 === storyTextsBook2.length && currentTextIndexBook3 === storyTextsBook3.length && (
       <>
         <div
-          className="absolute left-1/4 top-3/4 h-48 w-96 bg-cover hover:rotate-6 z-10 translate-x-[calc(-50%)] translate-y-[calc(-50%)]"
-          style={{ backgroundImage: "url('/book2.png')"}}
+          className="absolute left-1/4 top-3/4 h-48 w-72 bg-cover hover:rotate-6 z-10 translate-x-[calc(-50%)] translate-y-[calc(-50%)]"
+          style={{ backgroundImage: "url('/book4.png')"}}
           onClick={handleClickBook1}
         >
         </div>
         <div
-          className="absolute left-1/2 top-3/4 h-48 w-96 bg-cover hover:rotate-6 z-10 translate-x-[calc(-50%)] translate-y-[calc(-50%)]"
-          style={{ backgroundImage: "url('/book2.png')"}}
+          className="absolute left-1/2 top-3/4 h-48 w-72 bg-cover hover:rotate-6 z-10 translate-x-[calc(-50%)] translate-y-[calc(-50%)]"
+          style={{ backgroundImage: "url('/book4.png')"}}
           onClick={handleClickBook2}
         >
         </div>
         <div
-          className="absolute left-3/4 top-3/4 h-48 w-48 bg-cover hover:rotate-6 z-10 translate-x-[calc(-50%)] translate-y-[calc(-50%)]"
-          style={{ backgroundImage: "url('/book.png')"}}
+          className="absolute left-3/4 top-3/4 h-48 w-72 bg-cover hover:rotate-6 z-10 translate-x-[calc(-50%)] translate-y-[calc(-50%)]"
+          style={{ backgroundImage: "url('/book4.png')"}}
           onClick={handleClickBook3}
         >
         </div>

@@ -32,6 +32,11 @@ export default function Home() {
 
   async function joinRoom() {
     const name = prompt("招待コードを入力してください");
+    if (name === "MISERY") {
+      alert("ようこそ...");
+      router.push(`/misery`);
+      return;
+    }
     const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_HTTP_URL}/api/join-room/${name}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
