@@ -27,49 +27,11 @@ export default function Home() {
       </div>
      
       {/* Twitterリンク */}
-      <button className="icon"
-              onClick={() => {
-                       const tweetOptions = [
-                         "この館の残影に、闇よりも深い秘密が眠る。",
-                         "彼らが挑む、過去の鎖を断ち切る試練。",
-                         "生ける者に告ぐ、彼女の闇に踏み入るな。",
-                         "彼女の呪縛は永遠なり、その呼び声に応える者は…。",
-                         "亡霊少女の遊戯、その終わりなき螺旋。",
-                         "破滅を招く少女、その影が映すは真か謎か。",
-                         "彼らの運命は交錯し、一人の少女と邂逅する。",
-                         "館は語る、千年の孤独を、少女の絶望を。",
-                         "館に響くは、禁断の詠唱。",
-                         "屋敷の門を開く者、永遠の闇に囚われん。",
-                         "逃れがたき呪縛の館、あなたは真実を見つけ出せるか。",
-                         "この洋館に響くは、悲劇のメロディー。彼女の声が導く、終焉のダンスへ。",
-                         "閉ざされた扉の向こうに、彼女は不死の孤独を紡ぐ。",
-                         "遺されし館の呪い、静寂が叫びに変わる時。",
-                         "暗闇に浮かぶ一筋の光、それは彼女の怨嗟か、救済か。",
-                         "彼女の名を呼ぶは、禁断を犯すこと。",
-                         "二人が目撃する闇は、時を超えし絶望の追憶。",
-                         "古の呪いが呼び覚ます、彼女の叫びを此処で聴け。",
-                         "館にうごめく、絶望の鎮魂歌。",
-                         "閉じ込められた過去が今、現実を織りなす枷となる。",
-                         "彼女の悲鳴は、夜の帳を切り裂く禁断の調べ。",
-                         
-                         
-                       ];
-                        const tweetText = tweetOptions[Math.floor(Math.random() * tweetOptions.length)];
-                        const pageUrl = "https://misery-seven.vercel.app/";
-
-                        // Twitter Intentでテキストと画像URLを含めてツイート
-                        window.open(
-                          `https://twitter.com/share?url=${encodeURIComponent(pageUrl)}&text=${encodeURIComponent(tweetText)}
-                          &hashtags=MISERY`,
-                          '_blank' 
-                        ); 
-                      }}
-      >
-        <TwitterIcon />  
-      </button>
+      <div className="true_title">ヒント:JOIN ROOMに"MISERY"と入力すると...？</div>
+           
 
       <div className="absolute bottom-20 left-20 text-xl">
-        <p>True End: 少女の正体</p>
+        <p className="end_title">True End: 少女の正体</p>
       </div>
       {/* トップページへのリンク */}
       <Link href="/"

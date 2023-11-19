@@ -94,7 +94,7 @@ export default function Home({ params }: { params: { slug: string } }) {
       </button>
 
       <div className="absolute bottom-20 left-20 text-xl">
-        <p>Normal End: 少女の謎</p>
+        <p className="end_title">Normal End: 少女の謎</p>
       </div>
       {/* トップページへのリンク */}
       <Link href="/"
