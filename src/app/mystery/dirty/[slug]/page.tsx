@@ -2,7 +2,6 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from "next/image";
-import { GetWindowSize } from "../../../../hooks/GetWindowSize";
 
 // アイテム型定義
 type Item = {
@@ -73,6 +72,7 @@ export default function Home({ params }: { params: { slug: string } }) {
   const [cleanIsReadyToAcceptItem, setCleanIsReadyToAcceptItem] = useState(false);
   const [dirtyIsReadyToAcceptItem, setDirtyIsReadyToAcceptItem] = useState(false);
   const [currentTextIndex, setCurrentTextIndex] = useState(0);
+  const [diaryCurrentTextIndex, setDiaryCurrentTextIndex] = useState(14);
   const [isGameOver, setIsGameOver] = useState(false);
 
   const storyTexts = [
@@ -86,26 +86,42 @@ export default function Home({ params }: { params: { slug: string } }) {
     setCurrentTextIndex((prevIndex) => prevIndex + 1);
   };
 
+  const diaryTexts = [
+    '5月3日',
+    '毎日が同じ。窓から外の世界を眺めることしかできない。部屋の中はもう狭く感じる。',
+    '壁には剥がれかけた壁紙が、昔の楽しかった日々を思い出させる。',
+    '親はまた教会に行った。彼らは「信仰が全てを解決する」と言うが、私の空腹は消えない。',
+    '昨日の夜は、また食べるものがなかった。キッチンには食べ物があるはずだけど、ドアはいつも鍵がかかっている。',
+    
+    '5月10日',
+    '今日は何も食べていない。お腹が空いて、空いて、もう考えることすらできない。',
+    '壁には自分の落書きで埋め尽くされている。文字や絵で、自分の気持ちを表現するしかない。',
+    '昔、母が作ってくれた温かい食事を思い出す。でも今は、ただの遠い記憶。部屋から出られる日は来るのだろうか。',
+    
+    '5月17日',
+    '親が戻ってきた時、私は声を出して助けを求めた。でも、彼らは私の声を無視して、自分たちの祈りに没頭している。',
+    '彼らの世界では、私はもう存在していないようだ。',
+    '壁に新しい絵を描いた。自由を夢見る鳥の絵だ。',
+    'いつか、この部屋から飛び立ち、自分の翼で大空を飛べる日が来ると信じている。',
+  ];
+
+  const nextTextDiary = () => {
+    setDiaryCurrentTextIndex((prevIndex) => prevIndex + 1);
+  };
+
   // 配列にて、アイテム、メッセージ、選択肢等をオブジェクトの形で管理。
   const items: Item[] = [
     {
       id: 1,
       name: '日記',
-      positionClasses: "invisible absolute top-1/2 left-1/2 translate-x-[calc(-50%+360px)] translate-y-[calc(-50%+350px)]",
-      width: "w-64",
-      height: "h-20",
+      positionClasses: "absolute top-2/3 left-1/3 translate-x-[calc(-50%)] translate-y-[calc(-50%)] opacity-0",
+      width: "w-36",
+      height: "h-16",
       // コメントアウトで、クリック部分の色を消す
       additionalStyles: { background: 'rgba(255, 255, 255, 0.1)', borderRadius: '8px' },
       messages: [
         {
-          text: "日記を開きますか？",
-          choices: {
-            confirmText: "開く",
-            cancelText: "開かない"
-          }
-        },
-        {
-          text: "日記の内容を読みますか？",
+          text: "ベッドの上に誰かの日記がある。読みますか？",
           choices: {
             confirmText: "読む",
             cancelText: "読まない"
@@ -423,6 +439,9 @@ export default function Home({ params }: { params: { slug: string } }) {
       setCurrentItem(null);
     } else if (currentItem && currentItem.name === 'ドア') {
       router.push(`/maze/dirty/${params.slug}`);
+    } else if (currentItem && currentItem.name === '日記') {
+      setDiaryCurrentTextIndex(0);
+      setCurrentItem(null);
     } else {
       if (currentItem) {
         setAcquiredItems([...acquiredItems, currentItem]);
@@ -771,16 +790,39 @@ export default function Home({ params }: { params: { slug: string } }) {
               </div>
             </div>
           )}
-          {/* Buttons */}
-          {currentTextIndex >= storyTexts.length && (
+          {/* Diary Texts */}
+          {diaryCurrentTextIndex < diaryTexts.length && (
             <div
               style={{
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
+                position: 'absolute', // Keep this as absolute
+                top: '50%', // Align top edge of element to the center of the screen vertically
+                left: '50%', // Align left edge of element to the center of the screen horizontally
+                transform: 'translate(-50%, -50%)', // Shift element to the left and up by 50% of its own width and height
+                backgroundColor: 'rgba(0, 0, 0, 0.56)',
+                color: 'white',
+                padding: '20px',
+                borderRadius: '10px',
+                textAlign: 'center',
+                width: '1000px', // You might want to ensure this width is responsive
+                maxHeight: '80vh',
+                overflowY: 'auto',
                 zIndex: 1000,
               }}
             >
+              <p style={{ margin: '10px', height: '20px' }}>{diaryTexts[diaryCurrentTextIndex]}</p>
+              <div
+                style={{
+                  position: 'absolute',
+                  right: '10px',
+                  bottom: '10px',
+                  cursor: 'pointer',
+                  fontSize: '24px',
+                  animation: 'bounce 1s infinite'
+                }}
+                onClick={nextTextDiary}
+              >
+                ▼
+              </div>
             </div>
           )}
         </div>

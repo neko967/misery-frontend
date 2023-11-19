@@ -117,6 +117,7 @@ export default function Home({ params }: { params: { slug: string } }) {
   const [cleanIsReadyToAcceptItem, setCleanIsReadyToAcceptItem] = useState(false);
   const [dirtyIsReadyToAcceptItem, setDirtyIsReadyToAcceptItem] = useState(false);
   const [currentTextIndex, setCurrentTextIndex] = useState(0);
+  const [diaryCurrentTextIndex, setDiaryCurrentTextIndex] = useState(12);
   const [isGameOver, setIsGameOver] = useState(false);
 
   const storyTexts = [
@@ -130,26 +131,41 @@ export default function Home({ params }: { params: { slug: string } }) {
     setCurrentTextIndex((prevIndex) => prevIndex + 1);
   };
 
+  const diaryTexts = [
+    '3月28日',
+    '今日、私たちの幸せな家庭が崩れ始めた。宴会で出会った人が、私に信じられない話をした。',
+    '夫が浮気をしているというのだ。最初は信じられなかったが、疑念は心の中で大きくなり、家族の平和を脅かし始めた。',
+    
+    '4月11日',
+    '夫との関係は悪化の一途を辿り、ついに私たちは離婚訴訟に至った。',
+    '私は裁判で勝つためには、質素な生活を送らなければならないとアドバイスされた。これが私と子供たちにとって最善の策だと信じている。',
+    
+    '4月30日',
+    '娘の体重が増えると、療育費が減ると聞いた。だから、彼女には厳しい食事制限を課している。',
+    '部屋に閉じ込めて、食事を減らしているのは彼女のためだと信じている。',
+    
+    '5月20日',
+    '娘は弱っている。彼女の部屋からは、もはや元気な声は聞こえない。',
+    '私はただ、このすべてが終わり、私たちが再び平和な生活を取り戻せることを願っている。私の決断は正しいのだろうか。',
+  ];
+
+  const nextTextDiary = () => {
+    setDiaryCurrentTextIndex((prevIndex) => prevIndex + 1);
+  };
+
   // 配列にて、アイテム、メッセージ、選択肢等をオブジェクトの形で管理。
   const items: Item[] = [
     {
       id: 1,
       name: '日記',
-      positionClasses: "invisible absolute top-1/2 left-1/2 translate-x-[calc(-50%+360px)] translate-y-[calc(-50%+350px)]",
-      width: "w-64",
-      height: "h-20",
+      positionClasses: "absolute top-3/4 left-3/4 translate-x-[calc(-50%-40px)] translate-y-[calc(-50%+100px)] opacity-0",
+      width: "w-32",
+      height: "h-16",
       // コメントアウトで、クリック部分の色を消す
       additionalStyles: { background: 'rgba(255, 255, 255, 0.1)', borderRadius: '8px' },
       messages: [
         {
-          text: "日記を開きますか？",
-          choices: {
-            confirmText: "開く",
-            cancelText: "開かない"
-          }
-        },
-        {
-          text: "日記の内容を読みますか？",
+          text: "誰かの日記が落ちている。読みますか？",
           choices: {
             confirmText: "読む",
             cancelText: "読まない"
@@ -606,6 +622,9 @@ export default function Home({ params }: { params: { slug: string } }) {
       }
       setAcquiredRedBox(true);
       setMessageIndex(2);
+    } else if (currentItem && currentItem.name === '日記') {
+      setDiaryCurrentTextIndex(0);
+      setCurrentItem(null);
     } else if (currentItem && messageIndex < currentItem.messages.length - 1) {
       setMessageIndex(prevIndex => prevIndex + 1);
     } else {
@@ -953,7 +972,7 @@ export default function Home({ params }: { params: { slug: string } }) {
               <TriangleButton direction="left" handleClickTriangle={() => switchBackgroundImage('left')} />
             </>
           )}
-    
+
           {/* 壁の穴を表示しているとき */}
           {backgroundImage === '/wall.png' && (
             <>
@@ -1144,16 +1163,39 @@ export default function Home({ params }: { params: { slug: string } }) {
               </div>
             </div>
           )}
-          {/* Buttons */}
-          {currentTextIndex >= storyTexts.length && (
+          {/* Diary Texts */}
+          {diaryCurrentTextIndex < diaryTexts.length && (
             <div
               style={{
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
+                position: 'absolute', // Keep this as absolute
+                top: '50%', // Align top edge of element to the center of the screen vertically
+                left: '50%', // Align left edge of element to the center of the screen horizontally
+                transform: 'translate(-50%, -50%)', // Shift element to the left and up by 50% of its own width and height
+                backgroundColor: 'rgba(0, 0, 0, 0.56)',
+                color: 'white',
+                padding: '20px',
+                borderRadius: '10px',
+                textAlign: 'center',
+                width: '1000px', // You might want to ensure this width is responsive
+                maxHeight: '80vh',
+                overflowY: 'auto',
                 zIndex: 1000,
               }}
             >
+              <p style={{ margin: '10px', height: '20px' }}>{diaryTexts[diaryCurrentTextIndex]}</p>
+              <div
+                style={{
+                  position: 'absolute',
+                  right: '10px',
+                  bottom: '10px',
+                  cursor: 'pointer',
+                  fontSize: '24px',
+                  animation: 'bounce 1s infinite'
+                }}
+                onClick={nextTextDiary}
+              >
+                ▼
+              </div>
             </div>
           )}
         </div>
