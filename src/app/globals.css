@@ -835,6 +835,8 @@ opacity: 1; /* ホバー時に不透明度を戻す */
     background-position: 600px;
   }
 }
+
+
 .true_title {
 
   color: #fff;
@@ -859,3 +861,4 @@ opacity: 1; /* ホバー時に不透明度を戻す */
   transform: translate(-50%, -50%);
 
 }
+
