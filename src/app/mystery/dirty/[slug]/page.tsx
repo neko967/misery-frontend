@@ -2,7 +2,6 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from "next/image";
-import { GetWindowSize } from "../../../../hooks/GetWindowSize";
 
 // アイテム型定義
 type Item = {
@@ -73,6 +72,8 @@ export default function Home({ params }: { params: { slug: string } }) {
   const [cleanIsReadyToAcceptItem, setCleanIsReadyToAcceptItem] = useState(false);
   const [dirtyIsReadyToAcceptItem, setDirtyIsReadyToAcceptItem] = useState(false);
   const [currentTextIndex, setCurrentTextIndex] = useState(0);
+  const [diaryCurrentTextIndex, setDiaryCurrentTextIndex] = useState(14);
+  const [isGameOver, setIsGameOver] = useState(false);
 
   const storyTexts = [
     '部屋に入ると、ドアが勢いよく閉じた。',
@@ -85,26 +86,41 @@ export default function Home({ params }: { params: { slug: string } }) {
     setCurrentTextIndex((prevIndex) => prevIndex + 1);
   };
 
+  const diaryTexts = [
+    '5月3日',
+    '毎日が同じ。窓から外の世界を眺めることしかできない。部屋の中はもう狭く感じる。',
+    '壁には剥がれかけた壁紙が、昔の楽しかった日々を思い出させる。',
+    '昨日の夜は、また食べるものがなかった。キッチンには食べ物があるはずだけど、ドアはいつも鍵がかかっている。',
+    
+    '5月10日',
+    '今日は何も食べていない。お腹が空いて、空いて、もう考えることすらできない。',
+    '壁には自分の落書きで埋め尽くされている。文字や絵で、自分の気持ちを表現するしかない。',
+    '昔、母が作ってくれた温かい食事を思い出す。でも今は、ただの遠い記憶。部屋から出られる日は来るのだろうか。',
+    
+    '5月17日',
+    '親が戻ってきた時、私は声を出して助けを求めた。でも、彼らは私の声を無視して、自分たちの祈りに没頭している。',
+    '彼らの世界では、私はもう存在していないようだ。',
+    '壁に新しい絵を描いた。自由を夢見る鳥の絵だ。',
+    'いつか、この部屋から飛び立ち、自分の翼で大空を飛べる日が来ると信じている。',
+  ];
+
+  const nextTextDiary = () => {
+    setDiaryCurrentTextIndex((prevIndex) => prevIndex + 1);
+  };
+
   // 配列にて、アイテム、メッセージ、選択肢等をオブジェクトの形で管理。
   const items: Item[] = [
     {
       id: 1,
       name: '日記',
-      positionClasses: "invisible absolute top-1/2 left-1/2 translate-x-[calc(-50%+360px)] translate-y-[calc(-50%+350px)]",
-      width: "w-64",
-      height: "h-20",
+      positionClasses: "absolute top-2/3 left-1/3 translate-x-[calc(-50%)] translate-y-[calc(-50%)] opacity-0",
+      width: "w-36",
+      height: "h-16",
       // コメントアウトで、クリック部分の色を消す
       additionalStyles: { background: 'rgba(255, 255, 255, 0.1)', borderRadius: '8px' },
       messages: [
         {
-          text: "日記を開きますか？",
-          choices: {
-            confirmText: "開く",
-            cancelText: "開かない"
-          }
-        },
-        {
-          text: "日記の内容を読みますか？",
+          text: "ベッドの上に誰かの日記がある。読みますか？",
           choices: {
             confirmText: "読む",
             cancelText: "読まない"
@@ -422,6 +438,9 @@ export default function Home({ params }: { params: { slug: string } }) {
       setCurrentItem(null);
     } else if (currentItem && currentItem.name === 'ドア') {
       router.push(`/maze/dirty/${params.slug}`);
+    } else if (currentItem && currentItem.name === '日記') {
+      setDiaryCurrentTextIndex(0);
+      setCurrentItem(null);
     } else {
       if (currentItem) {
         setAcquiredItems([...acquiredItems, currentItem]);
@@ -574,6 +593,8 @@ export default function Home({ params }: { params: { slug: string } }) {
             setCleanIsReadyToAcceptItem(true);
           } else if (event.data == "cleanIsNotReadyToAcceptItem") {
             setCleanIsReadyToAcceptItem(false);
+          } else if (event.data == "mysteryGameOver") {
+            setIsGameOver(true);
           }
         };
 
@@ -584,7 +605,7 @@ export default function Home({ params }: { params: { slug: string } }) {
     }
 
     checkRoomExists();
-  }, [params.slug, selectedItem]);
+  }, [params.slug]);
 
   //音
   const playGunSound = () => {
@@ -592,175 +613,234 @@ export default function Home({ params }: { params: { slug: string } }) {
     sound.play();
   };
 
+  const reStartGame = () => {
+    setIsCleanDoorOpen(false);
+    setIsDirtyDoorOpen(false);
+    setIsBlueBoxBroken(false);
+    setAcquiredBlueBox(false);
+    setAcquiredBear(false);
+    setIsBearCutted(false);
+    setAcquiredItems([]);
+    setCurrentItem(null);
+    setMessageIndex(0);
+    setIsItemListVisible(false);
+    setSelectedItem(null);
+    setPutImageItem(null);
+    setBackgroundImage('/dirty_room.png');
+    setCleanIsReadyToAcceptItem(false);
+    setCurrentTextIndex(4);
+    setIsGameOver(false);
+  }
+
   return (
     <div className="relative h-screen w-screen">
-      <div
-        // 背景画像
-        className="bg-contain bg-center bg-no-repeat bg-black absolute top-1/2 left-1/2 translate-x-[-50%] translate-y-[-50%]"
-        style={{ backgroundImage: `url(${backgroundImage})`,
-                 width: `1300px`,
-                 height: `700px`}}
-      >
-        {/* 条件に基づいて左の三角形ボタンを表示 */}
-        {backgroundImage === '/wall.png' && (
-          <>
-            <button onClick={handleClickHole}
-                    className="text-white absolute top-1/2 left-1/2 translate-x-[calc(-50%+10px)] translate-y-[calc(-50%)] w-36 h-36"
-            >
-
-            </button>
-            {/* currentItemに値がある場合、以降のメッセージと選択を描画する */}
-            {currentItem && (
-              <>
-                <div className="fixed justify-center items-end bottom-4 left-0 right-0 flex">
-                  <div className="mb-20 w-3/5 p-20 relative">
-                    <div className="absolute top-0 left-0 w-full h-full border-4 border-gray-600 bg-gray-800 bg-opacity-50">
-                    {message && <Message text={message} />}
-                    </div>
-                  </div>
-                </div>
-  
-                <div className="fixed top-0 left-0 right-0 bottom-0 flex items-center justify-center">
-                  <div className="relative w-1/5 p-14">
-                    <div className="absolute top-0 left-0 w-full h-full border-4 border-gray-600 bg-gray-800 bg-opacity-50 flex flex-col items-center justify-center">
-                      <Choices
-                        onConfirm={handleConfirm}
-                        onCancel={handleCancel}  
-                        options={choicesOptions} 
-                      />
-                    </div>
-                  </div>
-                </div>
-              </>
-            )}
-            <TriangleButton direction="left" handleClickTriangle={() => switchBackgroundImage('left')} />
-          </>
-        )}
-
-        {/* 条件に基づいて右の三角形ボタンを表示 */}
-        {backgroundImage === '/dirty_room.png' && (
-          <>
-            {/* アイテム配置 */}
-            {items.map(item => (
-              <div
-                key={item.id} 
-                onClick={() => handleClick(item)}
-                className={`text-white ${item.positionClasses} cursor-pointer ${item.width} ${item.height} flex justify-center items-center`}
-                style={item.additionalStyles}
+      {!isGameOver ?
+        <div
+          // 背景画像
+          className="bg-contain bg-center bg-no-repeat bg-black absolute top-1/2 left-1/2 translate-x-[-50%] translate-y-[-50%]"
+          style={{ backgroundImage: `url(${backgroundImage})`,
+                   width: `1300px`,
+                   height: `700px`}}
+        >
+          {/* 条件に基づいて左の三角形ボタンを表示 */}
+          {backgroundImage === '/wall.png' && (
+            <>
+              <button onClick={handleClickHole}
+                      className="text-white absolute top-1/2 left-1/2 translate-x-[calc(-50%+10px)] translate-y-[calc(-50%)] w-36 h-36"
               >
-                {item.name}
-              </div>
-            ))}
-            {/* currentItemに値がある場合、以降のメッセージと選択を描画する */}
-            {currentItem && (
-              <>
-                <div className="fixed justify-center items-end bottom-4 left-0 right-0 flex">
-                  <div className="mb-20 w-3/5 p-20 relative">
-                    <div className="absolute top-0 left-0 w-full h-full border-4 border-gray-600 bg-gray-800 bg-opacity-50">
-                    {message && <Message text={message} />}
-                  </div>
-                </div>
-                </div>
   
-                <div className="fixed top-0 left-0 right-0 bottom-0 flex items-center justify-center">
-                  <div className="relative w-1/5 p-14">
-                    <div className="absolute top-0 left-0 w-full h-full border-4 border-gray-600 bg-gray-800 bg-opacity-50 flex flex-col items-center justify-center">
-                      <Choices
-                        onConfirm={handleConfirm}
-                        onCancel={handleCancel}  
-                        options={choicesOptions} 
-                      />
+              </button>
+              {/* currentItemに値がある場合、以降のメッセージと選択を描画する */}
+              {currentItem && (
+                <>
+                  <div className="fixed justify-center items-end bottom-4 left-0 right-0 flex">
+                    <div className="mb-20 w-3/5 p-20 relative">
+                      <div className="absolute top-0 left-0 w-full h-full border-4 border-gray-600 bg-gray-800 bg-opacity-50">
+                      {message && <Message text={message} />}
+                      </div>
                     </div>
                   </div>
-                </div>
-              </>
-            )}
-            <TriangleButton direction="right" handleClickTriangle={() => switchBackgroundImage('right')} />
-          </>
-        )}
-        
-        {/* 取得済みアイテム */}
-        <div className="absolute top-0 right-0 text-white">
-          <div className="bg-gray-800 bg-opacity-60 p-2 rounded-t-lg cursor-pointer hover:bg-opacity-70" onClick={() => setIsItemListVisible(!isItemListVisible)}>
-            <span>
-              アイテム一覧
-              <span className="ml-2">
-                {isItemListVisible ? '▲' : '▼'}
-              </span>
-            </span>
-          </div>
-          {isItemListVisible && (
-          <div className="bg-gray bg-opacity-60 p-2 rounded-b-lg shadow-xl border-t border-gray-500">
-            {acquiredItems.map(item => (
-              <div key={item.id} 
-                   className={`p-2 rounded-b-lg shadow-xl border-t ${((selectedItem && selectedItem.id === item.id) || (putImageItem && putImageItem.id ===item.id)) ? 'bg-red-600' : 'bg-gray-800 bg-opacity-60'}`} 
-                   onClick={() => handleItemSelect(item)}
-              >
-                {item.name}
-              </div>
-            ))}
-          </div>
+    
+                  <div className="fixed top-0 left-0 right-0 bottom-0 flex items-center justify-center">
+                    <div className="relative w-1/5 p-14">
+                      <div className="absolute top-0 left-0 w-full h-full border-4 border-gray-600 bg-gray-800 bg-opacity-50 flex flex-col items-center justify-center">
+                        <Choices
+                          onConfirm={handleConfirm}
+                          onCancel={handleCancel}  
+                          options={choicesOptions} 
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </>
+              )}
+              <TriangleButton direction="left" handleClickTriangle={() => switchBackgroundImage('left')} />
+            </>
           )}
-        </div>
-        {/* アイテムリストから選んだアイテムが画像を表示するもの（ぬいぐるみ、箱）の場合、画像を表示する */}
-        {putImageItem && putImageItem.imagePath && (
-          <Image src={putImageItem.imagePath} 
-                 alt={putImageItem.name}
-                 width={1280} 
-                 height={852}
-                 className="absolute top-1/2 left-1/2 translate-x-[-50%] translate-y-[-50%] w-96 h-96 z-10 cursor-pointer"
-                 priority
-                 onClick={handleClickItemImage}
-          />
-        )}
-        {/* Story Texts */}
-        {currentTextIndex < storyTexts.length && (
-          <div
-            style={{
-              position: 'absolute', // Keep this as absolute
-              top: '50%', // Align top edge of element to the center of the screen vertically
-              left: '50%', // Align left edge of element to the center of the screen horizontally
-              transform: 'translate(-50%, -50%)', // Shift element to the left and up by 50% of its own width and height
-              backgroundColor: 'rgba(0, 0, 0, 0.56)',
-              color: 'white',
-              padding: '20px',
-              borderRadius: '10px',
-              textAlign: 'center',
-              width: '1000px', // You might want to ensure this width is responsive
-              maxHeight: '80vh',
-              overflowY: 'auto',
-              zIndex: 1000,
-            }}
-          >
-            <p style={{ margin: '10px', height: '20px' }}>{storyTexts[currentTextIndex]}</p>
+  
+          {/* 条件に基づいて右の三角形ボタンを表示 */}
+          {backgroundImage === '/dirty_room.png' && (
+            <>
+              {/* アイテム配置 */}
+              {items.map(item => (
+                <div
+                  key={item.id} 
+                  onClick={() => handleClick(item)}
+                  className={`text-white ${item.positionClasses} cursor-pointer ${item.width} ${item.height} flex justify-center items-center`}
+                  style={item.additionalStyles}
+                >
+                  {item.name}
+                </div>
+              ))}
+              {/* currentItemに値がある場合、以降のメッセージと選択を描画する */}
+              {currentItem && (
+                <>
+                  <div className="fixed justify-center items-end bottom-4 left-0 right-0 flex">
+                    <div className="mb-20 w-3/5 p-20 relative">
+                      <div className="absolute top-0 left-0 w-full h-full border-4 border-gray-600 bg-gray-800 bg-opacity-50">
+                      {message && <Message text={message} />}
+                    </div>
+                  </div>
+                  </div>
+    
+                  <div className="fixed top-0 left-0 right-0 bottom-0 flex items-center justify-center">
+                    <div className="relative w-1/5 p-14">
+                      <div className="absolute top-0 left-0 w-full h-full border-4 border-gray-600 bg-gray-800 bg-opacity-50 flex flex-col items-center justify-center">
+                        <Choices
+                          onConfirm={handleConfirm}
+                          onCancel={handleCancel}  
+                          options={choicesOptions} 
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </>
+              )}
+              <TriangleButton direction="right" handleClickTriangle={() => switchBackgroundImage('right')} />
+            </>
+          )}
+          
+          {/* 取得済みアイテム */}
+          <div className="absolute top-0 right-0 text-white">
+            <div className="bg-gray-800 bg-opacity-60 p-2 rounded-t-lg cursor-pointer hover:bg-opacity-70" onClick={() => setIsItemListVisible(!isItemListVisible)}>
+              <span>
+                アイテム一覧
+                <span className="ml-2">
+                  {isItemListVisible ? '▲' : '▼'}
+                </span>
+              </span>
+            </div>
+            {isItemListVisible && (
+            <div className="bg-gray bg-opacity-60 p-2 rounded-b-lg shadow-xl border-t border-gray-500">
+              {acquiredItems.map(item => (
+                <div key={item.id} 
+                     className={`p-2 rounded-b-lg shadow-xl border-t ${((selectedItem && selectedItem.id === item.id) || (putImageItem && putImageItem.id ===item.id)) ? 'bg-red-600' : 'bg-gray-800 bg-opacity-60'}`} 
+                     onClick={() => handleItemSelect(item)}
+                >
+                  {item.name}
+                </div>
+              ))}
+            </div>
+            )}
+          </div>
+          {/* アイテムリストから選んだアイテムが画像を表示するもの（ぬいぐるみ、箱）の場合、画像を表示する */}
+          {putImageItem && putImageItem.imagePath && (
+            <Image src={putImageItem.imagePath} 
+                   alt={putImageItem.name}
+                   width={1280} 
+                   height={852}
+                   className="absolute top-1/2 left-1/2 translate-x-[-50%] translate-y-[-50%] w-96 h-96 z-10 cursor-pointer"
+                   priority
+                   onClick={handleClickItemImage}
+            />
+          )}
+          {/* Story Texts */}
+          {currentTextIndex < storyTexts.length && (
             <div
               style={{
-                position: 'absolute',
-                right: '10px',
-                bottom: '10px',
-                cursor: 'pointer',
-                fontSize: '24px',
-                animation: 'bounce 1s infinite'
+                position: 'absolute', // Keep this as absolute
+                top: '50%', // Align top edge of element to the center of the screen vertically
+                left: '50%', // Align left edge of element to the center of the screen horizontally
+                transform: 'translate(-50%, -50%)', // Shift element to the left and up by 50% of its own width and height
+                backgroundColor: 'rgba(0, 0, 0, 0.56)',
+                color: 'white',
+                padding: '20px',
+                borderRadius: '10px',
+                textAlign: 'center',
+                width: '1000px', // You might want to ensure this width is responsive
+                maxHeight: '80vh',
+                overflowY: 'auto',
+                zIndex: 1000,
               }}
-              onClick={nextText}
             >
-              ▼
+              <p style={{ margin: '10px', height: '20px' }}>{storyTexts[currentTextIndex]}</p>
+              <div
+                style={{
+                  position: 'absolute',
+                  right: '10px',
+                  bottom: '10px',
+                  cursor: 'pointer',
+                  fontSize: '24px',
+                  animation: 'bounce 1s infinite'
+                }}
+                onClick={nextText}
+              >
+                ▼
+              </div>
             </div>
-          </div>
-        )}
-        {/* Buttons */}
-        {currentTextIndex >= storyTexts.length && (
-          <div
-            style={{
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              zIndex: 1000,
-            }}
+          )}
+          {/* Diary Texts */}
+          {diaryCurrentTextIndex < diaryTexts.length && (
+            <div
+              style={{
+                position: 'absolute', // Keep this as absolute
+                top: '50%', // Align top edge of element to the center of the screen vertically
+                left: '50%', // Align left edge of element to the center of the screen horizontally
+                transform: 'translate(-50%, -50%)', // Shift element to the left and up by 50% of its own width and height
+                backgroundColor: 'rgba(0, 0, 0, 0.56)',
+                color: 'white',
+                padding: '20px',
+                borderRadius: '10px',
+                textAlign: 'center',
+                width: '1000px', // You might want to ensure this width is responsive
+                maxHeight: '80vh',
+                overflowY: 'auto',
+                zIndex: 1000,
+              }}
+            >
+              <p style={{ margin: '10px', height: '20px' }}>{diaryTexts[diaryCurrentTextIndex]}</p>
+              <div
+                style={{
+                  position: 'absolute',
+                  right: '10px',
+                  bottom: '10px',
+                  cursor: 'pointer',
+                  fontSize: '24px',
+                  animation: 'bounce 1s infinite'
+                }}
+                onClick={nextTextDiary}
+              >
+                ▼
+              </div>
+            </div>
+          )}
+        </div>
+      :
+      <div className="bg-contain bg-center bg-no-repeat bg-black absolute top-1/2 left-1/2 translate-x-[-50%] translate-y-[-50%]"
+        style={{
+          backgroundImage: `url(/mystery_gameover.png)`,
+          width: `1300px`,
+          height: `700px`
+        }}>
+          <p className="absolute bottom-20 left-20">Bad End: 仲間割れ</p>
+          <button className="absolute bg-red-700 border-2 border-red-700 rounded-3xl shadow w-32 py-2.5 px-5 text-base left-1/2 bottom-20 translate-x-[-50%] hover:bg-red-400 hover:text-gray-200"
+                  onClick={reStartGame}
           >
-          </div>
-        )}
+            リスタート
+          </button>
       </div>
+      }
     </div>
-  )
-}
+  )  
+}  
+  

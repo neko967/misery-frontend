@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from "next/image";
 import localImage from "../../../../../public/horror_image.png";
-import Link from 'next/link';
+import localImage2 from "../../../../../public/angry_horror_image.png";
 import { GetWindowSize } from "../../../../hooks/GetWindowSize";
 
 type pointerPosition = {
@@ -19,8 +19,10 @@ export default function Dealer({ params }: { params: { slug: string } }) {
   const brickImage = "/brick.png";
   const keyImage = "/keyImage.png";
   const countDownImage = "/countDownImage.png";
+  const timedVanisingDoorImage = "/timedVanisingDoor.png";
+  const newsPaperImage = "/newsPaper.png";
   const keyPositions: number[][] = [[],[1,29],[0,0],[14,1],[0,0],[6,19],[0,0],[1,11],[0,0]];  //[[空の配列],[key1縦,key1横],[key2縦,key2横],[key3縦,key3横]],[key4縦,key4横]]
-  const doorPositions: number[][] = [[],[0,0],[15,6],[0,0],[9,16],[0,0],[4,13],[0,0],[5,4]]; //[[空の配列],[door1縦,door1横],[door2縦,door2横],[door3縦,door3横]],[door4縦,door4横]]
+  const doorPositions: number[][] = [[],[0,0],[15,6],[0,0],[9,16],[0,0],[4,13],[7,10],[4,4]]; //[[空の配列],[door1縦,door1横],[door2縦,door2横],[door3縦,door3横]],[door4縦,door4横]]
   const { height, width } = GetWindowSize();
   const cellSize = Math.min(width, height) / elements;
   const [ws, setWs] = useState<WebSocket | null>(null);
@@ -46,8 +48,17 @@ export default function Dealer({ params }: { params: { slug: string } }) {
       setResetButton(true);
     }, 3000);
   }
-  const [movingDot, setMovingDot] = useState({ x: 1, y: 12, direction: 1 }); // 移動するギミック。yを4にして、xを1から開始
+  const [movingDot, setMovingDot] = useState({ x: 2, y: 5, direction: 1 }); // 移動するギミック。yを4にして、xを1から開始
   const [currentTextIndex, setCurrentTextIndex] = useState(0);
+  // カウントダウンタイマーを取得すると消失するドア
+  const timedVanisingDoor: number[][] = [[],[14,29]];
+  // 取得するとTrueEndに行ける新聞紙
+  const newsPaper: number[][] = [[],[12,29]];
+  // 新聞紙の取っているか
+  const [getDirtyNewsPaper, setGetDirtyNewsPaper] = useState(false);
+  const [getCleanNewsPaper, setGetCleanNewsPaper] = useState(false);
+  const [gameSaved, setGameSaved] = useState(false);
+  const [missCount, setMissCount] = useState(0);
 
   const storyTexts = [
     '閉ざされた屋敷の扉を押し開けると、そこはもはやただの屋敷ではなかった。',
@@ -87,15 +98,17 @@ export default function Dealer({ params }: { params: { slug: string } }) {
         websocket.onmessage = (event) => {
           if (event.data == "gameover") {
             setIsGameOver(true);
-            playGameOverSound();
             resetButtonTimer();
             return () => clearTimeout(resetButtonTimer);
           } else if (event.data == "isDirtyGameClear") {
             setIsDirtyGameClear(true);
           } else if (event.data == "isCleanGameClear") {
             setIsCleanGameClear(true);
+          } else if (event.data == "getDirtyNewsPaper") {
+            setGetDirtyNewsPaper(true);
           } else if (event.data == "timeAttack") {
             setIsTimeAttackStarted(true);
+            setGameSaved(true);
           } else if (event.data == "getkey1") {
             setKeys(prev => ({ ...prev, key1: true }));
             maze[doorPositions[1][0]][doorPositions[1][1]] = ' ';
@@ -132,30 +145,40 @@ export default function Dealer({ params }: { params: { slug: string } }) {
     checkRoomExists();
   }, [params.slug]);
 
-  const playGameOverSound = () => {
-    const sound = new Audio("/horror_sound.wav");
-    sound.play();
+  const playGameOverSound = (gameSaved: boolean) => {
+    if (gameSaved) {
+      const angrysound = new Audio("/gyaaaa_d.wav");
+      angrysound.play();
+    } else {
+      const normalsound = new Audio("/horror_sound.wav");
+      normalsound.play();
+    }
   };
 
   const restartGame = () => {
+    if (gameSaved) {
+      setTimeLeft(30 + missCount*5);
+    } else {
+      setTimeLeft(30);
+      setKeys({
+        key1: false,
+        key2: false,
+        key3: false,
+        key4: false,
+        key5: false,
+        key6: false,
+        key7: false,
+        key8: false,
+      });
+    }
     setIsGameOver(false);
     setResetButton(false);
     setIsGameStarted(false);
     setShowWall(false);
-    setTimeLeft(30);
     setIsCleanGameClear(false);
     setIsDirtyGameClear(false);
-    setKeys({
-      key1: false,
-      key2: false,
-      key3: false,
-      key4: false,
-      key5: false,
-      key6: false,
-      key7: false,
-      key8: false,
-    });
-    // 他に初期化するべきステートや変数があればこちらに追加
+    setGetDirtyNewsPaper(false);
+    setGetCleanNewsPaper(false);
   };
 
   useEffect(() => {
@@ -165,7 +188,13 @@ export default function Dealer({ params }: { params: { slug: string } }) {
   }, [isCleanGameClear]);
 
   useEffect(() => {
-    if (isGameOver) {
+    if (isGameOver && isTimeAttackStarted ) {
+      setMissCount(missCount + 1);
+      setIsTimeAttackStarted(false);
+      playGameOverSound(gameSaved);
+    } else if (isGameOver && !isTimeAttackStarted) {
+      playGameOverSound(gameSaved);
+    } else {
       setIsTimeAttackStarted(false);
     }
   }, [isGameOver]);
@@ -203,7 +232,7 @@ export default function Dealer({ params }: { params: { slug: string } }) {
         let newDirection = prev.direction;
   
         // 点が[4][8]の右端または[4][1]の左端に達した場合、方向を反転
-        if (newX > 6 || newX < 1) { // xの範囲を1〜8に変更
+        if (newX > 6 || newX < 2) { // xの範囲を1〜8に変更
           newDirection *= -1; // 方向を反転させる
           newX = prev.x + newDirection; // 新しい方向で位置を更新
         }
@@ -241,8 +270,11 @@ export default function Dealer({ params }: { params: { slug: string } }) {
                              || (y == doorPositions[6][0] && x == doorPositions[6][1] && !keys.key6)
                              || (y == doorPositions[7][0] && x == doorPositions[7][1] && !keys.key7)
                              || (y == doorPositions[8][0] && x == doorPositions[8][1] && !keys.key8)
-                             || (maze[y][x] === 'W' && showWall)) {
+                             || (maze[y][x] === 'W' && showWall)
+                             || (y == timedVanisingDoor[1][0] && x == timedVanisingDoor[1][1]) && !isTimeAttackStarted)
+                             {
         ws.send('gameover');
+        playGameOverSound(gameSaved);
       } else if (maze[y][x] === 'G') {
         if (ws && ws.readyState === WebSocket.OPEN) {
           ws.send('isCleanGameClear');
@@ -265,28 +297,32 @@ export default function Dealer({ params }: { params: { slug: string } }) {
         ws.send('getkey7');
       } else if (y === keyPositions[8][0] && x === keyPositions[8][1] && maze[y][x] === 'K') {
         ws.send('getkey8');
+      } else if (y === newsPaper[1][0] && x === newsPaper[1][1] && maze[y][x] === 'N') {
+        setGetCleanNewsPaper(true);
+        ws.send('getCleanNewsPaper');
       } else {
         setPlayerPosition({ x, y });
       }
     }
   };
+
   const maze = [
 //    0    1    2    3    4    5    6    7    8    9   10   11   12   13   14   15   16   17   18   19   20   21   22   23   24   25   26   27   28   29   30
     ['#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#'],
     ['#', 'G', '#', '#', '#', '#', '#', '#', '#', '#', ' ', 'K', ' ', ' ', ' ', '#', '#', '#', ' ', '#', ' ', ' ', ' ', '#', '#', '#', '#', ' ', ' ', 'K', '#'],
     ['#', ' ', ' ', ' ', ' ', '#', ' ', ' ', ' ', '#', ' ', '#', '#', '#', ' ', '#', ' ', ' ', ' ', '#', ' ', '#', ' ', '#', '#', '#', '#', ' ', '#', '#', '#'],
     ['#', '#', '#', '#', ' ', '#', ' ', '#', ' ', '#', ' ', ' ', ' ', ' ', ' ', '#', ' ', '#', '#', '#', ' ', '#', ' ', ' ', '#', ' ', ' ', ' ', '#', '#', '#'],
-    ['#', '#', '#', '#', ' ', '#', ' ', '#', ' ', '#', '#', '#', '#', '*', '#', '#', ' ', '#', '#', '#', ' ', '#', '#', ' ', '#', ' ', '#', '#', '#', '#', '#'],
-    ['#', '#', '#', ' ', '*', ' ', ' ', '#', ' ', ' ', '#', '#', '#', ' ', ' ', ' ', ' ', '#', ' ', ' ', ' ', '#', '#', ' ', '#', ' ', '#', '#', '#', '#', '#'],
-    ['#', '#', '#', ' ', '#', '#', '#', '#', '#', ' ', '#', '#', '#', '#', '#', '#', ' ', '#', ' ', 'K', ' ', '#', '#', ' ', '#', ' ', '#', ' ', ' ', ' ', '#'],
-    ['#', ' ', ' ', ' ', '#', '#', '#', '#', '#', ' ', ' ', ' ', ' ', ' ', ' ', '#', ' ', '#', ' ', ' ', ' ', '#', '#', ' ', '#', ' ', ' ', ' ', '#', ' ', '#'],
+    ['#', '#', '#', '#', '*', '#', ' ', '#', ' ', '#', '#', '#', '#', '*', '#', '#', ' ', '#', '#', '#', ' ', '#', '#', ' ', '#', ' ', '#', '#', '#', '#', '#'],
+    ['#', '#', ' ', ' ', ' ', ' ', ' ', '#', ' ', ' ', '#', '#', '#', ' ', ' ', ' ', ' ', '#', ' ', ' ', ' ', '#', '#', ' ', '#', ' ', '#', '#', '#', '#', '#'],
+    ['#', ' ', '#', ' ', '#', '#', '#', '#', '#', ' ', '#', '#', '#', '#', '#', '#', ' ', '#', ' ', 'K', ' ', '#', '#', ' ', '#', ' ', '#', ' ', ' ', ' ', '#'],
+    ['#', ' ', ' ', ' ', '#', '#', '#', '#', '#', ' ', '*', ' ', ' ', ' ', ' ', ' ', ' ', '#', ' ', ' ', ' ', '#', '#', ' ', '#', ' ', ' ', ' ', '#', ' ', '#'],
     ['#', ' ', '#', '#', '#', '#', '#', '#', '#', ' ', '#', '#', '#', '#', '#', '#', ' ', '#', '#', '#', '#', '#', '#', ' ', '#', '#', '#', '#', '#', ' ', '#'],
     ['#', ' ', '#', '#', '#', '#', ' ', ' ', ' ', ' ', '#', '#', '#', ' ', ' ', ' ', '*', ' ', '#', '#', '#', '#', '#', ' ', '#', ' ', '#', '#', '#', ' ', '#'],
     ['#', ' ', '#', '#', ' ', ' ', ' ', '#', '#', '#', '#', '#', '#', ' ', '#', '#', '#', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '#', ' ', '#', ' ', ' ', ' ', '#'],
     ['#', ' ', '#', '#', ' ', '#', '#', '#', '#', '#', '#', '#', '#', ' ', '#', '#', '#', ' ', '#', '#', '#', '#', '#', '#', '#', ' ', '#', ' ', '#', '#', '#'],
-    ['#', ' ', ' ', ' ', ' ', ' ', ' ', '#', '#', ' ', ' ', ' ', ' ', ' ', ' ', '#', ' ', ' ', '#', ' ', ' ', ' ', ' ', ' ', '#', '#', '#', ' ', '#', 'K', '#'],
+    ['#', ' ', ' ', ' ', ' ', ' ', ' ', '#', '#', ' ', ' ', ' ', ' ', ' ', ' ', '#', ' ', ' ', '#', ' ', ' ', ' ', ' ', ' ', '#', '#', '#', ' ', '#', 'N', '#'],
     ['#', '#', '#', ' ', '#', '#', ' ', '#', '#', '#', '#', '#', '#', '#', ' ', '#', ' ', '#', '#', ' ', '#', '#', '#', ' ', '#', '#', '#', ' ', '#', ' ', '#'],
-    ['#', 'K', '#', ' ', '#', '#', ' ', '#', '#', '#', '#', '#', '#', '#', ' ', '#', '#', '#', '#', ' ', '#', '#', '#', ' ', ' ', ' ', ' ', ' ', '#', ' ', '#'],
+    ['#', 'K', '#', ' ', '#', '#', ' ', '#', '#', '#', '#', '#', '#', '#', ' ', '#', '#', '#', '#', ' ', '#', '#', '#', ' ', ' ', ' ', ' ', ' ', '#', 'D', '#'],
     ['#', ' ', '#', '#', '#', '#', '*', ' ', ' ', ' ', '#', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '#', '#', '#', '#', '#', '#', '#', '#', ' ', '#'],
     ['#', ' ', '#', ' ', ' ', ' ', ' ', '#', '#', ' ', '#', ' ', '#', '#', '#', ' ', '#', '#', '#', '#', ' ', '#', '#', ' ', ' ', ' ', ' ', '#', '#', ' ', '#'],
     ['#', ' ', ' ', ' ', '#', '#', ' ', ' ', '#', ' ', '#', ' ', '#', 'S', 'S', 'S', 'S', 'S', '#', '#', ' ', '#', '#', ' ', '#', '#', ' ', '#', '#', ' ', '#'],
@@ -299,14 +335,18 @@ export default function Dealer({ params }: { params: { slug: string } }) {
   });
 
   async function goEndingClean() {
-    router.push(`/ending/clean/${params.slug}`);
+    if (getCleanNewsPaper && getDirtyNewsPaper) {
+      router.push(`/ending/true`);
+    } else {
+      router.push(`/ending/clean/${params.slug}`);
+    }
   }
 
   return (
     <div
       className="h-screen w-full bg-cover flex justify-center items-center"
       style={{
-        backgroundImage: isGameOver ? "url('/dark.png')" : isCleanGameClear ? "url('/Gameclear.png')" : "url('/maze.png')",
+        backgroundImage: isGameOver ? "url('/black_background.png')" : isCleanGameClear ? "url('/Gameclear.png')" : "url('/maze.png')",
         backgroundSize: 'cover',
         backgroundPosition: 'center',
       }}
@@ -343,109 +383,123 @@ export default function Dealer({ params }: { params: { slug: string } }) {
             </div>
           </div>
         )}
-        {!isGameStarted ? (
-          // ゲームが開始されていない場合、スタートボタンを表示
-          <button onClick={() => setIsGameStarted(true)}
-            className="btn btn-error"
-            style={{
-              position: 'absolute',
-              top: '90%', // 画面の中央から上方向へ
-              left: '50%', // 画面の中央から左方向へ
-              transform: 'translate(-50%, -50%)', // ボタン自体の中心を基準に位置を調整
-            }}
-          >迷路を進む
-          </button>
-        ) :isGameOver ? (
-          <div>
-            <Image src={localImage} alt="ホラー" />
-            {resetButton &&
-              <div className="reset">
-                <button onClick={restartGame} className="reset-button">再挑戦する</button>
-              </div>
-            }
-          </div>
-        ) : isCleanGameClear ? (
-          <>
-            <div className="congratulation">congratulations!!</div>
-            {isDirtyGameClear && isCleanGameClear &&
-              <button onClick={goEndingClean}
-                      className="exit">
-                屋敷を出る
-              </button>
-            }
-          </>
-        ) : (
-          <div
-            style={{
-              display: 'grid',
-              gridTemplateColumns: `repeat(${maze[0].length}, ${cellSize}px)`,
-              cursor: 'none',
-              gridGap: '0px',
-              position: 'relative', /* Change from 'absolute' to 'relative' */
-              /* Remove 'top' and 'left' properties */
-            }}
-              onMouseMove={handleMouseMove}
-          >
-            {maze.map((row, rowIndex) =>
-              row.map((cell, cellIndex) => (
-                <div
-                  // タイムアタック処理の関数を呼び出す
-                  // onMouseOver={() => handleMouseOver(rowIndex, cellIndex)}
-                  key={`${rowIndex}-${cellIndex}`}
-                  data-start={cell === 'S' ? 'true' : undefined}
-                  style={{
-                      boxSizing: 'border-box',
-                      width: `${cellSize}px`,
-                      height: `${cellSize}px`,
-                      backgroundColor:
-                          (rowIndex === movingDot.y && cellIndex === movingDot.x) ? 'orange' : // 動く点の色
-                          cell === '#' ? 'black' :
-                          cell === 'S' ? 'green' :
-                          cell === 'G' ? 'red' :
-                          cell === 'E' ? 'white' :
-                          cell === 'W' ? (showWall ? 'pink' : 'white') :
-                          'white',
-                      cursor: `url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="5" height="5" viewBox="0 0 2 2"><circle cx="1" cy="1" r="1" fill="black" /></svg>') 1 1, auto`,
-                      backgroundSize: 'cover',
-                      backgroundImage:
-                      (rowIndex === movingDot.y && cellIndex === movingDot.x) ? `url(${girlImage})` :
-                      cell === 'W' ? (showWall ? `url(${needleImage})` : 'none') :
-                          cell === '#' ? `url(${brickImage})` :
-                          cell === 'E' ? (
-                            rowIndex === timeAttackPositions[1][0] && cellIndex === timeAttackPositions[1][1] && !isTimeAttackStarted ? `url(${countDownImage})` : undefined
-                          ) :
-                          cell === 'K' ? (
-                            rowIndex === keyPositions[1][0] && cellIndex === keyPositions[1][1] && !keys.key1 ? `url(${keyImage})` :
-                            rowIndex === keyPositions[2][0] && cellIndex === keyPositions[2][1] && !keys.key2 ? `url(${keyImage})` :
-                            rowIndex === keyPositions[3][0] && cellIndex === keyPositions[3][1] && !keys.key3 ? `url(${keyImage})` :
-                            rowIndex === keyPositions[4][0] && cellIndex === keyPositions[4][1] && !keys.key4 ? `url(${keyImage})` :
-                            rowIndex === keyPositions[5][0] && cellIndex === keyPositions[5][1] && !keys.key5 ? `url(${keyImage})` :
-                            rowIndex === keyPositions[6][0] && cellIndex === keyPositions[6][1] && !keys.key6 ? `url(${keyImage})` :
-                            rowIndex === keyPositions[7][0] && cellIndex === keyPositions[7][1] && !keys.key7 ? `url(${keyImage})` :
-                            rowIndex === keyPositions[8][0] && cellIndex === keyPositions[8][1] && !keys.key8 ? `url(${keyImage})` : undefined
-                          ) :
-                          cell === '*' ? (
-                            rowIndex === doorPositions[1][0] && cellIndex === doorPositions[1][1] && !keys.key1 ? `url(${doorImage})` :
-                            rowIndex === doorPositions[2][0] && cellIndex === doorPositions[2][1] && !keys.key2 ? `url(${doorImage})` :
-                            rowIndex === doorPositions[3][0] && cellIndex === doorPositions[3][1] && !keys.key3 ? `url(${doorImage})` :
-                            rowIndex === doorPositions[4][0] && cellIndex === doorPositions[4][1] && !keys.key4 ? `url(${doorImage})` :
-                            rowIndex === doorPositions[5][0] && cellIndex === doorPositions[5][1] && !keys.key5 ? `url(${doorImage})` :
-                            rowIndex === doorPositions[6][0] && cellIndex === doorPositions[6][1] && !keys.key6 ? `url(${doorImage})` :
-                            rowIndex === doorPositions[7][0] && cellIndex === doorPositions[7][1] && !keys.key7 ? `url(${doorImage})` :
-                            rowIndex === doorPositions[8][0] && cellIndex === doorPositions[8][1] && !keys.key8 ? `url(${doorImage})` : undefined
-                          ) :
-                          undefined,
-                  }}
-                ></div>
-              ))
-            )}
-            <div className="fixed top-4 right-4">
-              <div className="bg-pink-500 text-white py-2 px-4 rounded shadow-lg">
-                {!isGameOver && isTimeAttackStarted && <div>残り時間：{timeLeft}秒</div>}
+        {currentTextIndex == storyTexts.length ? 
+          !isGameStarted ? (
+            // ゲームが開始されていない場合、スタートボタンを表示
+            <button onClick={() => setIsGameStarted(true)}
+              className="btn btn-error"
+              style={{
+                position: 'absolute',
+                top: '90%', // 画面の中央から上方向へ
+                left: '50%', // 画面の中央から左方向へ
+                transform: 'translate(-50%, -50%)', // ボタン自体の中心を基準に位置を調整
+              }}
+            >迷路を進む
+            </button>
+          ) :isGameOver ? (
+            <div>
+              {gameSaved ? 
+                <Image src={localImage2} alt="ホラー" />
+              :
+                <Image src={localImage} alt="ホラー" />
+              }
+              {resetButton &&
+                <div className="reset">
+                  <button onClick={restartGame} className="reset-button">再挑戦する</button>
+                </div>
+              }
+            </div>
+          ) : isCleanGameClear ? (
+            <>
+              <div className="congratulation">congratulations!!</div>
+              {isDirtyGameClear && isCleanGameClear &&
+                <button onClick={goEndingClean}
+                        className="exit">
+                  屋敷を出る
+                </button>
+              }
+            </>
+          ) : (
+            <div
+              style={{
+                display: 'grid',
+                gridTemplateColumns: `repeat(${maze[0].length}, ${cellSize}px)`,
+                cursor: 'none',
+                gridGap: '0px',
+                position: 'relative', /* Change from 'absolute' to 'relative' */
+                /* Remove 'top' and 'left' properties */
+              }}
+                onMouseMove={handleMouseMove}
+            >
+              {maze.map((row, rowIndex) =>
+                row.map((cell, cellIndex) => (
+                  <div
+                    // タイムアタック処理の関数を呼び出す
+                    // onMouseOver={() => handleMouseOver(rowIndex, cellIndex)}
+                    key={`${rowIndex}-${cellIndex}`}
+                    data-start={cell === 'S' ? 'true' : undefined}
+                    style={{
+                        boxSizing: 'border-box',
+                        width: `${cellSize}px`,
+                        height: `${cellSize}px`,
+                        backgroundColor:
+                            (rowIndex === movingDot.y && cellIndex === movingDot.x) ? 'orange' : // 動く点の色
+                            cell === '#' ? 'black' :
+                            cell === 'S' ? 'green' :
+                            cell === 'G' ? 'red' :
+                            cell === 'E' ? 'white' :
+                            cell === 'W' ? (showWall ? 'pink' : 'white') :
+                            'white',
+                        cursor: `url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="5" height="5" viewBox="0 0 2 2"><circle cx="1" cy="1" r="1" fill="black" /></svg>') 1 1, auto`,
+                        backgroundSize: 'cover',
+                        backgroundImage:
+                        (rowIndex === movingDot.y && cellIndex === movingDot.x) ? `url(${girlImage})` :
+                            cell === 'W' ? (showWall ? `url(${needleImage})` : 'none') :
+                            cell === '#' ? `url(${brickImage})` :
+                            cell === 'N' ? (
+                              rowIndex === newsPaper[1][0] && cellIndex === newsPaper[1][1] && !getCleanNewsPaper ? `url(${newsPaperImage})` : undefined
+                            ) :
+                            cell === 'D' ? (
+                              rowIndex === timedVanisingDoor[1][0] && cellIndex === timedVanisingDoor[1][1] && !isTimeAttackStarted ? `url(${timedVanisingDoorImage})` : undefined
+                            ) :
+                            cell === 'E' ? (
+                              rowIndex === timeAttackPositions[1][0] && cellIndex === timeAttackPositions[1][1] && !isTimeAttackStarted ? `url(${countDownImage})` : undefined
+                            ) :
+                            cell === 'K' ? (
+                              rowIndex === keyPositions[1][0] && cellIndex === keyPositions[1][1] && !keys.key1 ? `url(${keyImage})` :
+                              rowIndex === keyPositions[2][0] && cellIndex === keyPositions[2][1] && !keys.key2 ? `url(${keyImage})` :
+                              rowIndex === keyPositions[3][0] && cellIndex === keyPositions[3][1] && !keys.key3 ? `url(${keyImage})` :
+                              rowIndex === keyPositions[4][0] && cellIndex === keyPositions[4][1] && !keys.key4 ? `url(${keyImage})` :
+                              rowIndex === keyPositions[5][0] && cellIndex === keyPositions[5][1] && !keys.key5 ? `url(${keyImage})` :
+                              rowIndex === keyPositions[6][0] && cellIndex === keyPositions[6][1] && !keys.key6 ? `url(${keyImage})` :
+                              rowIndex === keyPositions[7][0] && cellIndex === keyPositions[7][1] && !keys.key7 ? `url(${keyImage})` :
+                              rowIndex === keyPositions[8][0] && cellIndex === keyPositions[8][1] && !keys.key8 ? `url(${keyImage})` : undefined
+                            ) :
+                            cell === '*' ? (
+                              rowIndex === doorPositions[1][0] && cellIndex === doorPositions[1][1] && !keys.key1 ? `url(${doorImage})` :
+                              rowIndex === doorPositions[2][0] && cellIndex === doorPositions[2][1] && !keys.key2 ? `url(${doorImage})` :
+                              rowIndex === doorPositions[3][0] && cellIndex === doorPositions[3][1] && !keys.key3 ? `url(${doorImage})` :
+                              rowIndex === doorPositions[4][0] && cellIndex === doorPositions[4][1] && !keys.key4 ? `url(${doorImage})` :
+                              rowIndex === doorPositions[5][0] && cellIndex === doorPositions[5][1] && !keys.key5 ? `url(${doorImage})` :
+                              rowIndex === doorPositions[6][0] && cellIndex === doorPositions[6][1] && !keys.key6 ? `url(${doorImage})` :
+                              rowIndex === doorPositions[7][0] && cellIndex === doorPositions[7][1] && !keys.key7 ? `url(${doorImage})` :
+                              rowIndex === doorPositions[8][0] && cellIndex === doorPositions[8][1] && !keys.key8 ? `url(${doorImage})` : undefined
+                            ) :
+                            undefined,
+                    }}
+                  ></div>
+                ))
+              )}
+              <div className="fixed top-4 right-4">
+                <div className="bg-pink-500 text-white py-2 px-4 rounded shadow-lg">
+                  {!isGameOver && isTimeAttackStarted && <div>残り時間：{timeLeft}秒</div>}
+                </div>
               </div>
             </div>
-          </div>
-        )}
+          )
+          :
+          undefined
+        }
       </main>
     </div>
   );
