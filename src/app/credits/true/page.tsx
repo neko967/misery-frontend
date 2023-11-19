@@ -14,7 +14,7 @@ export default function Home() {
       </div>
      
       {/* Twitterリンク */}
-      <div className="true_title">ヒント:JOIN ROOMに"MISERY"と入力すると...？</div>
+      <div className="true_title">ヒント:JOIN ROOMに「MISERY」と入力すると...？</div>
            
 
       <div className="absolute bottom-20 left-20 text-xl">
