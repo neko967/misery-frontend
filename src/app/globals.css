@@ -15,6 +15,7 @@
     --background-end-rgb: 0, 0, 0;
   }
 }
+
 .text {
   position: absolute;
   left: 0; 
@@ -84,6 +85,7 @@ body {
   transform: translateY(-50%);
   z-index: 10;
 }
+
 .triangle-button.triangle-down {
   width: 0;
   height: 0;
@@ -95,6 +97,7 @@ body {
 .custom-cursor {
   cursor: url('/path/to/custom-cursor.png'), auto;
 }
+
 .modal {
   position: fixed;
   left: 0;
@@ -105,8 +108,8 @@ body {
 
 .modal {
   width: 100%; /* modalのwidthが100% */
-  
 }
+
 .modal-box {
   max-width: 900px;
   height: 150px;
@@ -116,6 +119,7 @@ body {
 .modal p {
   font-size: 15px;
 }
+
 .red-text {
   color: red; 
 }
@@ -140,8 +144,8 @@ body {
   background-color: #fff;
   border: 2px solid #000;
 }
-.reset {
 
+.reset {
   /* 見た目 */
   background: #000000; 
   color: #fff;
@@ -164,12 +168,12 @@ body {
   align-items: center;
 }
 
-
 /* ホバー時 */
 .reset:hover {
   background-color: #ffffff;
   color: #000000;
 }
+
 .close {
   color: #aaaaaa;
   float: right;
@@ -216,8 +220,6 @@ body {
   right: 0;
 }
 
-
-
 .my-button {
   font-family: font-horror2;
   margin-left: 10px;
@@ -227,8 +229,8 @@ body {
   bottom: 300px;    /* 画面の下から20pxの位置 */
   transform: translateX(-50%); /* X軸に沿って中央揃え */
   /* その他のスタイリング（サイズ、色、フォント等） */
-  
 }
+
 .my-buttons {
   position: fixed; /* 画面に対して固定位置 */
   left: 75%;       /* 左から画面の50%の位置 */
@@ -236,6 +238,7 @@ body {
   transform: translateX(-50%); /* X軸に沿って中央揃え */
   /* その他のスタイリング（サイズ、色、フォント等） */
 }
+
 .game-start {
   border-radius: 30px; 
   padding: 15px 30px;
@@ -245,15 +248,12 @@ body {
   transform: translateX(-50%);
   transition: transform 0.1s;
   font-weight: bold;
-
   font-size: 24px;
   color: #eae4e4;
   background: rgb(233, 224, 224); 
   background: linear-gradient(to bottom, #f60b0b, #950404);
   border-radius: 5px;
   padding: 10px 20px;
-  
-
   box-shadow: 1px 1px #000, 
               inset 2px 2px 0 rgba(255,255,255,0.5),
               0 0 15px rgba(0,0,0,0.6);
@@ -269,7 +269,6 @@ body {
               box-shadow: 0 4px 8px rgba(0, 0, 0, 0.6); /* 影をつけて立体感を出す */
               transition: background-color 0.3s ease;
   
-  
   transition: 0.5s;
   transform: skewZ(-5deg);
   text-shadow: 1px 1px rgb(23, 16, 16);
@@ -284,18 +283,13 @@ body {
      1px 1px 1px #f40909,
      2px 2px 1px #000;
    animation: glitch 2s infinite;
-
-  
 }
-
-
 
 .game-start:active {
   transform: translateX(-48%) translateY(-10%) scale(0.95);
   opacity: 0.85;
   transition: transform 0.1s, opacity 0.2s; 
   box-shadow: 0 0 12px rgba(0,0,0,0.4);
-
 }
 
 .game-start:hover {
@@ -343,9 +337,8 @@ body {
   /* テキストの位置 */
   position: fixed;
   left: 50%;
-  bottom: 280px;
-  
-  transform: translateX(-50%);
+  bottom: 35%;
+  transform: translate(-50%, -50%);
   
   /* フォント */
   font-size: 14px;
@@ -358,47 +351,49 @@ body {
   
   /* 影 */
   box-shadow: 0 1px 2px rgba(0,0,0,0.1);
-  }
+}
 
 .invite-code {
-     /* "この部屋の招待コード"のテキストのスタイル */
-     width: 110px;
-     position: fixed;
-     left: 50%;
-     top: 500px;  
-     transform: translateX(-50%);
-   
-     /* フォントと文字 */
-     font-size: 16px; /* フォントサイズを少し大きく */
-     color: #333; /* 色をダークグレーに */
-   
-     /* 背景と影 */ 
-     background: #fff; /* 背景色を白に */
-     box-shadow: 0 2px 4px rgba(0,0,0,0.1); /* 影を少し控えめに */
-   
-     /* パディングとボーダーラディウス */
-     padding: 10px 20px;
-     border-radius: 5px;
+  /* "この部屋の招待コード"のテキストのスタイル */
+  width: 110px;
+  position: fixed;
+  left: 50%;
+  bottom: 28%;  
+  transform: translate(-50%, -50%);
+
+  /* フォントと文字 */
+  font-size: 16px; /* フォントサイズを少し大きく */
+  color: #333; /* 色をダークグレーに */
+
+  /* 背景と影 */ 
+  background: #fff; /* 背景色を白に */
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1); /* 影を少し控えめに */
+
+  /* パディングとボーダーラディウス */
+  padding: 10px 20px;
+  border-radius: 5px;
+
   /* {params.slug}のテキストのスタイル */
   opacity: 0.7;
-transition: opacity 0.2s;
+  transition: opacity 0.2s;
 }
 
 .invite-code:hover,
 .invite-code:active {
-opacity: 1; /* ホバー時に不透明度を戻す */
+  opacity: 1; /* ホバー時に不透明度を戻す */
 }
+
 .invite-code.clicked {
   opacity: 1;
-  }
+}
+
 .typing {
   width: 50ch; 
   animation: typing 2s steps(16), blink .5s step-end infinite alternate; 
-  
   border-right: 3px solid; 
   font-size: 2em;
-  
 }
+
 .text-container {
   position: relative;
   bottom: 650px
@@ -409,6 +404,7 @@ opacity: 1; /* ホバー時に不透明度を戻す */
   left: 0;
   bottom: 0; 
 }
+
 .new_twitter .fa-twitter:before {
   content: '𝕏' !important;
   font-family: sans-serif !important;
@@ -431,6 +427,7 @@ opacity: 1; /* ホバー時に不透明度を戻す */
   transform: translate(-50%, -50%); /* テキスト自体をその中心に移動 */
   white-space: nowrap; /* 改行を防ぐ */
 }
+
 .icon {
   padding-top: 10px;    /* 上に10pxのパディングを設定 */
   padding-right: 10px;  /* 右に20pxのパディングを設定 */
@@ -450,18 +447,16 @@ opacity: 1; /* ホバー時に不透明度を戻す */
   padding: 15px 30px;
   position: fixed; 
   left: 50%;
-  bottom: 130px;
-  transform: translateX(-50%);
+  bottom: 15%;
+  transform: translate(-50%, -50%);
   transition: transform 0.1s;
   font-weight: bold;
-
   font-size: 24px;
   color: #eae4e4;
   background: rgb(233, 224, 224); 
   background: linear-gradient(to bottom, #f60b0b, #950404);
   border-radius: 5px;
   padding: 10px 20px;
-
   box-shadow: 1px 1px #000, 
               inset 2px 2px 0 rgba(255,255,255,0.5),
               0 0 15px rgba(0,0,0,0.6);
@@ -477,20 +472,56 @@ opacity: 1; /* ホバー時に不透明度を戻す */
               box-shadow: 0 4px 8px rgba(0, 0, 0, 0.6); /* 影をつけて立体感を出す */
               transition: background-color 0.3s ease;
   
+  transition: 0.5s;
+  transform: skewZ(-5deg);
+  text-shadow: 1px 1px rgb(23, 16, 16);
+  animation: creepy-font 2s infinite;
+  background: linear-gradient(to right, #f40909, #ff0000, #f40909);
+  animation: gradient 5s infinite;
+  
+  /* グリッチエフェクト */
+  text-shadow: 
+    1px 1px 1px #f40909,
+    2px 2px 1px #000;
+  animation: glitch 2s infinite; 
+}
+
+.game-start-host-wait {
+  border-radius: 30px; 
+  padding: 15px 30px;
+  position: fixed; 
+  left: 50%;
+  bottom: 15%;
+  transform: translate(-50%, -50%);
+  transition: transform 0.1s;
+  font-weight: bold;
+  font-size: 24px;
+  color: #f0e9e9;
+  background: rgb(233, 224, 224); 
+  background: linear-gradient(to bottom, #f60b0b, #950404);
+  border-radius: 5px;
+  padding: 10px 20px;
+  box-shadow: 1px 1px #000, 
+              inset 2px 2px 0 rgba(255,255,255,0.5),
+              0 0 15px rgba(0,0,0,0.6);
+              
+              background-color: #f60b0b; /* ダークグレーのボタン背景 */
+              color: #696464;
+              border: none;
+              padding: 10px 20px;
+              text-transform: uppercase;
+              font-size: 18px;
+              cursor: pointer;
+              border-radius: 5px;
+              box-shadow: 0 4px 8px rgba(0, 0, 0, 0.6); /* 影をつけて立体感を出す */
+              transition: background-color 0.3s ease;
   
   transition: 0.5s;
   transform: skewZ(-5deg);
   text-shadow: 1px 1px rgb(23, 16, 16);
-   animation: creepy-font 2s infinite;
-   background: linear-gradient(to right, #f40909, #ff0000, #f40909);
-   animation: gradient 5s infinite;
-   
-   /* グリッチエフェクト */
-   text-shadow: 
-     1px 1px 1px #f40909,
-     2px 2px 1px #000;
-   animation: glitch 2s infinite; 
-
+  animation: creepy-font 2s infinite;
+  background: linear-gradient(to right, #691717, #5d1313, #5e1212);
+  animation: gradient 5s infinite;
 }
 
 @keyframes creepy-font {
@@ -501,32 +532,29 @@ opacity: 1; /* ホバー時に不透明度を戻す */
 	  1px 1px 1px #f40909,
 	  2px 2px 1px #000;
 	animation: glitch 2s infinite;  
+}
   
-  }
-  
-  /* グラデーションアニメーション */
-  @keyframes gradient {
+/* グラデーションアニメーション */
+@keyframes gradient {
 	0% {background-position: 0% 50%;}
 	50% {background-position: 100% 50%;}
 	100% {background-position: 0% 50%;}
-  }
+}
   
-  /* グリッチアニメーション */  
-  @keyframes glitch {
+/* グリッチアニメーション */  
+@keyframes glitch {
 	0% {text-shadow: none;}
 	20% {text-shadow: 
 	  1px 1px 1px #f40909,
 	  2px 2px 1px #000;}
 	100% {text-shadow: none;}
-  }
-
+}
 
 .game-start-host:active {
   transform: translateX(-48%) translateY(-10%) scale(0.95);
   opacity: 0.85;
   transition: transform 0.1s, opacity 0.2s; 
   box-shadow: 0 0 12px rgba(0,0,0,0.4);
-
 }
 
 .game-start-host:hover {
@@ -534,6 +562,7 @@ opacity: 1; /* ホバー時に不透明度を戻す */
   background: linear-gradient(to bottom,#ff1a1a,#820404); 
 
 }
+
 .game-start-host:active::after {
   content: "";
   animation: click-feedback 0.3s ease;
@@ -547,25 +576,24 @@ opacity: 1; /* ホバー時に不透明度を戻す */
     transform: translateY(-10px);
   }
 }
+
 .game-start-host-door {
   border-radius: 30px; 
   padding: 10px 10px;
   position: fixed; 
-  left: 700px;
+  left: 50%;
   bottom: 300px;
   transform: translateX(-50%);
   transition: transform 0.1s;
   font-weight: bold;
   width: 180px; /* ボタンの幅を200pxに設定 */
   height: 60px;
-
   font-size: 24px;
   color: #eae4e4;
   background: rgb(233, 224, 224); 
   background: linear-gradient(to bottom, #ffffff, #950404);
   border-radius: 5px;
   padding: 10px 20px;
-
   box-shadow: 1px 1px #000, 
               inset 2px 2px 0 rgba(255,255,255,0.5),
               0 0 15px rgba(0,0,0,0.6);
@@ -581,33 +609,26 @@ opacity: 1; /* ホバー時に不透明度を戻す */
               box-shadow: 0 4px 8px rgba(0, 0, 0, 0.6); /* 影をつけて立体感を出す */
               transition: background-color 0.3s ease;
   
-  
   transition: 0.5s;
   transform: skewZ(-5deg);
   text-shadow: 1px 1px rgb(23, 16, 16);
    animation: creepy-font 2s infinite;
    background: linear-gradient(to right, #000000, #000000, #000000);
    animation: gradient 5s infinite;
-   
- 
-
 }
-
-
 
 .game-start-host-door:active {
   transform: translateX(-48%) translateY(-10%) scale(0.95);
   opacity: 0.85;
   transition: transform 0.1s, opacity 0.2s; 
   box-shadow: 0 0 12px rgba(0,0,0,0.4);
-
 }
 
 .game-start-host-door:hover {
   background: rgb(229, 225, 225);
   background: linear-gradient(to bottom,#000000,#000000); 
-
 }
+
 .game-start-host-door:active::after {
   content: "";
   animation: click-feedback 0.3s ease;
@@ -621,6 +642,7 @@ opacity: 1; /* ホバー時に不透明度を戻す */
     transform: translateY(-10px);
   }
 }
+
 .copy-message {
   animation: fade-out 1s ease-out forwards; 
 
@@ -628,6 +650,7 @@ opacity: 1; /* ホバー時に不透明度を戻す */
   top: 500px;
   left: 800px;
 }
+
 @keyframes fade-out {
     0% {
     opacity: 1;
@@ -643,11 +666,10 @@ opacity: 1; /* ホバー時に不透明度を戻す */
     }
   }
 
-
   .end-button {
   position: absolute;
   right: 80px;
-  bottom: 30px;
+  bottom: 45px;
   /* サイズ */
   display: inline-block;
   padding: 20px 40px; /* パディングを大きく */
@@ -678,13 +700,14 @@ opacity: 1; /* ホバー時に不透明度を戻す */
   box-shadow: none;
   transform: translateY(2px) scale(0.9); /* アクティブ時にボタンを少し小さく */
 }
+
 .code-s {
   position: absolute;
-  left: 40%;
-  
-  top: 80%;
-  
+  left: 50%;
+  bottom: 25%;
+  transform: translate(-50%, -50%);
 }
+
 .exit {
   position: absolute;
   bottom: 50%;
@@ -709,6 +732,7 @@ opacity: 1; /* ホバー時に不透明度を戻す */
       color: #82ffc9;
       box-shadow: inset 0 0 10px rgba(27, 253, 156, 0.6), 0 0 9px 3px rgba(27, 253, 156, 0.2);
   }
+
   .exit:hover:before {
     content: "";
     position: absolute;
@@ -719,36 +743,21 @@ opacity: 1; /* ホバー時に不透明度を戻す */
     transition: transform .4s ease-in-out;
     background: linear-gradient(to right, transparent 1%, rgba(27, 253, 156, 0.1) 40%,rgba(27, 253, 156, 0.1) 60% , transparent 100%);
   }
+
   .exit:hover:before {
     transform: translateX(15em);
   }
-  
- 
 
   /* その他スタイル */
-  
   padding: 0.6em;
   border: mediumspringgreen solid 0.15em;
   border-radius: 0.25em;
   color: mediumspringgreen;
   font-size: 1.5em;  
   font-weight: 700;
-  
-  
-  
-  
-
-  
 }
 
-
-
-
-
-
-
 .congratulation {
-
   /* 文字を中央上寄せ */
   position: absolute;
   top: 25%;
@@ -835,9 +844,8 @@ opacity: 1; /* ホバー時に不透明度を戻す */
     background-position: 600px;
   }
 }
-.true_title {
 
-  color: #fff;
+.true_title {
   font-size: 20px;
   font-weight: bold;
 
@@ -848,14 +856,10 @@ opacity: 1; /* ホバー時に不透明度を戻す */
     -2px 2px 0 #000,
      2px 2px 0 #000;
 
-  
-
   /* 丸みをつける */
- 
   padding: 5px 20px;
   position: absolute;
-  top: 93.5%;
-  left: 42.5%;
+  left: 670px;
+  bottom: 48px;
   transform: translate(-50%, -50%);
-
 }

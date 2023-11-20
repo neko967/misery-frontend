@@ -6,15 +6,16 @@ import styles from '../../components/WaitingRoomButton.module.css';
 
 function WaitingRoomButton() {
   return (
-      <main className={styles.container}>
-          <div className={styles.section}>
-              <div className={styles.text}>
-                  <div className={styles.character}>
-                  <span style={{color: 'yellow'}}>⚠️</span> 本アプリにはショックの強い表現が含まれています。</div>
-                  <div className={styles.character}>苦手な方や心臓の弱い方はご注意ください。</div>
-              </div>
+    <main className={styles.container}>
+      <div className={styles.section}>
+        <div className={styles.text}>
+          <div className={styles.character}>
+            <span style={{color: 'yellow'}}>⚠️</span> 本アプリにはショックの強い表現が含まれています。
           </div>
-      </main>
+          <div className={styles.character}>苦手な方や心臓の弱い方はご注意ください。</div>
+        </div>
+      </div>
+    </main>
   );
 }
 export default function Home({ params }: { params: { slug: string } }) {
@@ -35,8 +36,6 @@ export default function Home({ params }: { params: { slug: string } }) {
   ];
 
   const nextText = () => {
-    // 最後のテキストを表示した後、もう一つインデックスを増やして
-    // `WaitingRoomButton`が表示されるようにする。
     if (currentTextIndex < storyTexts.length) {
       setCurrentTextIndex(currentTextIndex + 1);
     }
@@ -83,64 +82,60 @@ export default function Home({ params }: { params: { slug: string } }) {
       className="h-screen w-full bg-cover"
       style={{ backgroundImage: "url('/Central.png')" }}
     >
-        <div className="warning">※このゲームは、2人プレイ専用です。音を出してお楽しみください。</div>
+      <div className="warning">※このゲームは、2人プレイ専用です。音を出してお楽しみください。</div>
       {currentTextIndex < storyTexts.length && (
-      <div
-        style={{
-          position: 'fixed',
-          top: '50%',
-          left: '50%',
-          transform: 'translate(-50%, -50%)',
-          backgroundColor: 'rgba(0, 0, 0, 0.56)',
-          color: 'white',
-          padding: '20px',
-          borderRadius: '10px',
-          textAlign: 'center',
-          width: '1000px',
-          maxHeight: '80vh', // 画面の高さの80%を最大に
-          overflowY: 'auto', // 縦方向にスクロール可能に
-          zIndex: 1000
-        }}
-      >
-        <p style={{ margin: '10px', height: '20px' }}>{storyTexts[currentTextIndex]}</p>
         <div
           style={{
-            position: 'absolute',
-            right: '10px',
-            bottom: '10px',
-            cursor: 'pointer',
-            fontSize: '24px',
-            padding: '10px',
+            position: 'fixed',
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
+            backgroundColor: 'rgba(0, 0, 0, 0.56)',
+            color: 'white',
+            padding: '20px',
+            borderRadius: '10px',
             textAlign: 'center',
-            animation: 'bounce 1s infinite'
+            width: '1000px',
+            maxHeight: '80vh', // 画面の高さの80%を最大に
+            overflowY: 'auto', // 縦方向にスクロール可能に
+            zIndex: 1000
           }}
-          onClick={nextText}
         >
-          ▼
+          <p style={{ margin: '10px', height: '20px' }}>{storyTexts[currentTextIndex]}</p>
+          <div
+            style={{
+              position: 'absolute',
+              right: '10px',
+              bottom: '10px',
+              cursor: 'pointer',
+              fontSize: '24px',
+              padding: '10px',
+              textAlign: 'center',
+              animation: 'bounce 1s infinite'
+            }}
+            onClick={nextText}
+          >
+            ▼
+          </div>
         </div>
-      </div>
-    )}
-   
-    {currentTextIndex === storyTexts.length && (
-      <div
-        style={{
-          position: 'fixed',
-          top: '50%',
-          left: '50%',
-          transform: 'translate(-50%, -50%)',
-          maxWidth: '80%',
-          zIndex: 1000
-        }}
-      >
-        <WaitingRoomButton />
-        <button onClick={clickReady} className="game-start">
-        準備OK?
-      </button>
-      </div>
-    )}
-
-      
-     
+      )}
+      {currentTextIndex === storyTexts.length && (
+        <div
+          style={{
+            position: 'fixed',
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
+            maxWidth: '80%',
+            zIndex: 1000
+          }}
+        >
+          <WaitingRoomButton />
+          <button onClick={clickReady} className="game-start">
+            準備OK?
+          </button>
+        </div>
+      )}
     </div>
   );
 }
