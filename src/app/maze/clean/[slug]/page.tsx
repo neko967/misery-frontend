@@ -73,15 +73,17 @@ export default function Dealer({ params }: { params: { slug: string } }) {
   };
 
   useEffect(() => {
-    const startPosition = document.querySelector('[data-start]');
-    if (startPosition) {
-      startPosition.dispatchEvent(new MouseEvent('mousemove', {
-        clientX: startPosition.getBoundingClientRect().left + 20,  // Center the cursor
-        clientY: startPosition.getBoundingClientRect().top + 20,   // Center the cursor
-        bubbles: true
-      }));
+    if (isGameStarted) {
+      const startPosition = document.querySelector('[data-start]');
+      if (startPosition) {
+        startPosition.dispatchEvent(new MouseEvent('mousemove', {
+          clientX: startPosition.getBoundingClientRect().left + 20,  // Center the cursor
+          clientY: startPosition.getBoundingClientRect().top + 20,   // Center the cursor
+          bubbles: true
+        }));
+      }
     }
-  }, []);
+  }, [isGameStarted]);
 
   useEffect(() => {
     async function checkRoomExists() {
@@ -201,12 +203,14 @@ export default function Dealer({ params }: { params: { slug: string } }) {
 
   // 壁を2秒間隔で出現・消失
   useEffect(() => {
-    const interval = setInterval(() => {
-      setShowWall(prev => !prev);
-    }, 2000);
+    if (isGameStarted) {
+      const interval = setInterval(() => {
+        setShowWall(prev => !prev);
+      }, 2000);
   
-    return () => clearInterval(interval);
-  }, []);
+      return () => clearInterval(interval);
+    }
+  }, [isGameStarted]);
 
   // タイムアタックのタイマーを実装
   useEffect(() => {
@@ -226,23 +230,25 @@ export default function Dealer({ params }: { params: { slug: string } }) {
 
   // X軸に移動するギミック
   useEffect(() => {
-    const interval = setInterval(() => {
-      setMovingDot(prev => {
-        let newX = prev.x + prev.direction; // 現在の方向に応じてXを更新
-        let newDirection = prev.direction;
-  
-        // 点が[4][8]の右端または[4][1]の左端に達した場合、方向を反転
-        if (newX > 6 || newX < 2) { // xの範囲を1〜8に変更
-          newDirection *= -1; // 方向を反転させる
-          newX = prev.x + newDirection; // 新しい方向で位置を更新
-        }
-  
-        return { ...prev, x: newX, direction: newDirection };
-      });
-    }, 1000); // 1秒ごとに動かす
-  
-    return () => clearInterval(interval); // コンポーネントのアンマウント時にクリーンアップ
-  }, []);
+    if (isGameStarted) {
+      const interval = setInterval(() => {
+        setMovingDot(prev => {
+          let newX = prev.x + prev.direction; // 現在の方向に応じてXを更新
+          let newDirection = prev.direction;
+
+          // 点が[4][8]の右端または[4][1]の左端に達した場合、方向を反転
+          if (newX > 6 || newX < 2) { // xの範囲を1〜8に変更
+            newDirection *= -1; // 方向を反転させる
+            newX = prev.x + newDirection; // 新しい方向で位置を更新
+          }
+
+          return { ...prev, x: newX, direction: newDirection };
+        });
+      }, 1000); // 1秒ごとに動かす
+
+      return () => clearInterval(interval); // コンポーネントのアンマウント時にクリーンアップ
+    }
+  }, [isGameStarted]);
   
   // X軸に移動するギミックの衝突判定
   useEffect(() => {
