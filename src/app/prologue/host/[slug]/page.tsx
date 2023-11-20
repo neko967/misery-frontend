@@ -8,27 +8,27 @@ import DirtyButtonStyles from '../../components/WaitingRoomDirtyButton.module.cs
 
 function WaitingRoomButton() {
   return (
-      <main className={styles.container}>
-          <div className={styles.section}>
-              <div className={styles.text}>
-                  <div className={styles.character}>綺麗な</div>
-                  <div className={styles.character}>部屋に入る？</div>
-              </div>
-          </div>
-      </main>
+    <main className={styles.container}>
+      <div className={styles.section}>
+        <div className={styles.text}>
+          <div className={styles.character}>綺麗な</div>
+          <div className={styles.character}>部屋に入る？</div>
+        </div>
+      </div>
+    </main>
   );
 }
 
 function WaitingRoomDirtyButton() {
   return (
-      <main className={DirtyButtonStyles.container}>
-          <div className={DirtyButtonStyles.section}>
-              <div className={DirtyButtonStyles.text}>
-                  <div className={DirtyButtonStyles.character}>寂れた</div>
-                  <div className={DirtyButtonStyles.character}>部屋に入る？</div>
-              </div>
-          </div>
-      </main>
+    <main className={DirtyButtonStyles.container}>
+      <div className={DirtyButtonStyles.section}>
+        <div className={DirtyButtonStyles.text}>
+          <div className={DirtyButtonStyles.character}>寂れた</div>
+          <div className={DirtyButtonStyles.character}>部屋に入る？</div>
+        </div>
+      </div>
+    </main>
   );
 }
 
