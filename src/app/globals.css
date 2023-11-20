@@ -411,11 +411,6 @@ body {
   font-weight: bold;
 }
 
-@font-face {
-  font-family: 'DancingScript';
-  src: url('/fonts/DancingScript.woff2') format('woff2');
-}
-
 .thanks-message {
   font-family: 'DancingScript', cursive; 
   font-size: 130px;
@@ -645,10 +640,10 @@ body {
 
 .copy-message {
   animation: fade-out 1s ease-out forwards; 
-
   position: fixed; /* 画面に対して固定位置 */
   top: 500px;
   left: 800px;
+  color: white;
 }
 
 @keyframes fade-out {
@@ -706,6 +701,7 @@ body {
   left: 50%;
   bottom: 25%;
   transform: translate(-50%, -50%);
+  color: white;
 }
 
 .exit {
@@ -848,6 +844,7 @@ body {
 .true_title {
   font-size: 20px;
   font-weight: bold;
+  color: white;
 
   /* 文字の縁取り */
   text-shadow: 
