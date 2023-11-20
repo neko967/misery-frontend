@@ -842,7 +842,7 @@ export default function Home({ params }: { params: { slug: string } }) {
           height: `700px`
         }}>
           <div className="absolute bottom-20 left-20 text-xl">
-            <p className="end-title">Bad End: 仲間割れ</p>
+            <p className="end-title text-white">Bad End: 仲間割れ</p>
           </div>
           <button className="absolute bg-red-700 border-2 border-red-700 rounded-3xl shadow w-32 py-2.5 px-5 text-base left-1/2 bottom-20 translate-x-[-50%] text-white hover:bg-red-400 hover:text-gray-200"
                   onClick={reStartGame}
