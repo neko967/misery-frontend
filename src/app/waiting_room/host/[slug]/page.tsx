@@ -1,26 +1,21 @@
 'use client';
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import Link from 'next/link'
 import styles from '../../components/WaitingRoomButton.module.css';
 import { KoHo } from 'next/font/google';
 
-
-
 function WaitingRoomButton() {
-    return (
-        <main className={styles.container}>
-            <div className={styles.section}>
-                <div className={styles.text}>
-                    <div className={styles.character}><span style={{color: 'yellow'}}>⚠️</span> 本アプリにはショックの強い表現が含まれています。</div>
-                  <div className={styles.character}>苦手な方や心臓の弱い方はご注意ください。</div>
-                </div>
-            </div>
-        </main>
-    );
+  return (
+    <main className={styles.container}>
+      <div className={styles.section}>
+        <div className={styles.text}>
+          <div className={styles.character}><span style={{color: 'yellow'}}>⚠️</span> 本アプリにはショックの強い表現が含まれています。</div>
+          <div className={styles.character}>苦手な方や心臓の弱い方はご注意ください。</div>
+        </div>
+      </div>
+    </main>
+  );
 }
-
-
 
 export default function Home({ params }: { params: { slug: string } }) {
   const [ws, setWs] = useState<WebSocket | null>(null);
@@ -41,8 +36,6 @@ export default function Home({ params }: { params: { slug: string } }) {
   ];
 
   const nextText = () => {
-    // 最後のテキストを表示した後、もう一つインデックスを増やして
-    // `WaitingRoomButton`が表示されるようにする。
     if (currentTextIndex < storyTexts.length) {
       setCurrentTextIndex(currentTextIndex + 1);
     }
@@ -84,82 +77,78 @@ export default function Home({ params }: { params: { slug: string } }) {
     }
   }
 
-
   return (
     <div
       className="h-screen w-full bg-cover"
       style={{ backgroundImage: "url('/Central.png')" }}
     >
-        <div className="warning">※このゲームは、2人プレイ専用です。音を出してお楽しみください。</div>
+      <div className="warning">※このゲームは、2人プレイ専用です。音を出してお楽しみください。</div>
       <p className="invite-text">この部屋の招待コード</p>
-        <p className="invite-code" onClick={() => {
-          navigator.clipboard.writeText(params.slug);
-        setCopied(true);
-        }}>
-        {params.slug}
-        </p>
-        <p className="code-s">上記コードをクリックして相手に伝えてください</p>
-        {copied && <p className="copy-message">コピーしました!</p>}
-      {currentTextIndex < storyTexts.length && (
-      <div
-        style={{
-          position: 'fixed',
-          top: '50%',
-          left: '50%',
-          transform: 'translate(-50%, -50%)',
-          backgroundColor: 'rgba(0, 0, 0, 0.56)',
-          color: 'white',
-          padding: '20px',
-          borderRadius: '10px',
-          textAlign: 'center',
-          width: '1000px',
-          maxHeight: '80vh', // 画面の高さの80%を最大に
-          overflowY: 'auto', // 縦方向にスクロール可能に
-          zIndex: 1000
-        }}
+      <p className="invite-code" onClick={() => {
+         navigator.clipboard.writeText(params.slug);
+         setCopied(true);}}
       >
-        <p style={{ margin: '10px', height: '20px' }}>{storyTexts[currentTextIndex]}</p>
+        {params.slug}
+      </p>
+      <p className="code-s">上記コードをクリックして相手に伝えてください</p>
+      {copied && <p className="copy-message">コピーしました!</p>}
+      {currentTextIndex < storyTexts.length && (
         <div
           style={{
-            position: 'absolute',
-            right: '10px',
-            bottom: '10px',
-            cursor: 'pointer',
-            fontSize: '24px',
-            animation: 'bounce 1s infinite'
+            position: 'fixed',
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
+            backgroundColor: 'rgba(0, 0, 0, 0.56)',
+            color: 'white',
+            padding: '20px',
+            borderRadius: '10px',
+            textAlign: 'center',
+            width: '1000px',
+            maxHeight: '80vh', // 画面の高さの80%を最大に
+            overflowY: 'auto', // 縦方向にスクロール可能に
+            zIndex: 1000
           }}
-          onClick={nextText}
         >
-          ▼
+          <p style={{ margin: '10px', height: '20px' }}>{storyTexts[currentTextIndex]}</p>
+          <div
+            style={{
+              position: 'absolute',
+              right: '10px',
+              bottom: '10px',
+              cursor: 'pointer',
+              fontSize: '24px',
+              animation: 'bounce 1s infinite'
+            }}
+            onClick={nextText}
+          >
+            ▼
+          </div>
         </div>
-      </div>
-    )}
-   
-   {currentTextIndex === storyTexts.length && (
-      <div
-        style={{
-          position: 'fixed',
-          top: '50%',
-          left: '50%',
-          transform: 'translate(-50%, -50%)',
-          maxWidth: '80%',
-          zIndex: 1000
-        }}
-      >
-        <WaitingRoomButton />
-      
-      </div>
-    )}
-   
-    
-
-      {readyToPrologue &&
-        <button onClick={goPrologue}
-                className="game-start-host">
+      )}
+      {currentTextIndex === storyTexts.length && (
+        <div
+          style={{
+            position: 'fixed',
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
+            maxWidth: '80%',
+            zIndex: 1000
+          }}
+        >
+          <WaitingRoomButton />
+        </div>
+      )}
+      {readyToPrologue ? 
+        <button onClick={goPrologue} className="game-start-host">
+          GAME START
+        </button>
+      :
+        <button className="game-start-host-wait">
           GAME START
         </button>
       }
-      
     </div>
   );
 }

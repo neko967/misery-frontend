@@ -8,26 +8,26 @@ import DirtyButtonStyles from '../../components/WaitingRoomDirtyButton.module.cs
 
 function WaitingRoomButton() {
   return (
-      <main className={styles.container}>
-          <div className={styles.section}>
-              <div className={styles.text}>
-                  <div className={styles.character}>綺麗な</div>
-                  <div className={styles.character}>部屋に入る？</div>
-              </div>
-          </div>
-      </main>
+    <main className={styles.container}>
+      <div className={styles.section}>
+        <div className={styles.text}>
+          <div className={styles.character}>綺麗な</div>
+          <div className={styles.character}>部屋に入る？</div>
+        </div>
+      </div>
+    </main>
   );
 }
 function WaitingRoomDirtyButton() {
   return (
-      <main className={DirtyButtonStyles.container}>
-          <div className={DirtyButtonStyles.section}>
-              <div className={DirtyButtonStyles.text}>
-                  <div className={DirtyButtonStyles.character}>寂れた</div>
-                  <div className={DirtyButtonStyles.character}>部屋に入る？</div>
-              </div>
-          </div>
-      </main>
+    <main className={DirtyButtonStyles.container}>
+      <div className={DirtyButtonStyles.section}>
+        <div className={DirtyButtonStyles.text}>
+          <div className={DirtyButtonStyles.character}>寂れた</div>
+          <div className={DirtyButtonStyles.character}>部屋に入る？</div>
+        </div>
+      </div>
+    </main>
   );
 }
 
@@ -107,7 +107,6 @@ export default function Home({ params }: { params: { slug: string } }) {
       style={{ backgroundImage: "url('/prologue.png')" }}
     >
       <GlitchEffect />
-
       {/* Story Texts */}
       {currentTextIndex < storyTexts.length && (
         <div
@@ -149,23 +148,18 @@ export default function Home({ params }: { params: { slug: string } }) {
             flexDirection: 'column',
             alignItems: 'center',
             zIndex: 1000,
-            
           }}
-          
         >
           <button className="clean-my-button" onClick={clickMysteryClean} type="button">
             <WaitingRoomButton />
             {hostWhichRoom === 'clean' && <span className="indicator-item indicator-start badge badge-secondary"></span>}
             {guestWhichRoom === 'clean' && <span className="indicator-item badge badge-primary"></span>}
           </button>
-          
-
           <button className="dirty-my-button" onClick={clickMysteryDirty} type="button">
             <WaitingRoomDirtyButton />
             {hostWhichRoom === 'dirty' && <span className="indicator-item indicator-start badge badge-secondary"></span>}
             {guestWhichRoom === 'dirty' && <span className="indicator-item badge badge-primary"></span>}
           </button>
-          
         </div>
       )}
     </div>
