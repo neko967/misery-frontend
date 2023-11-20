@@ -60,19 +60,19 @@ export default function Home() {
     >
       <div className="relative ml-0">
         <div className="fixed top-[-30px] ml-10 flex animate-flicker-5 pt-0">
-          <div className="font-horror2 ml-4  text-[min(20vw,130px)]">M</div>
-          <div className="font-horror1 text-[min(20vw,130px)]">ISE</div>
-          <div className="font-horror2 text-[min(20vw,130px)]">R</div>
-          <div className="font-horror4 text-[min(20vw,130px)]">Y</div>
+          <div className="font-horror2 ml-4 text-[min(20vw,130px)] text-white">M</div>
+          <div className="font-horror1 text-[min(20vw,130px)] text-white">ISE</div>
+          <div className="font-horror2 text-[min(20vw,130px)] text-white">R</div>
+          <div className="font-horror4 text-[min(20vw,130px)] text-white">Y</div>
         </div>
       </div>
       <div className="absolute top-80 right-90 bottom-60 gap-4 flex flex-col ">
         <button onClick={createRoom}
-                className="font-horror2 my-5 ml-10 mr-50  text-7xl">
+                className="font-horror2 my-5 ml-10 mr-50 text-7xl text-white">
           NEW GAME
         </button>
         <button onClick={joinRoom}
-                className="font-horror2 ml-20 mr-10  text-7xl">
+                className="font-horror2 ml-20 mr-10 text-7xl text-white">
           JOIN ROOM
         </button>
       </div>
