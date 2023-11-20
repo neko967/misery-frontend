@@ -122,7 +122,7 @@ export default function Home({ params }: { params: { slug: string } }) {
   const [dirtyIsReadyToAcceptItem, setDirtyIsReadyToAcceptItem] = useState(false);
   const [currentTextIndex, setCurrentTextIndex] = useState(0);
   const [diaryCurrentTextIndex, setDiaryCurrentTextIndex] = useState(12);
-  const [isGameOver, setIsGameOver] = useState(true);
+  const [isGameOver, setIsGameOver] = useState(false);
 
   const storyTexts = [
     '部屋に入ると、ドアが勢いよく閉じた。',
