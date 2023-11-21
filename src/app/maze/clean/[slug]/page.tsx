@@ -21,8 +21,10 @@ export default function Dealer({ params }: { params: { slug: string } }) {
   const countDownImage = "/countDownImage.png";
   const timedVanisingDoorImage = "/timedVanisingDoor.png";
   const newsPaperImage = "/newsPaper.png";
-  const keyPositions: number[][] = [[],[1,29],[0,0],[14,1],[0,0],[6,19],[0,0],[1,11],[0,0]];  //[[空の配列],[key1縦,key1横],[key2縦,key2横],[key3縦,key3横]],[key4縦,key4横]]
-  const doorPositions: number[][] = [[],[0,0],[15,6],[0,0],[9,16],[0,0],[4,13],[7,10],[4,4]]; //[[空の配列],[door1縦,door1横],[door2縦,door2横],[door3縦,door3横]],[door4縦,door4横]]
+  const keyPositions: number[][] = [[],[1,29],[0,0],[14,1],[0,0],[6,19],[0,0],[1,11],[0,0]];  //[[空の配列],[key1縦,key1横],[key2縦,key2横],[key3縦,key3横]]]
+  const doorPositions: number[][] = [[],[0,0],[15,6],[0,0],[9,16],[0,0],[4,13],[7,10],[4,4]]; //[[空の配列],[door1縦,door1横],[door2縦,door2横],[door3縦,door3横]]]
+  const wallPositions: number[][] = [[5,19],[7,19],[6,20],[6,18],[8,29],[9,1],[18,10],[2,14],[4,8]]; // 出現・消失する壁
+  const [keys, setKeys] = useState({ key1: false, key2: false, key3: false, key4: false, key5: false, key6: false, key7: false, key8: false });
   const { height, width } = GetWindowSize();
   const cellSize = Math.min(width, height) / elements;
   const [ws, setWs] = useState<WebSocket | null>(null);
@@ -33,32 +35,25 @@ export default function Dealer({ params }: { params: { slug: string } }) {
   const [isDirtyGameClear, setIsDirtyGameClear] = useState(false);
   const [isCleanGameClear, setIsCleanGameClear] = useState(false);
   const [isGameStarted, setIsGameStarted] = useState(false);
-  const [keys, setKeys] = useState({ key1: false, key2: false, key3: false, key4: false, 
-                                     key5: false, key6: false, key7: false, key8: false });
-  const wallPositions: number[][] = [[5,19],[7,19],[6,20],[6,18],[8,29],[9,1],[18,10],[2,14],[4,8]]; // 出現・消失する壁
   // const [wallPositions, setWallPositions] = useState<number[][]>([[16, 13]]);
-  // 壁の表示/非表示を管理するstateを追加
-  const [showWall, setShowWall] = useState(false);
+  const [showWall, setShowWall] = useState(false); // 壁の表示/非表示を管理するstateを追加
+  const [movingDot, setMovingDot] = useState({ x: 2, y: 5, direction: 1 }); // 移動するギミック。yを4にして、xを1から開始
+  const [currentTextIndex, setCurrentTextIndex] = useState(0);
+  const timedVanisingDoor: number[][] = [[],[14,29]]; // カウントダウンタイマーを取得すると消失するドア
+  const newsPaper: number[][] = [[],[12,29]]; // 取得するとTrueEndに行ける新聞紙
+  const [getDirtyNewsPaper, setGetDirtyNewsPaper] = useState(false); // 新聞紙の取っているか
+  const [getCleanNewsPaper, setGetCleanNewsPaper] = useState(false);
+  const [gameSaved, setGameSaved] = useState(false);
+  const [allowPlusMissCount, setAllowPlusMissCount] = useState(false);
+  const [missCount, setMissCount] = useState(0);
   const [timeLeft, setTimeLeft] = useState(30); // 残り10秒からスタート
   const [isTimeAttackStarted, setIsTimeAttackStarted] = useState(false); // タイムアタックが開始されたかどうかを追跡
   const timeAttackPositions: number[][] = [[],[0,0]] // タイムアタック開始のppsition
-  // リセットボタンの呼び出し関数
-  const resetButtonTimer: any = () => {
+  const resetButtonTimer: any = () => { // リセットボタンの呼び出し関数
     setTimeout(() => {
       setResetButton(true);
     }, 3000);
   }
-  const [movingDot, setMovingDot] = useState({ x: 2, y: 5, direction: 1 }); // 移動するギミック。yを4にして、xを1から開始
-  const [currentTextIndex, setCurrentTextIndex] = useState(0);
-  // カウントダウンタイマーを取得すると消失するドア
-  const timedVanisingDoor: number[][] = [[],[14,29]];
-  // 取得するとTrueEndに行ける新聞紙
-  const newsPaper: number[][] = [[],[12,29]];
-  // 新聞紙の取っているか
-  const [getDirtyNewsPaper, setGetDirtyNewsPaper] = useState(false);
-  const [getCleanNewsPaper, setGetCleanNewsPaper] = useState(false);
-  const [gameSaved, setGameSaved] = useState(false);
-  const [missCount, setMissCount] = useState(0);
 
   const storyTexts = [
     '閉ざされた屋敷の扉を押し開けると、そこはもはやただの屋敷ではなかった。',
@@ -111,6 +106,7 @@ export default function Dealer({ params }: { params: { slug: string } }) {
           } else if (event.data == "timeAttack") {
             setIsTimeAttackStarted(true);
             setGameSaved(true);
+            setAllowPlusMissCount(true);
           } else if (event.data == "getkey1") {
             setKeys(prev => ({ ...prev, key1: true }));
             maze[doorPositions[1][0]][doorPositions[1][1]] = ' ';
@@ -181,22 +177,21 @@ export default function Dealer({ params }: { params: { slug: string } }) {
     setIsDirtyGameClear(false);
     setGetDirtyNewsPaper(false);
     setGetCleanNewsPaper(false);
+    setAllowPlusMissCount(false);
   };
 
   useEffect(() => {
-    if (isCleanGameClear) {
+    if (isCleanGameClear && isDirtyGameClear) {
       setIsTimeAttackStarted(false);
     }
-  }, [isCleanGameClear]);
+  }, [isCleanGameClear, isDirtyGameClear]);
 
   useEffect(() => {
-    if (isGameOver && isTimeAttackStarted ) {
-      setMissCount(missCount + 1);
-      setIsTimeAttackStarted(false);
+    if (isGameOver) {
+      if (allowPlusMissCount) {
+        setMissCount(missCount + 1);
+      }
       playGameOverSound(gameSaved);
-    } else if (isGameOver && !isTimeAttackStarted) {
-      playGameOverSound(gameSaved);
-    } else {
       setIsTimeAttackStarted(false);
     }
   }, [isGameOver]);
