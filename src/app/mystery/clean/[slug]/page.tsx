@@ -491,11 +491,18 @@ export default function Home({ params }: { params: { slug: string } }) {
 
   //音
   const playGunSound = () => {
-    if (!currentItem) {
-      const sound = new Audio("/se_gun_fire10.wav");
-      sound.play();
-    }
+    const sound = new Audio("/se_gun_fire10.wav");
+    sound.play();
   };
+
+  useEffect(() => {
+    if (selectedItem && selectedItem.name === "銃" 
+                     && diaryCurrentTextIndex >= diaryTexts.length
+                     && currentItem
+                     && currentItem.name !== "銃") {
+      playGunSound();
+    }
+  }, [selectedItem, diaryCurrentTextIndex, diaryTexts, currentItem]);
 
   const handleGameOver = () => {
     if (ws && ws.readyState === WebSocket.OPEN) {
@@ -539,7 +546,6 @@ export default function Home({ params }: { params: { slug: string } }) {
             width: `1300px`,
             height: `700px`
           }}
-          onClick={() => `${selectedItem && selectedItem.name === "銃" && backgroundImage !== '/wall.png' && diaryCurrentTextIndex >= diaryTexts.length ? playGunSound() : undefined}`}
         >
           {/* 条件に基づいて左の三角形ボタンを表示 */}
           {backgroundImage === '/clean_room.png' && (
