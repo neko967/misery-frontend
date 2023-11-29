@@ -227,7 +227,7 @@ return (
                 
                     // Twitter Intentでテキストと画像URLを含めてツイート
                     window.open(
-                      `https://twitter.com/share?url=${encodeURIComponent(pageUrl)}&text=${encodeURIComponent(tweetText)}
+                      `https://twitter.com/intent/tweet?url=${encodeURIComponent(pageUrl)}&text=${encodeURIComponent(tweetText)}
                       &hashtags=MISERY`,
                       '_blank' 
                     ); 
