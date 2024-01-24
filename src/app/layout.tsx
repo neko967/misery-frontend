@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import './globals.css'
 import { Analytics } from '@vercel/analytics/react'; //ここを追加
-
+import GoogleAnalytics from '@/components/GoogleAnalytics'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -20,21 +20,14 @@ export const metadata: Metadata = {
 		card: 'summary_large_image',
 	},
 };
- 
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode
-}) {
+export default function RootLayout({ children }: { children: React.ReactNode }): JSX.Element {
   return (
-    
-    <html lang="en">
-      <body className={inter.className}>
-		{children}
-		<Analytics />
-		</body>
-    </html>
-    
+    <html lang='en'>
+	  <head>
+		<GoogleAnalytics />
+	  </head>
+	  <body>{children}</body>
+	</html>
   )
 }
