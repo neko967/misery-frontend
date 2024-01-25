@@ -103,7 +103,7 @@ export default function Home() {
         </div>
       </div>
       {matches &&
-        <div className={"absolute bottom-0 left-2"}>
+        <div className={"absolute bottom-0 left-2 text-white"}>
           <p>※スマホからのプレイには対応していません。</p>
           <p>PCからのプレイをお勧めします。</p>
         </div>
