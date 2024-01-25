@@ -95,7 +95,7 @@ export default function Home() {
             aria-labelledby="modal-modal-title"
             aria-describedby="modal-modal-description"
           >
-            <Box className="absolute top-1/2 left-1/2 translate-x-[calc(-50%)] translate-y-[calc(-50%)] w-2/3 border-2 border-solid border-black shadow">
+            <Box className="absolute top-1/2 left-1/2 translate-x-[calc(-50%)] translate-y-[calc(-50%)] w-full sm:w-1/2 md:w-2/3 border-2 border-solid border-black shadow">
               <Image src={localImage} alt="HowToPlay"  />
             </Box>
           </Modal>
