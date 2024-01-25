@@ -84,11 +84,11 @@ export default function Home() {
           JOIN ROOM
         </button>
         <div>
-          <Button onClick={handleOpen}
+          <button onClick={handleOpen}
                   className="font-horror2 my-2.5 mx-10 text-3xl md:text-7xl text-white"
           >
             HOW TO PLAY
-          </Button>
+          </button>
           <Modal
             open={open}
             onClose={handleClose}
