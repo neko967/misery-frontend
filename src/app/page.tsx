@@ -2,10 +2,10 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Box from '@mui/material/Box';
-import Button from '@mui/material/Button';
 import Modal from '@mui/material/Modal';
 import Image from "next/image";
 import localImage from "../../public/how_to_play.png";
+import { useMediaQuery } from "@mui/material";
 
 type Room = {
   name: string;
@@ -18,6 +18,7 @@ export default function Home() {
   const handleClose = () => setOpen(false);
   const [rooms, setRooms] = useState<Room[]>([]);
   const router = useRouter();
+  const matches: boolean = useMediaQuery("(max-width:577px)");
 
   async function createRoom() {
     var S="ABCDEFGHIJKLMNOPQRSTUVWXYZ"
@@ -101,6 +102,12 @@ export default function Home() {
           </Modal>
         </div>
       </div>
+      {matches &&
+        <div className={"absolute bottom-0 left-2"}>
+          <p>※スマホからのプレイには対応していません。</p>
+          <p>PCからのプレイをお勧めします。</p>
+        </div>
+      }
     </div>
   );
 }
