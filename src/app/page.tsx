@@ -1,6 +1,11 @@
 'use client';
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Box from '@mui/material/Box';
+import Button from '@mui/material/Button';
+import Modal from '@mui/material/Modal';
+import Image from "next/image";
+import localImage from "../../public/how_to_play.png";
 
 type Room = {
   name: string;
@@ -8,6 +13,9 @@ type Room = {
 };
 
 export default function Home() {
+  const [open, setOpen] = React.useState(false);
+  const handleOpen = () => setOpen(true);
+  const handleClose = () => setOpen(false);
   const [rooms, setRooms] = useState<Room[]>([]);
   const router = useRouter();
 
@@ -59,24 +67,40 @@ export default function Home() {
       style={{ backgroundImage: "url('/background.png')" }}
     >
       <div className="relative ml-0">
-        <div className="fixed top-[-30px] ml-10 flex animate-flicker-5 pt-0">
-          <div className="font-horror2 ml-4 text-[min(20vw,130px)] text-white">M</div>
-          <div className="font-horror1 text-[min(20vw,130px)] text-white">ISE</div>
-          <div className="font-horror2 text-[min(20vw,130px)] text-white">R</div>
-          <div className="font-horror4 text-[min(20vw,130px)] text-white">Y</div>
+        <div className="fixed ml-14 flex animate-flicker-5 pt-0">
+          <div className="font-horror2 text-[min(20vw,50px)] md:text-[min(20vw,130px)] text-white">M</div>
+          <div className="font-horror1 text-[min(20vw,50px)] md:text-[min(20vw,130px)] text-white">ISE</div>
+          <div className="font-horror2 text-[min(20vw,50px)] md:text-[min(20vw,130px)] text-white">R</div>
+          <div className="font-horror4 text-[min(20vw,50px)] md:text-[min(20vw,130px)] text-white">Y</div>
         </div>
       </div>
-      <div className="absolute top-80 right-90 bottom-60 gap-4 flex flex-col ">
+      <div className="absolute top-24 md:top-60 right-90 gap-4 flex flex-col ">
         <button onClick={createRoom}
-                className="font-horror2 my-5 ml-10 mr-50 text-7xl text-white">
+                className="font-horror2 my-2.5 mx-10 text-3xl md:text-7xl text-white">
           NEW GAME
         </button>
         <button onClick={joinRoom}
-                className="font-horror2 ml-20 mr-10 text-7xl text-white">
+                className="font-horror2 my-2.5 mx-10 text-3xl md:text-7xl text-white">
           JOIN ROOM
         </button>
+        <div>
+          <Button onClick={handleOpen}
+                  className="font-horror2 my-2.5 mx-10 text-3xl md:text-7xl text-white"
+          >
+            HOW TO PLAY
+          </Button>
+          <Modal
+            open={open}
+            onClose={handleClose}
+            aria-labelledby="modal-modal-title"
+            aria-describedby="modal-modal-description"
+          >
+            <Box className="absolute top-1/2 left-1/2 translate-x-[calc(-50%)] translate-y-[calc(-50%)] w-2/3 border-2 border-solid border-black shadow">
+              <Image src={localImage} alt="HowToPlay"  />
+            </Box>
+          </Modal>
+        </div>
       </div>
-      
     </div>
   );
 }
