@@ -1,19 +1,14 @@
 'use client';
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import styles from '../../components/WaitingRoomButton.module.css';
-import { KoHo } from 'next/font/google';
+import styles from '../../WaitingRoomButton.module.css';
 
 function WaitingRoomButton() {
   return (
-    <main className={styles.container}>
-      <div className={styles.section}>
-        <div className={styles.text}>
-          <div className={styles.character}><span style={{color: 'yellow'}}>⚠️</span> 本アプリにはショックの強い表現が含まれています。</div>
-          <div className={styles.character}>苦手な方や心臓の弱い方はご注意ください。</div>
-        </div>
-      </div>
-    </main>
+    <div className={styles.text}>
+        <span style={{color: 'yellow'}}>⚠️</span>本アプリにはショックの強い表現が含まれています。
+        <p>苦手な方や心臓の弱い方はご注意ください。</p>
+    </div>
   );
 }
 
@@ -79,7 +74,7 @@ export default function Home({ params }: { params: { slug: string } }) {
 
   return (
     <div
-      className="h-screen w-full bg-cover"
+      className="h-screen w-full bg-cover bg-center"
       style={{ backgroundImage: "url('/Central.png')" }}
     >
       <div className="warning">※このゲームは、2人プレイ専用です。音を出してお楽しみください。</div>

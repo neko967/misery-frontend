@@ -63,7 +63,7 @@ export default function Home() {
 
   return (
     <div
-      className="h-screen w-full bg-cover"
+      className="h-screen w-full bg-cover bg-center"
       style={{ backgroundImage: "url('/background.png')" }}
     >
       <div className="relative ml-0">
@@ -76,16 +76,16 @@ export default function Home() {
       </div>
       <div className="absolute top-24 md:top-60 right-90 gap-4 flex flex-col ">
         <button onClick={createRoom}
-                className="font-horror2 my-2.5 mx-10 text-3xl md:text-7xl text-white">
+                className="font-horror2 my-2.5 mx-10 text-3xl md:text-7xl text-white hover:text-red-600">
           NEW GAME
         </button>
         <button onClick={joinRoom}
-                className="font-horror2 my-2.5 mx-10 text-3xl md:text-7xl text-white">
+                className="font-horror2 my-2.5 mx-10 text-3xl md:text-7xl text-white hover:text-red-600">
           JOIN ROOM
         </button>
         <div>
           <button onClick={handleOpen}
-                  className="font-horror2 my-2.5 mx-10 text-3xl md:text-7xl text-white"
+                  className="font-horror2 my-2.5 mx-10 text-3xl md:text-7xl text-white hover:text-red-600"
           >
             HOW TO PLAY
           </button>

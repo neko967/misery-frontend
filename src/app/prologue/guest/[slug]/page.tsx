@@ -1,8 +1,6 @@
 'use client';
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import GlitchEffect from '../../components/GlitchEffect';
-import TextEffect from '../../components/TextEffect';
 import styles from '../../components/WaitingRoomButton.module.css';
 import DirtyButtonStyles from '../../components/WaitingRoomDirtyButton.module.css';
 
@@ -106,7 +104,6 @@ export default function Home({ params }: { params: { slug: string } }) {
       className="h-screen w-full bg-cover flex justify-center items-center"
       style={{ backgroundImage: "url('/prologue.png')" }}
     >
-      <GlitchEffect />
       {/* Story Texts */}
       {currentTextIndex < storyTexts.length && (
         <div
