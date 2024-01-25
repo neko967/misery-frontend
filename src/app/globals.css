@@ -641,8 +641,8 @@ body {
 .copy-message {
   animation: fade-out 1s ease-out forwards; 
   position: fixed; /* 画面に対して固定位置 */
-  top: 500px;
-  left: 800px;
+  top: 65%;
+  left: 55%;
   color: white;
 }
 
