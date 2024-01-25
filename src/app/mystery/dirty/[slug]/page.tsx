@@ -378,7 +378,7 @@ export default function Home({ params }: { params: { slug: string } }) {
   }
 
   return (
-    <div className="relative h-screen w-screen">
+    <div className="relative h-screen w-screen bg-black">
       {!isGameOver ?
         <div
           // 背景画像
