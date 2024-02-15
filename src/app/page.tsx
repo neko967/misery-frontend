@@ -6,6 +6,8 @@ import Modal from '@mui/material/Modal';
 import Image from "next/image";
 import localImage from "../../public/how_to_play.png";
 import { useMediaQuery } from "@mui/material";
+import IconButton from '@mui/material/IconButton';
+import GitHubIcon from '@mui/icons-material/GitHub';
 
 type Room = {
   name: string;
@@ -62,6 +64,10 @@ export default function Home() {
     }
   }
 
+  async function handleGitHubClick() {
+    router.push(`https://github.com/neko967/misery`);
+  }
+
   return (
     <div
       className="h-screen w-full bg-cover bg-center"
@@ -101,6 +107,11 @@ export default function Home() {
             </Box>
           </Modal>
         </div>
+      </div>
+      <div className="absolute bottom-0 right-0" onClick={handleGitHubClick}>
+        <IconButton aria-label="github" size="large" color="secondary" >
+          <GitHubIcon />
+        </IconButton>
       </div>
       {matches &&
         <div className={"absolute bottom-0 left-2 text-white"}>
