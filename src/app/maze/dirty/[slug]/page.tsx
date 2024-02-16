@@ -407,8 +407,10 @@ export default function Dealer({ params }: { params: { slug: string } }) {
                 <Image src={localImage} alt="ホラー" />
               }
               {resetButton &&
-                <div className="reset">
-                  <button onClick={restartGame} className="reset-button">再挑戦する</button>
+                <div className="reset bg-red-600 hover:bg-white border border-black border-solid rounded-full 
+                                shadow w-32 py-2.5 px-5 text-white hover:text-black text-base 
+                                absolute top-3/4 left-1/2 -translate-x-1/2 -translate-y-1/2 flex justify-center items-center">
+                  <button onClick={restartGame}>再挑戦する</button>
                 </div>
               }
             </div>
