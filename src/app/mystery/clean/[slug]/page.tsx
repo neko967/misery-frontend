@@ -534,6 +534,10 @@ export default function Home({ params }: { params: { slug: string } }) {
     setIsGameOver(false);
   }
 
+  useEffect(() => {
+    router.prefetch(`/maze/clean/${params.slug}`);
+  }, [])
+
   return (
     <div className="relative h-screen w-screen bg-black">
       {!isGameOver ?
