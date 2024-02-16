@@ -99,6 +99,11 @@ export default function Home({ params }: { params: { slug: string } }) {
     }
   }
 
+  useEffect(() => {
+    router.prefetch(`/mystery/dirty/${params.slug}`);
+    router.prefetch(`/mystery/clean/${params.slug}`);
+  }, [])
+
   return (
     <div
       className="h-screen w-full bg-cover flex justify-center items-center"
