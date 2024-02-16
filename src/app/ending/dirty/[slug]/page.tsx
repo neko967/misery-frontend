@@ -48,6 +48,10 @@ export default function Home({ params }: { params: { slug: string } }) {
   async function goCreditsDirty() {
     router.push(`/credits/dirty/${params.slug}`);
   }
+  
+  useEffect(() => {
+    router.prefetch(`/credits/dirty`);
+  }, [])
 
   return (
     <div

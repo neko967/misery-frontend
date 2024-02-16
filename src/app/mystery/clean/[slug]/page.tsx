@@ -536,6 +536,7 @@ export default function Home({ params }: { params: { slug: string } }) {
 
   useEffect(() => {
     router.prefetch(`/maze/clean/${params.slug}`);
+    console.log(`/maze/clean/${params.slug}をprefetchしました。`)
   }, [])
 
   return (

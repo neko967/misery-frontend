@@ -26,6 +26,10 @@ export default function Home() {
     router.push(`/credits/true`);
   }
 
+  useEffect(() => {
+    router.prefetch(`/credits/true`);
+  }, [])
+
   return (
     <div
       className="h-screen w-full bg-cover flex justify-center items-center"
