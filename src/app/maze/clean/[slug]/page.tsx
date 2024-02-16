@@ -343,6 +343,11 @@ export default function Dealer({ params }: { params: { slug: string } }) {
     }
   }
 
+  useEffect(() => {
+    router.prefetch(`/ending/clean/${params.slug}`);
+    router.prefetch(`/ending/true`);
+  }, [])
+
   return (
     <div
       className="h-screen w-full bg-cover flex justify-center items-center"

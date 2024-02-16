@@ -49,6 +49,10 @@ export default function Home({ params }: { params: { slug: string } }) {
     router.push(`/credits/clean/${params.slug}`);
   }
 
+  useEffect(() => {
+    router.prefetch(`/credits/clean`);
+  }, [])
+
   return (
     <div
       className="h-screen w-full bg-cover flex justify-center items-center"

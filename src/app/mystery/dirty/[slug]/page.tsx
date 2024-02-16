@@ -379,6 +379,7 @@ export default function Home({ params }: { params: { slug: string } }) {
 
   useEffect(() => {
     router.prefetch(`/maze/dirty/${params.slug}`);
+    console.log(`/maze/dirty/${params.slug}をprefetchしました。`)
   }, [])
 
   return (
