@@ -1,5 +1,5 @@
 'use client';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Box from '@mui/material/Box';
 import Modal from '@mui/material/Modal';
@@ -67,6 +67,10 @@ export default function Home() {
   async function handleGitHubClick() {
     router.push(`https://github.com/neko967/misery`);
   }
+
+  useEffect(() => {
+    router.prefetch('/misery')
+  }, [])
 
   return (
     <div
