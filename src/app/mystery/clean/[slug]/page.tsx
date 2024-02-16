@@ -604,13 +604,13 @@ export default function Home({ params }: { params: { slug: string } }) {
                         {/* passwordAttempted が false の場合のみ「確認」ボタンを表示 */}
                         {!passwordAttempted && (
                           <button
-                            className="btn btn-neutral border-none cursor-pointer text-center text-x1"
+                            className="btn btn-warning border-none cursor-pointer text-center text-lg"
                             onClick={handleSubmit}>
                             確認
                           </button>
                         )}
                         <button
-                          className="btn btn-warning border-none cursor-pointer text-center text-xl ml-4"
+                          className="btn btn-neutral border-none cursor-pointer text-center text-lg ml-4"
                           onClick={handleCancel}>
                           やめる
                         </button>
