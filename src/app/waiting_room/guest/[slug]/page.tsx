@@ -70,6 +70,10 @@ export default function Home({ params }: { params: { slug: string } }) {
     }
   }
 
+  useEffect(() => {
+    router.prefetch(`/prologue/guest/${params.slug}`);
+  }, [])
+
   return (
     <div
       className="h-screen w-full bg-cover bg-center"
