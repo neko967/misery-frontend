@@ -72,6 +72,10 @@ export default function Home({ params }: { params: { slug: string } }) {
     }
   }
 
+  useEffect(() => {
+    router.prefetch(`/prologue/host/${params.slug}`);
+  }, [])
+
   return (
     <div
       className="h-screen w-full bg-cover bg-center"
