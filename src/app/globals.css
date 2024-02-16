@@ -145,35 +145,6 @@ body {
   border: 2px solid #000;
 }
 
-.reset {
-  /* 見た目 */
-  background: #000000; 
-  color: #fff;
-  border: 1px solid #000000; 
-  border-radius: 25px;
-  box-shadow: 0 2px 2px rgba(0,0,0,0.1);
-  
-  width: 120px;
-  /* サイズ */
-  padding: 10px 20px 10px 20px;
-  font-size: 15px;
-
-  /* 位置 */  
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-/* ホバー時 */
-.reset:hover {
-  background-color: #ffffff;
-  color: #000000;
-}
-
 .close {
   color: #aaaaaa;
   float: right;
